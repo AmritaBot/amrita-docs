@@ -1,10 +1,13 @@
 ---
 layout: home
-
 hero:
   name: "Amrita"
   text: "基于 NoneBot 的 LLM 聊天机器人框架"
   tagline: 强大、灵活、开箱即用的聊天机器人解决方案
+  image:
+    src: /Amrita.png
+    alt: 项目 Logo
+
   actions:
     - theme: brand
       text: 开始探索

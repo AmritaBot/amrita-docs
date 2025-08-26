@@ -14,7 +14,7 @@ export default withMermaid({
       "link",
       {
         rel: "icon",
-        href: "/Amrita.jpg",
+        href: "/Amrita.png",
       },
     ],
   ],
@@ -25,7 +25,7 @@ export default withMermaid({
       { text: "首页", link: "/" },
       { text: "开始", link: "/amrita" },
     ],
-    logo: "/Amrita.jpg",
+    logo: "/Amrita.png",
 
     sidebar: [
       {
