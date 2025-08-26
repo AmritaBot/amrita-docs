@@ -1,6 +1,6 @@
 # 快速开始
 
-**Amrita WebUI 是 Amrita 的原生WebUI实现，基于FastAPI开发。**
+**Amrita WebUI 是 Amrita 的原生 WebUI 实现，基于 FastAPI 开发。**
 
 ## 配置
 

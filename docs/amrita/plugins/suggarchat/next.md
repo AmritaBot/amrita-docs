@@ -1,7 +1,6 @@
-# 对于已对SuggarChat有所熟悉用户，这个页面将提供更多的功能说明
+# 对于已对 SuggarChat 有所熟悉用户，这个页面将提供更多的功能说明
 
 传入 LLM 的信息格式如下，（这里提供了 use_base_prompt 选项，如果启用了可以忽略，这个选项将自动在你的 prompt 前插入内容，对消息段作出解释）：
-
 
 <details><summary>点击查看详细格式</summary>
 可解析的消息段：文字，at，合并转发
@@ -208,11 +207,11 @@ user_daily_token_limit = 100000  # 单个用户每日最大token消耗量
 [extra]
 ```
 
-## Cookie检测
+## Cookie 检测
 
 通过检测特定字符串是否包含在模型输出来检测提示词是否泄露
 
-请在提示词文件写入`{cookie}`，(可用占位符：`{cookie}`,`{self_id}`,`{user_id}`)(最好在人设部分，这样如果Cookie泄露了人设差不多也出来了。)并配置配置文件的Cookie部分。
+请在提示词文件写入`{cookie}`，(可用占位符：`{cookie}`,`{self_id}`,`{user_id}`)(最好在人设部分，这样如果 Cookie 泄露了人设差不多也出来了。)并配置配置文件的 Cookie 部分。
 
 ## 模型预设
 
@@ -237,7 +236,7 @@ user_daily_token_limit = 100000  # 单个用户每日最大token消耗量
 - `name`: 预设的名字，用于在插件中选择使用。
 - `base_url`: OpenAI 协议 API URL，默认为空。
 - `api_key`: OpenAI 协议 API 密钥，默认为空。
-- `procotol`: 预设的协议，默认为****main****，其他协议请阅读对应的文档。
+- `procotol`: 预设的协议，默认为\***\*main\*\***，其他协议请阅读对应的文档。
 - `extra`: 扩展配置文件
 
 ### 模型预设使用方法
@@ -270,4 +269,4 @@ user_daily_token_limit = 100000  # 单个用户每日最大token消耗量
 | **/sessions** 管理指令             | `set <编号>` 覆盖当前会话<br>`del <编号>` 删除会话<br>`archive` 归档当前会话<br>`clear` 清空所有会话 | 高级会话管理功能（需管理员权限）           |
 | **/debug**                         | 无                                                                                                   | 开发者调试模式开关（需管理员权限）         |
 | **/fakepeople**                    | on/off                                                                                               | 群内自动回复开关                           |
-| **/insights**                    | -                                                                                               | 今日用户用量统计                           |
+| **/insights**                      | -                                                                                                    | 今日用户用量统计                           |

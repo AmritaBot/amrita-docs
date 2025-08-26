@@ -152,7 +152,7 @@ WEBUI_PASSWORD=your_secure_password
 ### 网络安全
 
 1. 限制访问来源
-2. 使用 HTTPS代理到Amrita WebUI
+2. 使用 HTTPS 代理到 Amrita WebUI
 3. 定期更新依赖
 
 ## 🧪 故障排除
@@ -191,6 +191,6 @@ ulimit -m 1048576  # 1GB
 
 ### 数据库优化
 
-对于 SQLite 数据库，性能存在较大瓶颈，我们建议您使用MySQL 或 PostgreSQL 来提高性能。
+对于 SQLite 数据库，性能存在较大瓶颈，我们建议您使用 MySQL 或 PostgreSQL 来提高性能。
 
 现在您已经了解了如何部署 Amrita 机器人。接下来可以查看 [功能用法](./advanced-usage.md) 了解更多高级用法。

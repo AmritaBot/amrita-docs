@@ -2,9 +2,9 @@
 
 ## 内置权限节点
 
-| 权限节点 | 权限描述 |
-| --- | --- |
-| `liteperm.admin` | LitePerm管理员 |
+| 权限节点         | 权限描述        |
+| ---------------- | --------------- |
+| `liteperm.admin` | LitePerm 管理员 |
 
 ## [指令文档](./docs/commands)
 

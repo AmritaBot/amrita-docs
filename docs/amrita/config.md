@@ -18,7 +18,7 @@
 | WEBUI_ENABLE       | true                    | 是否启用 WebUI           |
 | WEBUI_USER_NAME    | admin                   | WebUI 用户名             |
 | WEBUI_PASSWORD     | admin123                | WebUI 密码               |
-| ADMIN_GROUP        | 无默认值                | 管理员群组         |
+| ADMIN_GROUP        | 无默认值                | 管理员群组               |
 
 ### Amrita 配置
 

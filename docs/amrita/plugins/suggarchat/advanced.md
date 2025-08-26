@@ -185,7 +185,7 @@
 
 ### 规范
 
-适配器规范定义了适配器应该实现的功能，用作与模型沟通的桥梁，在3.2.0进行了重构。继承自ModelAdapter时会自动注册模型适配器，您无需手动实现注册。
+适配器规范定义了适配器应该实现的功能，用作与模型沟通的桥梁，在 3.2.0 进行了重构。继承自 ModelAdapter 时会自动注册模型适配器，您无需手动实现注册。
 
 exapmle:
 
@@ -201,16 +201,15 @@ class YourAdapter(ModelAdapter):
 
     async def call_api(self, messages: Iterable[Any]) -> UniResponse:
         ...
-    
+
     async def call_tools(self, tools: Iterable[Any], tool_choice: ...) -> UniResponse:
         ...
         # 可选实现
-    
+
     def get_adapter_protocol() -> str | tuple[str, ...]:
         ...
 
 ```
-
 
 ## SuggarMatcher
 
