@@ -194,13 +194,17 @@ from nonebot import require
 from typing import Any, Iterable
 require("nonebot_plugin_suggarchat")
 
-from nonebot_plugin_suggarchat.API import ModelAdapter
+from nonebot_plugin_suggarchat.API import ModelAdapter, UniResponse
 
 class YourAdapter(ModelAdapter):
     # 需要实现call_api方法以及get_adapter_protocol()静态方法
 
-    async def call_api(self, messages: Iterable[Any]) -> str:
+    async def call_api(self, messages: Iterable[Any]) -> UniResponse:
         ...
+    
+    async def call_tools(self, tools: Iterable[Any], tool_choice: ...) -> UniResponse:
+        ...
+        # 可选实现
     
     def get_adapter_protocol() -> str | tuple[str, ...]:
         ...
@@ -256,5 +260,3 @@ async def _(event: ChatEvent):
 
 
 ```
-
-更多示例代码请参考插件源码测试用例处。

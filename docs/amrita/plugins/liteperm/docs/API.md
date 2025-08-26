@@ -1,6 +1,6 @@
 # API 文档
 
-`nonebot-plugin-liteperm.api.rules`
+`amrita.plugins.perm.api.rules`
 
 ## `PermissionChecker` 基类
 

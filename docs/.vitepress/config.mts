@@ -6,130 +6,72 @@ import { withMermaid } from "vitepress-plugin-mermaid";
 export default withMermaid({
   lastUpdated: true,
   ignoreDeadLinks: true,
-  title: "LiteSuggar",
-  description: "LiteSuggarDEV文档中心",
+  title: "Amrita",
+  description: "Amrita文档中心",
   head: [
     // 添加图标
     [
       "link",
       {
         rel: "icon",
-        href: "/Suggar.png",
+        href: "/Amrita.jpg",
       },
     ],
   ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    siteTitle: "LiteSuggarDEV文档中心",
+    siteTitle: "Amrita文档中心",
     nav: [
       { text: "首页", link: "/" },
-      { text: "开始", link: "/next" },
+      { text: "开始", link: "/amrita" },
     ],
-    logo: "/Suggar.png",
+    logo: "/Amrita.jpg",
 
     sidebar: [
       {
-        text: "目录",
+        text: "指南",
         items: [
-          { text: "前言", link: "/next" },
+          { text: "项目介绍", link: "/amrita/" },
+          { text: "快速开始", link: "/amrita/quick-start" },
+          { text: "部署", link: "/amrita/deployment" },
+          { text: "高级用法", link: "/amrita/advanced-usage" },
+          { text: "高级功能", link: "/amrita/advanced-features" },
+        ],
+      },
+      { text: "配置", items: [{ text: "配置", link: "/amrita/config" }] },
+      {
+        text: "API参考",
+        items: [{ text: "API参考", link: "/amrita/api/reference" }],
+      },
+      {
+        text: "插件",
+        items: [
           {
-            text: "原创形象",
-            link: "/project/oc/",
+            text: "Liteperm",
             items: [
-              { text: "Suggar", link: "/project/oc/suggar" },
-              { text: "KiriwaKosuzu", link: "/project/oc/kosuzu" },
+              { text: "简介", link: "/amrita/plugins/liteperm/" },
+              { text: "命令", link: "/amrita/plugins/liteperm/docs/commands" },
+              { text: "API", link: "/amrita/plugins/liteperm/docs/API" },
             ],
           },
           {
-            text: "机器人项目",
+            text: "Suggarchat",
             items: [
-              {
-                text: "LiteBot-NEO",
-                link: "/project/LiteBot/",
-                items: [
-                  { text: "简介", link: "/project/LiteBot/" },
-                  { text: "功能", link: "/project/LiteBot/menu" },
-                ],
-              },
-              {
-                text: "Suggar-NEO",
-                link: "/project/Suggar/",
-                items: [{ text: "简介", link: "/project/Suggar/" }],
-              },
+              { text: "简介", link: "/amrita/plugins/suggarchat/" },
+              { text: "进阶介绍", link: "/amrita/plugins/suggarchat/next" },
+              { text: "高级功能", link: "/amrita/plugins/suggarchat/advanced" },
             ],
           },
-          {
-            text: "插件项目",
-            items: [
-              {
-                text: "SuggarChat",
-                link: "/project/suggarchat",
-                items: [
-                  { text: "快速开始", link: "/project/suggarchat/quick-start" },
-                  { text: "进阶", link: "/project/suggarchat/next" },
-                  { text: "高级", link: "/project/suggarchat/advanced" },
-                ],
-              },
-              {
-                text: "SuggarChat-CF",
-                link: "/project/suggarchat-ada-cf",
-                items: [{ text: "开始", link: "/project/suggarchat-ada-cf" }],
-              },
-              {
-                text: "EconomyValue",
-                link: "/project/value",
-                items: [
-                  {
-                    text: "api",
-                    link: "/project/value/docs/api",
-                    items: [
-                      {
-                        text: "标准 API",
-                        link: "/project/value/docs/apis/standard",
-                      },
-                      {
-                        text: "服务层 API",
-                        link: "/project/value/docs/apis/advanced",
-                      },
-                      {
-                        text: "底层 API",
-                        link: "/project/value/docs/apis/kernel",
-                      },
-                      {
-                        text: "依赖注入",
-                        link: "/project/value/docs/apis/depends",
-                      },
-                      {
-                        text: "事件钩子",
-                        link: "/project/value/docs/apis/hooks",
-                      },
-                      {
-                        text: "迁移工具",
-                        link: "/project/value/docs/apis/migration",
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                text: "LitePerm",
-                link: "/project/liteperm",
-                items: [
-                  { text: "指令", link: "/project/liteperm/docs/commands" },
-                  { text: "API", link: "/project/liteperm/docs/API" },
-                ],
-              },
-            ],
-          },
+          { text: "WebUI", link: "/amrita/plugins/webui/" },
         ],
       },
     ],
     footer: {
-      message: `MIT License 发布 ，角色设定/提示词内容使用 CC-BY-NC-SA-4.0 协议授权`,
-      copyright: `© LiteSuggarDEV 2024-${new Date().getFullYear()}`,
+      message: `MIT License 发布`,
+      copyright: `© Amrita 2025-${new Date().getFullYear()}`,
     },
     socialLinks: [
-      { icon: "github", link: "https://github.com/LiteSuggarDEV/docs" },
+      { icon: "github", link: "https://github.com/LiteSuggarDEV/amrita-docs" },
     ],
   },
   mermaidPlugin: {
