@@ -192,9 +192,9 @@ exapmle:
 ```python
 from nonebot import require
 from typing import Any, Iterable
-require("nonebot_plugin_suggarchat")
+require("amrita.plugins.chat")
 
-from nonebot_plugin_suggarchat.API import ModelAdapter, UniResponse
+from amrita.plugins.chat.API import ModelAdapter, UniResponse
 
 class YourAdapter(ModelAdapter):
     # 需要实现call_api方法以及get_adapter_protocol()静态方法
@@ -219,14 +219,14 @@ class YourAdapter(ModelAdapter):
 from nonebot import logger
 from nonebot.plugin import require
 
-require("nonebot_plugin_suggarchat")
-from nonebot_plugin_suggarchat.event import (
+require("amrita.plugins.chat")
+from amrita.plugins.chat.event import (
     BeforeChatEvent,
     BeforePokeEvent,
     ChatEvent,
     PokeEvent,
 )
-from nonebot_plugin_suggarchat.on_event import (
+from amrita.plugins.chat.on_event import (
     on_before_chat,
     on_before_poke,
     on_chat,

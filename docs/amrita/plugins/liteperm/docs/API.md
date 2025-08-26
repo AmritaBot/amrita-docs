@@ -75,7 +75,7 @@ GroupEvent: TypeAlias = (
 ## 使用示例
 
 ```python
-from nonebot_plugin_liteperm.rules import UserPermissionChecker, GroupPermissionChecker
+from amrita.plugins.perm.rules import UserPermissionChecker, GroupPermissionChecker
 
 # 创建用户权限检查器
 user_perm_checker = UserPermissionChecker(permission="plugin.admin")
