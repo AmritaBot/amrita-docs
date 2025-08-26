@@ -193,4 +193,4 @@ ulimit -m 1048576  # 1GB
 
 对于 SQLite 数据库，性能存在较大瓶颈，我们建议您使用 MySQL 或 PostgreSQL 来提高性能。
 
-现在您已经了解了如何部署 Amrita 机器人。接下来可以查看 [功能用法](./advanced-usage.md) 了解更多高级用法。
+现在您已经了解了如何部署 Amrita 机器人。接下来可以查看 [功能用法](./advanced-usage) 了解更多高级用法。

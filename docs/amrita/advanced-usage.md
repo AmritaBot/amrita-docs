@@ -189,4 +189,4 @@ DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/amrita
 RATE_LIMIT=5
 ```
 
-现在您已经了解了 Amrita 的进阶功能。接下来可以查看 [高级功能](advanced-features.md) 了解更多扩展开发内容。
+现在您已经了解了 Amrita 的进阶功能。接下来可以查看 [高级功能](advanced-features) 了解更多扩展开发内容。

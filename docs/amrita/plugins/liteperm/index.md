@@ -8,4 +8,4 @@
 
 ## [指令文档](./docs/commands)
 
-## [API 文档](./docs/API.md)
+## [API 文档](./docs/API)

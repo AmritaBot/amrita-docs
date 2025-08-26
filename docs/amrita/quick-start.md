@@ -113,7 +113,7 @@ mybot/
 ├── .env.dev             # 开发环境配置
 ├── .env.prod            # 生产环境配置
 ├── .gitignore           # Git 忽略文件
-├── README.md            # 项目说明
+├── README            # 项目说明
 ├── pyproject.toml       # 项目配置文件
 ├── plugins/             # 插件目录
 ├── data/                # 数据目录
@@ -132,4 +132,4 @@ mybot/
 | `amrita proj-info`          | 显示项目信息         |
 | `amrita nb`                 | 直接运行 nb-cli 命令 |
 
-现在您已经成功安装并创建了第一个 Amrita 项目！接下来可以查看 [部署指南](deployment.md) 了解如何部署您的机器人。
+现在您已经成功安装并创建了第一个 Amrita 项目！接下来可以查看 [部署指南](deployment) 了解如何部署您的机器人。

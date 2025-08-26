@@ -12,4 +12,4 @@ Amrita 完全兼容 NoneBot2 的插件系统，您可以使用 NoneBot2 的插�
 
 ---
 
-现在您已经了解了 Amrita 的高级功能。有关详细的 API 参考，请查看 [API 参考](../api/reference.md)。
+现在您已经了解了 Amrita 的高级功能。有关详细的 API 参考，请查看 [API 参考](./api/reference)。
