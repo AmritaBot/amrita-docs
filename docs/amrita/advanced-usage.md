@@ -138,93 +138,9 @@ DISABLE_BUILTIN_MENU=false
 
 chat 插件支持多种大语言模型，关于 LLM 功能配置请参考[文档](./plugins/suggarchat)
 
-### 会话配置
-
-```dotenv
-# 最大会话历史长度
-SESSION_MAX_LENGTH=10
-
-# 默认模型
-DEFAULT_MODEL=gpt-3.5-turbo
-
-# 系统提示词
-SYSTEM_PROMPT="你是一个 helpful 的助手"
-```
-
 ## 🔐 权限系统
 
-### 权限组管理
-
-perm 插件提供基于权限节点的权限管理：
-
-```bash
-# 创建权限组
-/amrita perm group create <group_name>
-
-# 为权限组添加权限节点
-/amrita perm group add-node <group_name> <node_name>
-
-# 为用户分配权限组
-/amrita perm user assign-group <user_id> <group_name>
-```
-
-### 权限节点
-
-权限节点采用分层结构：
-
-```
-amrita
-├── chat
-│   ├── send
-│   └── history
-├── perm
-│   ├── group
-│   └── user
-└── manager
-    ├── ban
-    └── status
-```
-
-## 🌐 适配器配置
-
-### OneBot V11 适配器
-
-默认配置支持 OneBot V11 协议：
-
-```dotenv
-# 正向 WebSocket 连接
-ONEBOT_V11_WS_URL=ws://127.0.0.1:6700/
-
-# 反向 WebSocket 连接
-ONEBOT_V11_RWS_HOST=0.0.0.0
-ONEBOT_V11_RWS_PORT=8081
-```
-
-### 多适配器支持
-
-可以通过配置启用多个适配器：
-
-```toml
-[tool.nonebot]
-adapters = [
-    { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11" },
-    { name = "Telegram", module_name = "nonebot.adapters.telegram" },
-]
-```
-
-## 🌍 国际化支持
-
-Amrita 支持多语言界面：
-
-```dotenv
-# 设置语言
-LANGUAGE=zh_CN
-```
-
-支持的语言：
-
-- `zh_CN` - 简体中文
-- `en_US` - 英语
+请阅读 [权限系统](./plugins/perm) 文档。
 
 ## 📊 WebUI 配置
 
@@ -233,21 +149,13 @@ LANGUAGE=zh_CN
 ```dotenv
 # 启用 WebUI
 WEBUI_ENABLE=true
-
-# WebUI 访问地址
-WEBUI_HOST=0.0.0.0
-WEBUI_PORT=8082
 ```
 
 ### 用户认证
 
 ```dotenv
-# WebUI 用户名和密码
 WEBUI_USER_NAME=admin
 WEBUI_PASSWORD=your_secure_password
-
-# 密码加密盐值
-WEBUI_PASSWORD_SALT=your_salt_value
 ```
 
 ## 🧠 数据库配置
@@ -261,37 +169,15 @@ DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
 ### PostgreSQL
 
 ```dotenv
+# 需要额外安装asyncpg
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/amrita
 ```
 
 ### MySQL
 
 ```dotenv
+# 需要额外安装aiomysql
 DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/amrita
-```
-
-## 📈 性能调优
-
-### 连接池配置
-
-```dotenv
-# 数据库连接池大小
-DATABASE_POOL_SIZE=20
-DATABASE_MAX_OVERFLOW=0
-
-# HTTP 连接池
-HTTP_POOL_CONNECTIONS=100
-HTTP_POOL_MAXSIZE=1000
-```
-
-### 缓存配置
-
-```dotenv
-# Redis 缓存
-REDIS_URL=redis://localhost:6379/0
-
-# 内存缓存大小
-CACHE_SIZE=1000
 ```
 
 ## 🛡️ 安全配置
@@ -299,24 +185,8 @@ CACHE_SIZE=1000
 ### 请求限制
 
 ```dotenv
-# 全局限速
+# 会话限速
 RATE_LIMIT=5
-
-# IP 限速
-IP_RATE_LIMIT=100
-
-# 用户限速
-USER_RATE_LIMIT=50
-```
-
-### 内容过滤
-
-```dotenv
-# 敏感词过滤
-SENSITIVE_WORDS=["badword1", "badword2"]
-
-# 消息长度限制
-MAX_MESSAGE_LENGTH=1000
 ```
 
 现在您已经了解了 Amrita 的进阶功能。接下来可以查看 [高级功能](advanced-features.md) 了解更多扩展开发内容。
