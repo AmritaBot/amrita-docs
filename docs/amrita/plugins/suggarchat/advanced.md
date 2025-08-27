@@ -259,3 +259,7 @@ async def _(event: ChatEvent):
 
 
 ```
+
+## Function Calling(`amrita.plugins.chat.API`)
+
+请见[Function Calling](./function_calling)一章

@@ -60,6 +60,10 @@ export default withMermaid({
               { text: "简介", link: "/amrita/plugins/suggarchat/" },
               { text: "进阶介绍", link: "/amrita/plugins/suggarchat/next" },
               { text: "高级功能", link: "/amrita/plugins/suggarchat/advanced" },
+              {
+                text: "Tools调用",
+                link: "/amrita/plugins/suggarchat/function_calling",
+              },
             ],
           },
           { text: "WebUI", link: "/amrita/plugins/webui/" },
