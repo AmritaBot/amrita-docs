@@ -36,6 +36,7 @@ export default withMermaid({
           { text: "部署", link: "/amrita/deployment" },
           { text: "高级用法", link: "/amrita/advanced-usage" },
           { text: "高级功能", link: "/amrita/advanced-features" },
+          { text: "社区支持", link: "/amrita/community" },
         ],
       },
       { text: "配置", items: [{ text: "配置", link: "/amrita/config" }] },
