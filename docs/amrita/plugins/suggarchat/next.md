@@ -167,8 +167,6 @@ after_deleted_say_what = [  # 消息被撤回后的随机回复列表
 # ========================
 [admin]
 allow_send_to_admin = false  # 是否允许向管理群发送系统消息
-admin_group = 0  # 管理群组ID（0表示未设置）
-admins = []  # 管理员用户ID列表
 
 # ========================
 #   大语言模型(LLM)配置
@@ -190,6 +188,8 @@ enable_tools = true  # 是否启用外部工具调用功能
 enable_report = true  # 是否启用NSFW内容举报工具
 report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
+agent_mode_enable = false # 使用使用实验性的智能体模式
+agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
 
 # ========================
 #      使用限额配置
