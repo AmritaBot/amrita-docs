@@ -4,7 +4,7 @@
 
 ## 加入 QQ 群
 
-如果您在使用 Amrita 的过程中遇到问题，或者想要与其他用户交流经验，欢迎加入我们的 QQ 群：
+Amrita 是 [LiteSuggarDEV](https://docs.suggar.top) 的附属团队，如果您在使用 Amrita 的过程中遇到问题，或者想要与其他用户交流经验，欢迎加入我们的 QQ 群：
 
 - QQ 群：812849068
 - QQ 群链接：[点击链接加入群聊【LiteSuggarDEV】](https://qm.qq.com/q/W1VFK6rJgy)

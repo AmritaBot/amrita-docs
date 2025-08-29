@@ -77,7 +77,7 @@ export default withMermaid({
       copyright: `© Amrita 2025-${new Date().getFullYear()}`,
     },
     socialLinks: [
-      { icon: "github", link: "https://github.com/LiteSuggarDEV/amrita-docs" },
+      { icon: "github", link: "https://github.com/AmritaBot/amrita-docs" },
     ],
   },
   mermaidPlugin: {

@@ -14,7 +14,7 @@ hero:
       link: /amrita/
     - theme: alt
       text: 前往GitHub
-      link: https://github.com/LiteSuggarDEV/Amrita
+      link: https://github.com/AmritaBot/Amrita
 
 features:
   - title: 多模型支持

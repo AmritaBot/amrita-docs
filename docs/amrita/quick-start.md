@@ -24,7 +24,7 @@ uv pip install amrita
 
 ```bash
 # 克隆项目
-git clone https://github.com/LiteSuggarDEV/Amrita.git
+git clone https://github.com/AmritaBot/Amrita.git
 cd Amrita
 
 # 安装
