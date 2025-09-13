@@ -41,58 +41,9 @@ amrita run
    amrita run
    ```
 
-### Docker 部署
+### 一键部署脚本/容器化部署
 
-创建 Dockerfile：
-
-```dockerfile
-FROM python:3.10-slim
-
-WORKDIR /app
-
-COPY . .
-
-RUN pip install amrita[full]
-
-EXPOSE 8080
-
-CMD ["amrita", "run"]
-```
-
-构建并运行容器：
-
-```bash
-docker build -t amrita-bot .
-docker run -d -p 8080:8080 --name mybot amrita-bot
-```
-
-### 使用 Docker Compose
-
-创建 `docker-compose.yml`：
-
-```yaml
-version: "3.8"
-
-services:
-  amrita:
-    build: .
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./data:/app/data
-      - ./config:/app/config
-    environment:
-      - ENVIRONMENT=prod
-      - HOST=0.0.0.0
-      - PORT=8080
-      - ADMIN_GROUP=123456789
-```
-
-运行服务：
-
-```bash
-docker-compose up -d
-```
+请参考[仓库](https://github.com/AmritaBot/AmritaScript)
 
 ## ⚙️ 环境配置
 
