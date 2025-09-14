@@ -45,7 +45,7 @@ export default withMermaid({
         items: [{ text: "API参考", link: "/amrita/api/reference" }],
       },
       {
-        text: "插件",
+        text: "模块",
         items: [
           {
             text: "Liteperm",
@@ -67,7 +67,15 @@ export default withMermaid({
               },
             ],
           },
-          { text: "WebUI", link: "/amrita/plugins/webui/" },
+          {
+            text: "WebUI",
+            link: "/amrita/plugins/webui/",
+            items: [
+              { text: "介绍", link: "/amrita/plugins/webui/" },
+              { text: "页面开发", link: "/amrita/plugins/webui/DEV" },
+              { text: "前端API", link: "/amrita/plugins/webui/frontendAPI" },
+            ],
+          },
           { text: "Menu", link: "/amrita/plugins/menu/" },
         ],
       },
