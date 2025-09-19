@@ -6,8 +6,8 @@
 
 Amrita 是 [LiteSuggarDEV](https://docs.suggar.top) 的附属团队，如果您在使用 Amrita 的过程中遇到问题，或者想要与其他用户交流经验，欢迎加入我们的 QQ 群：
 
-- QQ 群：1002495699
-- QQ 群链接：[点击链接加入群聊【LiteSuggarDEV】](https://qm.qq.com/q/ZhjhxB8MSW)
+- QQ 群：1006893368
+- QQ 群链接：[点击链接加入群聊【「雾见茶屋」：](https://qm.qq.com/q/IvG8Dm7W4m)
 
 在 QQ 群中，您可以：
 
