@@ -48,7 +48,7 @@ export default withMermaid({
         text: "模块",
         items: [
           {
-            text: "Liteperm",
+            text: "权限模块",
             items: [
               { text: "简介", link: "/amrita/plugins/liteperm/" },
               { text: "命令", link: "/amrita/plugins/liteperm/docs/commands" },
@@ -56,7 +56,7 @@ export default withMermaid({
             ],
           },
           {
-            text: "Suggarchat",
+            text: "聊天模块",
             items: [
               { text: "简介", link: "/amrita/plugins/suggarchat/" },
               { text: "详细介绍", link: "/amrita/plugins/suggarchat/next" },
@@ -74,6 +74,7 @@ export default withMermaid({
               { text: "介绍", link: "/amrita/plugins/webui/" },
               { text: "页面开发", link: "/amrita/plugins/webui/DEV" },
               { text: "前端API", link: "/amrita/plugins/webui/frontendAPI" },
+              { text: "CSS组件库", link: "/amrita/plugins/webui/css" },
             ],
           },
           { text: "Menu", link: "/amrita/plugins/menu/" },

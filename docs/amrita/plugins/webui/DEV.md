@@ -141,62 +141,6 @@ async def dashboard(ctx: PageContext) -> HTMLResponse:
     )
 ```
 
-对应的模板文件 (dashboard.html) 示例：
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>仪表板 - Amrita 管理后台</title>
-    {% include "components/head.html" %}
-  </head>
-  <body>
-    <div class="wrapper">
-      {% include "components/sidebar.html" %}
-      <div class="main-panel">
-        {% include "components/header.html" %}
-        <div class="content">
-          <div class="container-fluid">
-            <h1>欢迎使用 Amrita 管理后台</h1>
-            <!-- 页面内容 -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
-```
-
-在模板中，可以通过 `sidebar_items` 变量访问侧边栏数据：
-
-```html
-<!-- 侧边栏渲染示例 -->
-{% for category in sidebar_items %}
-<li class="nav-item {% if category.active %}active{% endif %}">
-  <a class="nav-link" href="{{ category.url or '#' }}">
-    {% if category.icon %}
-    <i class="{{ category.icon }}"></i>
-    {% endif %}
-    <p>{{ category.name }}</p>
-  </a>
-  {% if category.children %}
-  <ul class="nav">
-    {% for item in category.children %}
-    <li class="nav-item {% if item.active %}active{% endif %}">
-      <a class="nav-link" href="{{ item.url }}">
-        {% if item.icon %}
-        <i class="{{ item.icon }}"></i>
-        {% endif %}
-        <span>{{ item.name }}</span>
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-</li>
-{% endfor %}
-```
-
 ## 最佳实践
 
 1. **页面组织**: 将相关功能的页面放在同一分类下，提高用户体验
