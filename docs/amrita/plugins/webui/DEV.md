@@ -119,35 +119,72 @@ AuthManager 提供用户认证相关功能。
 
 TokenManager 负责管理访问令牌。
 
+## 页面开发 API
+
+### TemplatesManager
+
+TemplatesManager 是一个单例类，用于管理页面模板。
+**主要方法**
+
+- `add_templates_dir(dir_path: Path)`: 添加模板目录
+- `get_templates_dir() -> list[Path]`: 获取模板目录列表
+- `get_templates() -> Jinja2Templates`: 获取模板对象
+- `get_base_html_path() -> Path`: 基本 HTML 模板路径
+
 ## 页面开发示例
 
 以下是一个完整的页面开发示例：
 
 ```python
-from fastapi.responses import HTMLResponse
-from amrita.plugins.webui.API import on_page, PageContext
-from amrita.plugins.webui.service.main import templates
+from pathlib import Path
 
-@on_page("/dashboard", "仪表板", "控制台", "fa fa-dashboard")
-async def dashboard(ctx: PageContext) -> HTMLResponse:
-    # 使用模板渲染页面
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": ctx.request,
-            "sidebar_items": ctx.get_sidebar(),
-            "custom_data": get_some_data(),
-        }
+from amrita.plugins.webui.API import (
+    PageContext,
+    PageResponse,
+    TemplatesManager,
+    on_page,
+)
+
+# 添加模板目录
+TemplatesManager().add_templates_dir(
+    Path(__file__).resolve().parent / "templates_example"
+)
+
+
+# 创建页面
+@on_page(path="/path/to/your/page", page_name="我的Amrita 页面", category="其他功能")
+async def _(ctx: PageContext):
+    return PageResponse(
+        name="my_page.html.jinja2", context={"title": "我的Amrita 页面"}
     )
+
+```
+
+以下是一个示例页面模板：
+
+```html
+{%extends base_html%} {% block title %}我的Amrita页面{% endblock %} {% block
+topbar_title %}我的页面{% endblock %} {% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">我的页面</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 ```
 
 ## 最佳实践
 
 1. **页面组织**: 将相关功能的页面放在同一分类下，提高用户体验
-2. **权限控制**: 在页面处理函数中使用 `ctx.auth.check_current_user()` 验证用户权限
-3. **错误处理**: 为页面添加适当的错误处理机制
-4. **性能优化**: 对于数据量大的页面，考虑添加分页或懒加载功能
+2. **错误处理**: 为页面添加适当的错误处理机制
+3. **性能优化**: 对于数据量大的页面，考虑添加分页或懒加载功能
 
-## 前端API
+## 前端 API
 
-请参考[前端API](./frontendAPI.md)
+请参考[前端 API](./frontendAPI.md)

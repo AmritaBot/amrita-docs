@@ -1,360 +1,184 @@
-# Amrita CSS组件库文档
-
-本文档详细介绍了Amrita项目Web界面中使用的CSS组件和样式规范。
+# 管理仪表板组件库文档
 
 ## 目录
 
-1. [颜色变量](#颜色变量)
-2. [布局组件](#布局组件)
-   - [仪表板容器](#仪表板容器)
-   - [侧边栏](#侧边栏)
-   - [顶部导航栏](#顶部导航栏)
-   - [主要内容区](#主要内容区)
-3. [UI组件](#ui组件)
-   - [卡片](#卡片)
-   - [按钮](#按钮)
-   - [表单元素](#表单元素)
-   - [表格](#表格)
-   - [警告框](#警告框)
-   - [标签页](#标签页)
-   - [信息卡片](#信息卡片)
-   - [图表组件](#图表组件)
-   - [日志组件](#日志组件)
-4. [功能组件](#功能组件)
-   - [加载条](#加载条)
-5. [响应式设计](#响应式设计)
+- [概述](#概述)
+- [主题与变量](#主题与变量)
+- [布局组件](#布局组件)
+  - [仪表板容器](#仪表板容器)
+  - [侧边栏](#侧边栏)
+  - [主内容区域](#主内容区域)
+  - [顶部导航栏](#顶部导航栏)
+- [基础组件](#基础组件)
+  - [卡片](#卡片)
+  - [按钮](#按钮)
+  - [表格](#表格)
+  - [表单元素](#表单元素)
+  - [警告框](#警告框)
+- [信息展示组件](#信息展示组件)
+  - [信息网格](#信息网格)
+  - [信息卡片](#信息卡片)
+  - [图表卡片](#图表卡片)
+  - [状态指示器](#状态指示器)
+- [导航组件](#导航组件)
+  - [菜单项](#菜单项)
+  - [子菜单](#子菜单)
+  - [标签页](#标签页)
+- [工具类](#工具类)
+- [响应式设计](#响应式设计)
+- [使用示例](#使用示例)
 
-## 颜色变量
+## 概述
 
-Amrita使用CSS变量来管理颜色，支持浅色和深色主题。
+这是 Amrita 的管理仪表板组件库，提供完整的亮色/暗色主题支持，响应式设计和丰富的 UI 组件。所有组件都采用 CSS 变量实现主题定制。
 
-### 浅色主题变量
+## 主题与变量
+
+组件库使用 CSS 变量实现主题系统，支持亮色和暗色模式切换。
+
+### 亮色主题变量
 
 ```css
 :root {
-  --primary-color: #3498db;      /* 主色调 */
-  --secondary-color: #2980b9;    /* 辅助色调 */
-  --accent-color: #1abc9c;       /* 强调色 */
-  --text-color: #333;            /* 文字颜色 */
-  --text-light: #fff;            /* 浅色文字 */
-  --bg-color: #f8f9fa;           /* 背景颜色 */
-  --sidebar-bg: #2c3e50;         /* 侧边栏背景 */
-  --sidebar-hover: #34495e;      /* 侧边栏悬停背景 */
-  --header-height: 60px;         /* 顶部栏高度 */
-  --transition-speed: 0.3s;      /* 过渡动画速度 */
+  --primary-color: #3498db;
+  --secondary-color: #2980b9;
+  --accent-color: #1abc9c;
+  --text-color: #333;
+  --text-light: #fff;
+  --bg-color: #f8f9fa;
+  --sidebar-bg: #2c3e50;
+  --sidebar-hover: #34495e;
+  --header-height: 60px;
+  --transition-speed: 0.3s;
 }
 ```
 
-### 深色主题变量
+### 暗色主题变量
 
 ```css
 :root {
-  --dark-bg-color: #1a1a1a;         /* 深色背景 */
-  --dark-text-color: #f0f0f0;       /* 深色文字 */
-  --dark-sidebar-bg: #121212;       /* 深色侧边栏背景 */
-  --dark-sidebar-hover: #1e1e1e;    /* 深色侧边栏悬停 */
-  --dark-header-bg: #2d2d2d;        /* 深色顶部栏背景 */
-  --dark-card-bg: #252525;          /* 深色卡片背景 */
-  --dark-button-bg: #3b424b;        /* 深色按钮背景 */
-  --dark-border-color: #444;        /* 深色边框 */
+  --dark-bg-color: #1a1a1a;
+  --dark-text-color: #f0f0f0;
+  --dark-sidebar-bg: #121212;
+  --dark-sidebar-hover: #1e1e1e;
+  --dark-header-bg: #2d2d2d;
+  --dark-card-bg: #252525;
+  --dark-button-bg: #3b424b;
+  --dark-border-color: #444;
 }
+```
+
+### 主题切换
+
+通过给 body 添加/移除`.dark-mode`类来切换主题：
+
+```javascript
+document.body.classList.toggle("dark-mode");
 ```
 
 ## 布局组件
 
 ### 仪表板容器
 
-仪表板容器是整个页面的根布局容器，使用Flex布局。
+仪表板的主要容器，采用 flex 布局。
 
 ```html
 <div class="dashboard-container">
-  <!-- 侧边栏和主要内容 -->
+  <!-- 侧边栏和主内容 -->
 </div>
-```
-
-```css
-.dashboard-container {
-  display: flex;
-  min-height: 100vh;
-}
 ```
 
 ### 侧边栏
 
-侧边栏位于页面左侧，包含导航菜单。
+左侧导航栏，可折叠。
 
 ```html
-<div class="sidebar">
+<aside class="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-logo"></div>
-    <div class="sidebar-title">Amrita</div>
-  </div>
-  <div class="sidebar-menu">
-    <div class="menu-item">
-      <a class="menu-link" href="#">
-        <div class="menu-icon">图标</div>
-        <div class="menu-text">菜单项</div>
-        <div class="menu-arrow">></div>
-      </a>
-      <div class="submenu">
-        <div class="submenu-item">
-          <a class="submenu-link" href="#">子菜单项</a>
-        </div>
-      </div>
+    <div class="sidebar-logo">
+      <!-- 图标或logo -->
     </div>
+    <div class="sidebar-title">标题</div>
   </div>
-</div>
+  <nav class="sidebar-menu">
+    <!-- 菜单项 -->
+  </nav>
+</aside>
 ```
 
-```css
-.sidebar {
-  width: 250px;
-  background: var(--sidebar-bg);
-  color: var(--text-light);
-  transition: width var(--transition-speed);
-  overflow-y: auto;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 1000;
-}
+**状态类**：
 
-.sidebar.collapsed {
-  width: 60px;
-}
+- `.collapsed` - 侧边栏折叠状态
+
+### 主内容区域
+
+右侧主要内容区域。
+
+```html
+<main class="main-content">
+  <!-- 顶部导航栏和内容 -->
+</main>
 ```
+
+**状态类**：
+
+- `.expanded` - 侧边栏折叠时主内容扩展状态
 
 ### 顶部导航栏
 
-顶部导航栏位于页面顶部，包含页面标题和用户操作按钮。
+顶部固定导航栏。
 
 ```html
-<div class="topbar">
+<header class="topbar">
   <div class="topbar-left">
-    <button class="toggle-sidebar">☰</button>
-    <div class="topbar-title">页面标题</div>
+    <button class="toggle-sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+    <h1 class="topbar-title">页面标题</h1>
   </div>
   <div class="topbar-right">
-    <button class="theme-toggle">🌙</button>
-    <div class="user-info">
-      <div class="user-avatar">U</div>
-      <div class="user-name">用户名</div>
-      <button class="logout-btn">⇥</button>
-    </div>
+    <!-- 用户信息和操作 -->
   </div>
-</div>
+</header>
 ```
 
-```css
-.topbar {
-  height: var(--header-height);
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
-```
-
-### 主要内容区
-
-主要内容区位于侧边栏右侧，包含页面的主要内容。
-
-```html
-<div class="main-content">
-  <div class="content">
-    <!-- 页面内容 -->
-  </div>
-</div>
-```
-
-```css
-.main-content {
-  flex: 1;
-  margin-left: 250px;
-  transition: margin-left var(--transition-speed);
-}
-
-.main-content.expanded {
-  margin-left: 60px;
-}
-```
-
-## UI组件
+## 基础组件
 
 ### 卡片
 
-卡片是页面中最基本的容器组件，用于组织相关内容。
+通用卡片容器，用于内容分组。
 
 ```html
 <div class="card">
   <div class="card-header">
     <h2 class="card-title">卡片标题</h2>
+    <!-- 可选操作按钮 -->
   </div>
-  <div class="card-body">
-    <!-- 卡片内容 -->
-  </div>
+  <!-- 卡片内容 -->
 </div>
-```
-
-```css
-.card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 20px;
-  transition: box-shadow 0.3s;
-}
-
-.card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.card-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--primary-color);
-}
 ```
 
 ### 按钮
 
-提供多种样式的按钮组件。
+多种样式的按钮组件。
 
 ```html
+<button>默认按钮</button>
 <button class="btn-primary">主要按钮</button>
 <button class="btn-danger">危险按钮</button>
 <button class="btn-success">成功按钮</button>
-<button class="refresh-btn">刷新按钮</button>
-```
-
-```css
-button {
-  padding: 8px 16px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.btn-primary:hover {
-  background-color: #2980b9;
-  border-color: #2980b9;
-}
-
-.btn-danger {
-  background-color: #e74c3c;
-  color: white;
-  border-color: #e74c3c;
-}
-
-.btn-danger:hover {
-  background-color: #c0392b;
-  border-color: #c0392b;
-}
-
-.btn-success {
-  background-color: #27ae60;
-  color: white;
-  border-color: #27ae60;
-}
-
-.btn-success:hover {
-  background-color: #219653;
-  border-color: #219653;
-}
-
-.refresh-btn {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  transition: background 0.3s;
-}
-```
-
-### 表单元素
-
-包含输入框、选择框、文本域等表单组件。
-
-```html
-<div class="form-group">
-  <label class="form-label">标签</label>
-  <input type="text" class="form-input">
-  <select class="form-select">
-    <option>选项1</option>
-    <option>选项2</option>
-  </select>
-  <textarea class="form-textarea"></textarea>
-</div>
-```
-
-```css
-input,
-select,
-textarea {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 0.2rem rgba(26, 188, 156, 0.25);
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-}
 ```
 
 ### 表格
 
-用于展示结构化数据的表格组件。
+数据表格样式。
 
 ```html
 <table>
   <thead>
     <tr>
-      <th>列1</th>
-      <th>列2</th>
+      <th>表头1</th>
+      <th>表头2</th>
     </tr>
   </thead>
   <tbody>
@@ -366,406 +190,247 @@ textarea:focus {
 </table>
 ```
 
-```css
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+### 表单元素
 
-table th,
-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
+输入框、选择框和文本域。
 
-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #555;
-}
+```html
+<div class="form-group">
+  <label class="form-label">输入框</label>
+  <input type="text" placeholder="请输入内容" />
+</div>
 
-table tr:last-child td {
-  border-bottom: none;
-}
+<div class="form-group">
+  <label class="form-label">选择框</label>
+  <select>
+    <option>选项1</option>
+    <option>选项2</option>
+  </select>
+</div>
 
-table tr:nth-child(even) {
-  background-color: #f8f9fa;
-}
+<div class="form-group">
+  <label class="form-label">文本域</label>
+  <textarea placeholder="请输入内容"></textarea>
+</div>
 ```
 
 ### 警告框
 
-用于显示不同类型的消息提示。
+不同状态的提示信息。
 
 ```html
-<div class="alert alert-success">成功消息</div>
-<div class="alert alert-danger">错误消息</div>
-<div class="alert alert-warning">警告消息</div>
+<div class="alert alert-success">成功提示</div>
+<div class="alert alert-danger">错误提示</div>
+<div class="alert alert-warning">警告提示</div>
 ```
 
-```css
-.alert {
-  padding: 12px 15px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-}
+## 信息展示组件
 
-.alert-success {
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
-  color: #155724;
-}
+### 信息网格
 
-.alert-danger {
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
-}
+网格布局的信息容器。
 
-.alert-warning {
-  background-color: #fff3cd;
-  border: 1px solid #ffeaa7;
-  color: #856404;
-}
+```html
+<div class="info-grid">
+  <div class="info-card">...</div>
+  <div class="info-card">...</div>
+</div>
 ```
+
+### 信息卡片
+
+用于展示键值对信息。
+
+```html
+<div class="info-card">
+  <h4>卡片标题</h4>
+  <div class="info-item">
+    <span class="info-label">标签</span>
+    <span class="info-value">值</span>
+  </div>
+  <!-- 更多信息项 -->
+</div>
+```
+
+### 图表卡片
+
+用于放置图表或数据可视化。
+
+```html
+<div class="chart-card">
+  <div class="chart-container">
+    <!-- 图表内容 -->
+    <div class="gauge-container">
+      <div class="gauge-title">标题</div>
+      <div id="gauge"></div>
+      <div class="gauge-value">值</div>
+    </div>
+  </div>
+</div>
+```
+
+### 状态指示器
+
+用于显示状态信息。
+
+```html
+<span class="status-online">在线</span> <span class="status-offline">离线</span>
+```
+
+## 导航组件
+
+### 菜单项
+
+侧边栏菜单项。
+
+```html
+<div class="menu-item">
+  <a href="#" class="menu-link">
+    <span class="menu-icon"><i class="fas fa-icon"></i></span>
+    <span class="menu-text">菜单项</span>
+    <span class="menu-arrow"><i class="fas fa-angle-right"></i></span>
+  </a>
+</div>
+```
+
+**状态类**：
+
+- `.active` - 当前激活的菜单项
+- `.open` - 展开的菜单项（对于有子菜单的项）
+
+### 子菜单
+
+菜单项下的子菜单。
+
+```html
+<div class="submenu">
+  <div class="submenu-item">
+    <a href="#" class="submenu-link">子菜单项</a>
+  </div>
+  <!-- 更多子菜单项 -->
+</div>
+```
+
+**状态类**：
+
+- `.active` - 当前激活的子菜单项
 
 ### 标签页
 
-用于在同一区域展示不同内容的标签页组件。
+标签页导航组件。
 
 ```html
 <div class="tabs-container">
   <div class="tab active">标签1</div>
   <div class="tab">标签2</div>
 </div>
-<div class="tab-content active">
-  <!-- 标签1内容 -->
-</div>
-<div class="tab-content">
-  <!-- 标签2内容 -->
-</div>
+
+<div class="tab-content active">内容1</div>
+<div class="tab-content">内容2</div>
 ```
 
-```css
-.tabs-container {
-  display: flex;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #ddd;
-}
-
-.tab {
-  padding: 10px 20px;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: all 0.3s;
-  color: #555;
-}
-
-.tab.active {
-  border-bottom-color: var(--primary-color);
-  color: var(--primary-color);
-  font-weight: 500;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-```
-
-### 信息卡片
-
-用于展示关键信息的卡片组件。
-
-```html
-<div class="info-grid">
-  <div class="info-card">
-    <div class="card-header">
-      <h3 class="card-title">信息标题</h3>
-    </div>
-    <div class="info-item">
-      <span class="info-label">标签</span>
-      <span class="info-value">值</span>
-    </div>
-  </div>
-</div>
-```
-
-```css
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.info-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  margin-bottom: 20px;
-  margin-top: 10px;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f5f5f5;
-}
-
-.info-item:last-child {
-  border-bottom: none;
-}
-
-.info-label {
-  color: #777;
-  font-weight: 500;
-}
-
-.info-value {
-  font-weight: 600;
-}
-```
-
-### 图表组件
-
-用于展示图表数据的容器组件。
-
-```html
-<div class="charts-grid">
-  <div class="chart-card">
-    <div class="card-header">
-      <h3 class="card-title">图表标题</h3>
-    </div>
-    <div class="chart-container">
-      <div class="gauge-container">
-        <div class="gauge-title">图表说明</div>
-        <div class="gauge-value">值</div>
-      </div>
-    </div>
-  </div>
-</div>
-```
-
-```css
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.chart-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 10px;
-}
-
-.chart-container {
-  margin: 35px;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.gauge-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.gauge-title {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: #777;
-}
-
-.gauge-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--primary-color);
-  margin-top: 10px;
-}
-```
-
-### 日志组件
-
-用于展示日志信息的组件。
-
-```html
-<div class="log-container">
-  <div class="log-header">
-    <h3 class="log-title">日志标题</h3>
-  </div>
-  <div class="log-content">
-    <div class="log-line">
-      <span class="log-timestamp">时间戳</span>
-      <span class="log-info">日志信息</span>
-    </div>
-  </div>
-</div>
-```
-
-```css
-.log-container {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 20px;
-  margin-top: 20px;
-}
-
-.log-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.log-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--primary-color);
-}
-
-.log-content {
-  background: #f8f9fa;
-  border-radius: 5px;
-  padding: 15px;
-  font-family: "Courier New", Courier, monospace;
-  font-size: 13px;
-  line-height: 1.5;
-  max-height: 400px;
-  overflow-y: auto;
-  color: #333;
-}
-
-.log-line {
-  margin-bottom: 5px;
-}
-
-.log-line:last-child {
-  margin-bottom: 0;
-}
-
-.log-timestamp {
-  color: #6c757d;
-}
-
-.log-info {
-  color: #2c3e50;
-}
-
-.log-warning {
-  color: #f39c12;
-}
-
-.log-error {
-  color: #e74c3c;
-}
-```
-
-## 功能组件
+## 工具类
 
 ### 加载条
 
-页面加载时显示的进度条组件。
+页面顶部加载进度指示器。
 
 ```html
 <div class="loading-bar"></div>
 ```
 
-```css
-.loading-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 0%;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  z-index: 9999;
-  transition: width 0.3s ease;
-  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-}
+**状态类**：
 
-.loading-bar.hidden {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
+- `.hidden` - 隐藏加载条
+
+### 刷新按钮
+
+带有图标的刷新按钮。
+
+```html
+<button class="refresh-btn"><i class="fas fa-sync-alt"></i> 刷新</button>
 ```
 
 ## 响应式设计
 
-Amrita使用媒体查询实现响应式设计，适配不同屏幕尺寸。
+组件库内置响应式设计，针对不同屏幕尺寸有相应的适配。
 
-```css
-@media (max-width: 768px) {
-  /* 移动端样式 */
-  .sidebar {
-    width: 0;
-    overflow-x: hidden;
-  }
-  
-  .main-content {
-    margin-left: 0;
-  }
-  
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-}
+### 断点
 
-@media (max-width: 480px) {
-  /* 小屏幕移动端样式 */
-  .topbar {
-    padding: 0 10px;
-  }
-  
-  .user-name {
-    display: none;
-  }
-}
+- 移动设备: `max-width: 768px`
+- 小屏幕设备: `max-width: 480px`
 
-@media (min-width: 769px) {
-  /* 桌面端样式 */
-}
+### 响应式行为
+
+- 在移动设备上，侧边栏默认隐藏，可通过按钮展开
+- 表格和卡片在小屏幕上调整布局
+- 信息网格和图表网格在小屏幕上变为单列布局
+
+## 使用示例
+
+### 基本布局结构
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>管理控制台</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* 组件库CSS内容 */
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="sidebar-title">管理控制台</div>
+        </div>
+        <nav class="sidebar-menu">
+          <!-- 菜单项 -->
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <!-- 顶部导航 -->
+        </header>
+
+        <div class="loading-bar"></div>
+
+        <div class="content">
+          <!-- 页面内容 -->
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // 主题切换，哦当然这里都在base.html里，这里就不重复了
+    </script>
+  </body>
+</html>
 ```
 
-## 深色主题支持
+## 浏览器支持
 
-所有组件都支持深色主题，通过添加`body.dark-mode`类来激活。
+此组件库支持所有现代浏览器，包括：
 
-```css
-body.dark-mode .card {
-  background: var(--dark-card-bg);
-  border: 1px solid var(--dark-border-color);
-}
+- Chrome 60+
+- Firefox 60+
+- Safari 12+
+- Edge 79+
 
-body.dark-mode .card-title {
-  color: var(--accent-color);
-}
+## 注意事项
 
-/* 其他深色主题样式 */
-```
-
-要切换深色主题，只需在body元素上添加或移除`dark-mode`类。
+1. 使用前需要引入 Font Awesome 图标库
+2. 暗色主题需要手动添加`.dark-mode`类到 body 元素
+3. 侧边栏折叠功能需要自行实现 JavaScript 逻辑
+4. 图表组件需要额外引入图表库(如 Chart.js、ECharts 等)
