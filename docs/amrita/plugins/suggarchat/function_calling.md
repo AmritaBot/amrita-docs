@@ -101,11 +101,11 @@ ToolsManager().register_tool(tool_data)
 
 ### 常规调用
 
-<details><summary>点击查看类型</summary>
+::: details 点击查看类型
 
 您的函数应为：`Callable[dict[str, Any], Awaitable[str]]`
 
-</details>
+:::
 
 常规函数调用功能需要您实现一个函数，该函数将接收一个参数，为`dict[str, Any]`，并返回一个字符串，该字符串包含函数调用的返回值，将被加入模型上下文。
 
@@ -126,11 +126,11 @@ ToolsManager().register_tool(tool_data)
 
 自定义运行模式允许您更加自由地运行函数，并可选返回值。
 
-<details><summary>点击查看类型</summary>
+::: details 点击查看类型
 
 您的函数应为：`Callable[[ToolContext], Awaitable[str | None]]`
 
-</details>
+:::
 
 ```python
 from amrita.plugins.chat.API import ToolData, ToolsManager, ToolFunctionSchema, ToolContext

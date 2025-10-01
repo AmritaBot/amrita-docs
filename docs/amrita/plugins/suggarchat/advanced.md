@@ -1,6 +1,6 @@
 # Sugarchat API 文档
 
-<details>
+::: details
 
 ## Config 类
 
@@ -176,7 +176,7 @@
 
 - Any: LLM 响应内容
 
-</details>
+:::
 
 ## 适配器
 

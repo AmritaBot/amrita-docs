@@ -8,7 +8,7 @@
 
 ## 用户权限管理
 
-<details>
+::: details
 
 ### `lp.user` - 用户权限管理
 
@@ -42,11 +42,11 @@
 | `add` | `lp.user <ID> perm_group add <权限组>` | `lp.user 123 perm_group add vip`   | 添加用户到权限组 |
 | `del` | `lp.user <ID> perm_group del <权限组>` | `lp.user 123 perm_group del guest` | 从权限组移除用户 |
 
-</details>
+:::
 
 ## 群组权限管理
 
-<details>
+::: details
 
 ### `lp.group` - 群组权限管理
 
@@ -80,11 +80,11 @@
 | `add` | `lp.group <ID> perm_group add <权限组>` | `lp.group 456 perm_group add vip`   | 添加群组到权限组 |
 | `del` | `lp.group <ID> perm_group del <权限组>` | `lp.group 456 perm_group del guest` | 从权限组移除群组 |
 
-</details>
+:::
 
 ## 权限组管理
 
-<details>
+::: details
 
 ### `lp.perm_group` - 权限组管理
 
@@ -118,7 +118,7 @@
 | `create` | `lp.perm_group <组名> to create` | `lp.perm_group new_group to create` | 创建新权限组 |
 | `remove` | `lp.perm_group <组名> to remove` | `lp.perm_group old_group to remove` | 删除权限组   |
 
-</details>
+:::
 
 ## 通用参数说明
 

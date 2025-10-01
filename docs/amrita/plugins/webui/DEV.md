@@ -43,7 +43,7 @@ def on_page(
 - `category` (str, optional): 页面所属的分类，默认为"其他功能"
 - `icon` (str | None, optional): 页面图标，用于在侧边栏中显示
 
-:::tips
+::: tip
 
 注意：如果分类(`category`)**不存在**，则页面**不会**显示在侧边栏中
 
