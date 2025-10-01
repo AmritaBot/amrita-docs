@@ -43,6 +43,12 @@ def on_page(
 - `category` (str, optional): 页面所属的分类，默认为"其他功能"
 - `icon` (str | None, optional): 页面图标，用于在侧边栏中显示
 
+:::tips
+
+注意：如果分类(`category`)**不存在**，则页面**不会**显示在侧边栏中
+
+:::
+
 #### 返回值
 
 返回一个装饰器函数，用于装饰页面处理函数。
@@ -50,17 +56,12 @@ def on_page(
 #### 使用示例
 
 ```python
-@on_page("/my-page", "我的页面", "自定义分类", "fas fa-star")
-async def my_page(ctx: PageContext) -> HTMLResponse:
-    # 处理页面逻辑
-    return templates.TemplateResponse(
-        "my_page.html",
-        {
-            "request": ctx.request,
-            "sidebar_items": ctx.get_sidebar(),
-            # 其他模板变量
-        }
+@on_page(path="/path/to/your/page", page_name="我的Amrita 页面", category="其他功能")
+async def _(ctx: PageContext):
+    return PageResponse(
+        name="my_page.html.jinja2", context={"title": "我的Amrita 页面"}
     )
+
 ```
 
 在页面处理函数中，可以通过 `ctx` 参数访问请求信息、侧边栏数据和认证管理器。
