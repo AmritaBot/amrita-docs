@@ -1,14 +1,14 @@
 # 管理仪表板组件库文档
 
-## 目录
+::: details base.css
+
+### Base CSS 目录
 
 - [概述](#概述)
 - [主题与变量](#主题与变量)
 - [布局组件](#布局组件)
   - [仪表板容器](#仪表板容器)
-  - [侧边栏](#侧边栏)
   - [主内容区域](#主内容区域)
-  - [顶部导航栏](#顶部导航栏)
 - [基础组件](#基础组件)
   - [卡片](#卡片)
   - [按钮](#按钮)
@@ -20,23 +20,19 @@
   - [信息卡片](#信息卡片)
   - [图表卡片](#图表卡片)
   - [状态指示器](#状态指示器)
-- [导航组件](#导航组件)
-  - [菜单项](#菜单项)
-  - [子菜单](#子菜单)
-  - [标签页](#标签页)
 - [工具类](#工具类)
 - [响应式设计](#响应式设计)
 - [使用示例](#使用示例)
 
-## 概述
+### 概述
 
 这是 Amrita 的管理仪表板组件库，提供完整的亮色/暗色主题支持，响应式设计和丰富的 UI 组件。所有组件都采用 CSS 变量实现主题定制。
 
-## 主题与变量
+### 主题与变量
 
 组件库使用 CSS 变量实现主题系统，支持亮色和暗色模式切换。
 
-### 亮色主题变量
+###### 亮色主题变量
 
 ```css
 :root {
@@ -53,7 +49,7 @@
 }
 ```
 
-### 暗色主题变量
+###### 暗色主题变量
 
 ```css
 :root {
@@ -68,7 +64,7 @@
 }
 ```
 
-### 主题切换
+###### 主题切换
 
 通过给 body 添加/移除`.dark-mode`类来切换主题：
 
@@ -76,9 +72,9 @@
 document.body.classList.toggle("dark-mode");
 ```
 
-## 布局组件
+### 布局组件
 
-### 仪表板容器
+###### 仪表板容器
 
 仪表板的主要容器，采用 flex 布局。
 
@@ -88,29 +84,7 @@ document.body.classList.toggle("dark-mode");
 </div>
 ```
 
-### 侧边栏
-
-左侧导航栏，可折叠。
-
-```html
-<aside class="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo">
-      <!-- 图标或logo -->
-    </div>
-    <div class="sidebar-title">标题</div>
-  </div>
-  <nav class="sidebar-menu">
-    <!-- 菜单项 -->
-  </nav>
-</aside>
-```
-
-**状态类**：
-
-- `.collapsed` - 侧边栏折叠状态
-
-### 主内容区域
+###### 主内容区域
 
 右侧主要内容区域。
 
@@ -124,27 +98,9 @@ document.body.classList.toggle("dark-mode");
 
 - `.expanded` - 侧边栏折叠时主内容扩展状态
 
-### 顶部导航栏
+### 基础组件
 
-顶部固定导航栏。
-
-```html
-<header class="topbar">
-  <div class="topbar-left">
-    <button class="toggle-sidebar">
-      <i class="fas fa-bars"></i>
-    </button>
-    <h1 class="topbar-title">页面标题</h1>
-  </div>
-  <div class="topbar-right">
-    <!-- 用户信息和操作 -->
-  </div>
-</header>
-```
-
-## 基础组件
-
-### 卡片
+###### 卡片
 
 通用卡片容器，用于内容分组。
 
@@ -158,7 +114,7 @@ document.body.classList.toggle("dark-mode");
 </div>
 ```
 
-### 按钮
+###### 按钮
 
 多种样式的按钮组件。
 
@@ -169,7 +125,7 @@ document.body.classList.toggle("dark-mode");
 <button class="btn-success">成功按钮</button>
 ```
 
-### 表格
+###### 表格
 
 数据表格样式。
 
@@ -190,7 +146,7 @@ document.body.classList.toggle("dark-mode");
 </table>
 ```
 
-### 表单元素
+###### 表单元素
 
 输入框、选择框和文本域。
 
@@ -214,7 +170,7 @@ document.body.classList.toggle("dark-mode");
 </div>
 ```
 
-### 警告框
+###### 警告框
 
 不同状态的提示信息。
 
@@ -224,9 +180,9 @@ document.body.classList.toggle("dark-mode");
 <div class="alert alert-warning">警告提示</div>
 ```
 
-## 信息展示组件
+### 信息展示组件
 
-### 信息网格
+###### 信息网格
 
 网格布局的信息容器。
 
@@ -237,7 +193,7 @@ document.body.classList.toggle("dark-mode");
 </div>
 ```
 
-### 信息卡片
+###### 信息卡片
 
 用于展示键值对信息。
 
@@ -252,7 +208,7 @@ document.body.classList.toggle("dark-mode");
 </div>
 ```
 
-### 图表卡片
+###### 图表卡片
 
 用于放置图表或数据可视化。
 
@@ -269,7 +225,7 @@ document.body.classList.toggle("dark-mode");
 </div>
 ```
 
-### 状态指示器
+###### 状态指示器
 
 用于显示状态信息。
 
@@ -277,61 +233,9 @@ document.body.classList.toggle("dark-mode");
 <span class="status-online">在线</span> <span class="status-offline">离线</span>
 ```
 
-## 导航组件
+### 工具类
 
-### 菜单项
-
-侧边栏菜单项。
-
-```html
-<div class="menu-item">
-  <a href="#" class="menu-link">
-    <span class="menu-icon"><i class="fas fa-icon"></i></span>
-    <span class="menu-text">菜单项</span>
-    <span class="menu-arrow"><i class="fas fa-angle-right"></i></span>
-  </a>
-</div>
-```
-
-**状态类**：
-
-- `.active` - 当前激活的菜单项
-- `.open` - 展开的菜单项（对于有子菜单的项）
-
-### 子菜单
-
-菜单项下的子菜单。
-
-```html
-<div class="submenu">
-  <div class="submenu-item">
-    <a href="#" class="submenu-link">子菜单项</a>
-  </div>
-  <!-- 更多子菜单项 -->
-</div>
-```
-
-**状态类**：
-
-- `.active` - 当前激活的子菜单项
-
-### 标签页
-
-标签页导航组件。
-
-```html
-<div class="tabs-container">
-  <div class="tab active">标签1</div>
-  <div class="tab">标签2</div>
-</div>
-
-<div class="tab-content active">内容1</div>
-<div class="tab-content">内容2</div>
-```
-
-## 工具类
-
-### 加载条
+###### 加载条
 
 页面顶部加载进度指示器。
 
@@ -343,7 +247,7 @@ document.body.classList.toggle("dark-mode");
 
 - `.hidden` - 隐藏加载条
 
-### 刷新按钮
+###### 刷新按钮
 
 带有图标的刷新按钮。
 
@@ -351,24 +255,24 @@ document.body.classList.toggle("dark-mode");
 <button class="refresh-btn"><i class="fas fa-sync-alt"></i> 刷新</button>
 ```
 
-## 响应式设计
+### 响应式设计
 
 组件库内置响应式设计，针对不同屏幕尺寸有相应的适配。
 
-### 断点
+###### 断点
 
 - 移动设备: `max-width: 768px`
 - 小屏幕设备: `max-width: 480px`
 
-### 响应式行为
+###### 响应式行为
 
 - 在移动设备上，侧边栏默认隐藏，可通过按钮展开
 - 表格和卡片在小屏幕上调整布局
 - 信息网格和图表网格在小屏幕上变为单列布局
 
-## 使用示例
+### 使用示例
 
-### 基本布局结构
+###### 基本布局结构
 
 ```html
 <!DOCTYPE html>
@@ -419,6 +323,134 @@ document.body.classList.toggle("dark-mode");
 </html>
 ```
 
+:::
+
+::: details dash.css
+
+### Dashboard CSS 目录
+
+- [概述](#概述)
+- [组件说明](#组件说明)
+  - [统计卡片网格 (Stats Grid)](#统计卡片网格-stats-grid)
+  - [图表网格 (Charts Grid)](#图表网格-charts-grid)
+  - [最近活动 (Recent Activity)](#最近活动-recent-activity)
+- [暗黑模式支持](#暗黑模式支持)
+- [响应式设计](#响应式设计)
+
+### 概述
+
+Dashboard 组件库提供了一套完整的仪表板界面组件，包含统计卡片、图表展示和活动列表等功能模块。所有组件都支持暗黑模式和响应式设计。
+
+### 组件说明
+
+#### 统计卡片网格 (Stats Grid)
+
+##### 结构说明
+
+```html
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon [颜色类]">
+      <!-- 图标 -->
+    </div>
+    <div class="stat-info">
+      <h3>数值</h3>
+      <p>标题</p>
+    </div>
+  </div>
+  <!-- 更多统计卡片 -->
+</div>
+```
+
+##### 可用颜色类
+
+- `blue` - 蓝色主题
+- `green` - 绿色主题
+- `orange` - 橙色主题
+- `purple` - 紫色主题
+
+##### 特性
+
+- 自适应网格布局
+- 悬停动效
+- 暗黑模式支持
+
+#### 图表网格 (Charts Grid)
+
+##### 结构说明
+
+```html
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-header">
+      <div class="chart-title">图表标题</div>
+      <div class="chart-actions">
+        <!-- 操作按钮 -->
+      </div>
+    </div>
+    <div class="chart-container">
+      <!-- 图表内容 -->
+    </div>
+  </div>
+</div>
+```
+
+##### 布局选项
+
+- `charts-grid` 默认使用 2:1 的宽窄比例布局
+- 支持单列或双列布局
+
+#### 最近活动 (Recent Activity)
+
+##### 结构说明
+
+```html
+<div class="recent-activity">
+  <ul class="activity-list">
+    <li class="activity-item">
+      <div class="activity-icon [颜色类]">
+        <!-- 图标 -->
+      </div>
+      <div class="activity-content">
+        <div class="activity-title">活动标题</div>
+        <div class="activity-desc">活动描述</div>
+        <div class="activity-time">时间</div>
+      </div>
+    </li>
+  </ul>
+  <div class="activity-pagination">
+    <!-- 分页控件 -->
+  </div>
+</div>
+```
+
+##### 可用颜色类
+
+- `yellow`, `purple`, `red`, `blue`, `green`, `orange`
+
+##### 分页组件
+
+包含页面信息显示、页面大小选择器和分页按钮。
+
+### 暗黑模式支持
+
+所有组件都支持暗黑模式，需要在 `body` 元素上添加 `dark-mode` 类：
+
+```javascript
+// 切换暗黑模式
+document.body.classList.toggle("dark-mode");
+```
+
+### 响应式设计
+
+#### 断点说明
+
+- **768px 以下**: 单列布局，分页控件垂直排列
+- **480px 以下**: 完全移动端优化布局
+- **769px 以上**: 四列统计卡片网格
+
+:::
+
 ## 浏览器支持
 
 此组件库支持所有现代浏览器，包括：
@@ -434,3 +466,4 @@ document.body.classList.toggle("dark-mode");
 2. 暗色主题需要手动添加`.dark-mode`类到 body 元素
 3. 侧边栏折叠功能需要自行实现 JavaScript 逻辑
 4. 图表组件需要额外引入图表库(如 Chart.js、ECharts 等)
+5. 在 base.html 中已经引入了样式文件，所以不需要再在 extra_head 中重复引入
