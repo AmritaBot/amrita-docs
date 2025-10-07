@@ -20,15 +20,13 @@ Amrita 是 [LiteSuggarDEV](https://docs.suggar.top) 的附属团队，如果您�
 
 ### 为什么不能启动？
 
-最常见的原因是未正确配置 ADMIN_GROUP 参数。在生产环境中，您必须在环境变量中设置 ADMIN_GROUP，错误信息将会向这个群推送。
+::: tip
 
-请检查您的配置文件（如`.env.prod`）中是否已正确填写 ADMIN_GROUP 参数：
+从`0.3.5`开始, `ADMIN_GROUP` 变量不再强制要求填写，未填写时推送消息将以Warning方式提示在控制台。
 
-```dotenv
-ADMIN_GROUP=123456789  # 请替换为实际的管理员群组ID
-```
+:::
 
-此外，还需要检查以下配置：
+需要检查以下配置：
 
 - 确保已安装完整依赖：`amrita check-dependencies`
 - 检查环境变量是否正确配置

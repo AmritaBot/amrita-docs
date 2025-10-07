@@ -33,7 +33,7 @@ amrita run
    ENVIRONMENT=prod
    HOST=0.0.0.0
    PORT=8080
-   ADMIN_GROUP=123456789 # 必填，错误信息将会向这个群推送。
+   ADMIN_GROUP=123456789 # 建议填写，错误信息与审查信息将会向这个群推送。
    ```
 
 2. 运行生产环境：
@@ -95,7 +95,7 @@ WEBUI_PASSWORD=your_secure_password
   WEBUI_PASSWORD=your_strong_password
   ```
 
-- 设置管理员群组：
+- 设置管理员群组(建议填写)：
   ```dotenv
   ADMIN_GROUP=123456789
   ```

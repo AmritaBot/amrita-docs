@@ -118,14 +118,11 @@ session_control_history = 10  # 会话历史记录最大保存条数
 session_max_tokens = 5000  # 单次会话上下文最大token容量
 
 # ========================
-#     安全与内容审查
+#     电子水印检测功能
 # ========================
 [cookies]
 cookie = ""  # 用于安全检测的Cookie字符串
 enable_cookie = false  # 是否启用Cookie泄露检测机制
-block_msg = [  # 触发安全熔断时随机返回的提示消息
-    # ...(内置回复)
-]
 
 # ========================
 #      自动回复设置
@@ -181,6 +178,9 @@ enable_tokens_limit = true  # 是否启用上下文长度限制
 llm_timeout = 60  # API请求超时时间（秒）
 auto_retry = true  # 请求失败时自动重试
 max_retries = 3  # 最大重试次数
+block_msg = [  # 触发安全熔断时随机返回的提示消息
+    # ...(内置回复)
+]
 
 # 工具调用子系统
 [llm_config.tools]
@@ -200,6 +200,8 @@ group_daily_limit = 100  # 单个群组每日最大使用次数
 user_daily_limit = 100  # 单个用户每日最大使用次数
 group_daily_token_limit = 200000  # 单个群组每日最大token消耗量
 user_daily_token_limit = 100000  # 单个用户每日最大token消耗量
+total_daily_limit = 1000 # 总使用次数限制
+total_daily_token_limit = 100000 # 总使用token消耗量限制
 
 # ========================
 #       扩展预留区

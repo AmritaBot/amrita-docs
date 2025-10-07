@@ -149,7 +149,7 @@ run()
 
 ## 📊 WebUI API
 
-此处请参考 WebUI 的 SwaggerUI.
+此处请参考 [WebUI 文档](../plugins//webui/)
 
 ## 🧩 插件开发 API
 

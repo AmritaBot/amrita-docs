@@ -139,18 +139,6 @@
 
 ---
 
-### set_admin_group()
-
-**参数**
-
-- `group_id` (int): 群组 ID
-
-**返回**
-
-- Admin: 支持链式调用的实例
-
----
-
 ## Chat 类
 
 ### get_msg()

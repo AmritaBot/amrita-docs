@@ -18,7 +18,7 @@
 | WEBUI_ENABLE             | bool      | true                           | 是否启用 WebUI            |
 | WEBUI_USER_NAME          | str       | admin                          | WebUI 用户名              |
 | WEBUI_PASSWORD           | str       | admin123                       | WebUI 密码                |
-| **ADMIN_GROUP**          | int       | 无默认值                       | 日志推送群组（必须配置）  |
+| **ADMIN_GROUP**          | int       | 无默认值                       | 日志推送群组（建议配置）  |
 | DISABLE_BUILTIN_MENU     | bool      | false                          | 禁用内置菜单              |
 | PUBLIC_GROUP             | int       | 无默认值                       | 公开群组                  |
 | DISABLED_BUILTIN_PLUGINS | List[str] | []                             | 禁用内置插件              |
