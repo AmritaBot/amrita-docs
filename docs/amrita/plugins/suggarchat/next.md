@@ -1,4 +1,4 @@
-# 对于已对 SuggarChat 有所熟悉用户，这个页面将提供更多的功能说明
+# 详细说明
 
 传入 LLM 的信息格式如下，（这里提供了 use_base_prompt 选项，如果启用了可以忽略，这个选项将自动在你的 prompt 前插入内容，对消息段作出解释）：
 
@@ -147,6 +147,10 @@ enable_group_chat = true  # 是否启用群聊功能
 enable_private_chat = true  # 是否启用私聊功能
 allow_custom_prompt = true  # 是否允许用户自定义提示词
 use_user_nickname = false  # 在群聊中使用QQ昵称而非群名片
+chat_pending_mode = "queue" # 当同一个Session实例进行会话(私聊/群聊视为一个Session)时，并发下所使用的模式。
+# queue: 队列模式，等待前一条消息处理完后继续；
+# single: 单个模式，仅处理当前消息，不处理后续消息；
+# single_with_report: 单个模式，但是回复用户一条消息表示正在处理。
 
 # ========================
 #      扩展行为设置
@@ -190,6 +194,7 @@ report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
 agent_mode_enable = false # 使用使用实验性的智能体模式
 agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
+agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理。
 
 # ========================
 #      使用限额配置
