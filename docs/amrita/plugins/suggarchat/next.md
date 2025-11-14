@@ -237,7 +237,7 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 }
 ```
 
-### 解释：
+### 解释
 
 - `model`: 使用的模型，默认为 auto，即自动选择。
 - `name`: 预设的名字，用于在插件中选择使用。
@@ -268,7 +268,7 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 | **/del_memory** 系列指令           | 无                                                                                                   | 删除当前会话的聊天上下文                   |
 | **/enable_chat** 或 **/启用聊天**  | 无                                                                                                   | 在群聊中启用聊天功能（需管理员权限）       |
 | **/disable_chat** 或 **/禁用聊天** | 无                                                                                                   | 在群聊中禁用聊天功能（需管理员权限）       |
-| **/prompt**                        | `--(show)` 展示当前提示词<br>`--(clear)` 清空提示词<br>`--(set) [文本]` 设置提示词                   | 管理自定义提示词（支持 Markdown 格式）     |
+| **/prompt**                        | `--(show)` 展示当前extra提示词<br>`--(clear)` 清空提示词<br>`--(set) [文本]` 设置提示词                   | 管理自定义提示词（支持 Markdown 格式）     |
 | **/presets**                       | 无                                                                                                   | 查看可用模型预设列表                       |
 | **/set_preset** 系列指令           | `[模型预设名称]`                                                                                     | 设置使用的模型预设（不填参数则重置为默认） |
 | **/choose_prompt**                 | `group` 查看群组预设<br>`private` 查看私聊预设<br>`[提示词预设名称]` 设置预设                        | 选择群组/私聊提示词预设                    |
@@ -276,4 +276,5 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 | **/sessions** 管理指令             | `set <编号>` 覆盖当前会话<br>`del <编号>` 删除会话<br>`archive` 归档当前会话<br>`clear` 清空所有会话 | 高级会话管理功能（需管理员权限）           |
 | **/debug**                         | 无                                                                                                   | 开发者调试模式开关（需管理员权限）         |
 | **/fakepeople**                    | on/off                                                                                               | 群内自动回复开关                           |
-| **/insights**                      | -                                                                                                    | 今日用户用量统计                           |
+| **/insights**                      | [global]                                                                                                    | 今日用户/全局用量统计                           |
+| **/test_preset** | [-d\|--details] | 测试所有预设 |
