@@ -148,10 +148,10 @@ Agent 模式的核心是工具调用循环，其实现如下：
 
 `````text
 观察结果:
-\```text
+```text
 tool_name1: result1
 tool_name2: result2
-\````
+```
 
 请基于以上工具执行结果继续完成任务，如果任务已完成请使用工具 'completion' 结束。
 
