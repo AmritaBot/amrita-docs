@@ -40,10 +40,7 @@ export default withMermaid({
         ],
       },
       { text: "配置", items: [{ text: "配置", link: "/amrita/config" }] },
-      {
-        text: "API参考",
-        items: [{ text: "API参考", link: "/amrita/api/reference" }],
-      },
+
       {
         text: "模块",
         items: [
@@ -78,6 +75,19 @@ export default withMermaid({
             ],
           },
           { text: "Menu", link: "/amrita/plugins/menu/" },
+        ],
+      },
+      {
+        text: "API参考",
+        items: [{ text: "API参考", link: "/amrita/api/reference" }],
+      },
+      {
+        text: "最佳实践",
+        items: [
+          { text: "充分利用Agent功能", link: "/amrita/best-practice/agent" },
+          { text: "连接到MCP服务器", link: "/amrita/best-practice/mcp" },
+          { text: "提示工程", link: "/amrita/best-practice/prompt" },
+          { text: "配置Amrita", link: "/amrita/best-practice/config" },
         ],
       },
     ],

@@ -63,6 +63,7 @@ at+文字：
 ```
 
 ---
+
 戳一戳消息：
 
 ```plaintext
@@ -188,13 +189,17 @@ block_msg = [  # 触发安全熔断时随机返回的提示消息
 
 # 工具调用子系统
 [llm_config.tools]
-enable_tools = true  # 是否启用外部工具调用功能
-enable_report = true  # 是否启用NSFW内容举报工具
+enable_tools = true  # 是否启用外部工具调用功能（关闭此选项不影响内容审查系统）
+enable_report = true  # 是否启用内容审查系统
+report_exclude_system_prompt = false # 是否排除系统提示词
+report_exclude_context = false # 是否排除上下文
 report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
-agent_mode_enable = false # 使用使用实验性的智能体模式
+agent_mode_enable = false # 使用智能体模式
 agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
 agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理。
+agent_mcp_client_enable = true # 是否启用MCP客户端
+agent_mcp_server_scripts = [] # MCP服务端脚本列表
 
 # ========================
 #      使用限额配置
@@ -268,7 +273,7 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 | **/del_memory** 系列指令           | 无                                                                                                   | 删除当前会话的聊天上下文                   |
 | **/enable_chat** 或 **/启用聊天**  | 无                                                                                                   | 在群聊中启用聊天功能（需管理员权限）       |
 | **/disable_chat** 或 **/禁用聊天** | 无                                                                                                   | 在群聊中禁用聊天功能（需管理员权限）       |
-| **/prompt**                        | `--(show)` 展示当前extra提示词<br>`--(clear)` 清空提示词<br>`--(set) [文本]` 设置提示词                   | 管理自定义提示词（支持 Markdown 格式）     |
+| **/prompt**                        | `--(show)` 展示当前 extra 提示词<br>`--(clear)` 清空提示词<br>`--(set) [文本]` 设置提示词            | 管理自定义提示词（支持 Markdown 格式）     |
 | **/presets**                       | 无                                                                                                   | 查看可用模型预设列表                       |
 | **/set_preset** 系列指令           | `[模型预设名称]`                                                                                     | 设置使用的模型预设（不填参数则重置为默认） |
 | **/choose_prompt**                 | `group` 查看群组预设<br>`private` 查看私聊预设<br>`[提示词预设名称]` 设置预设                        | 选择群组/私聊提示词预设                    |
@@ -276,5 +281,9 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 | **/sessions** 管理指令             | `set <编号>` 覆盖当前会话<br>`del <编号>` 删除会话<br>`archive` 归档当前会话<br>`clear` 清空所有会话 | 高级会话管理功能（需管理员权限）           |
 | **/debug**                         | 无                                                                                                   | 开发者调试模式开关（需管理员权限）         |
 | **/fakepeople**                    | on/off                                                                                               | 群内自动回复开关                           |
-| **/insights**                      | [global]                                                                                                    | 今日用户/全局用量统计                           |
-| **/test_preset** | [-d\|--details] | 测试所有预设 |
+| **/insights**                      | [global]                                                                                             | 今日用户/全局用量统计                      |
+| **/test_preset**                   | [-d\|--details]                                                                                      | 测试所有预设                               |
+| **/mcp_stats**                     | [-d\|--details]                                                                                      | 获取 MCP 状态                              |
+| **/add_mcp_server**                | <server_script>                                                                                      | 添加 MCP 服务器                            |
+| **/del_mcp_server**                | <server_script>                                                                                      | 删除 MCP 服务器                            |
+| **/mcp_reload**                    | -                                                                                                    | 重载 MCP 服务                              |
