@@ -284,6 +284,4 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 | **/insights**                      | [global]                                                                                             | 今日用户/全局用量统计                      |
 | **/test_preset**                   | [-d\|--details]                                                                                      | 测试所有预设                               |
 | **/mcp_stats**                     | [-d\|--details]                                                                                      | 获取 MCP 状态                              |
-| **/add_mcp_server**                | <server_script>                                                                                      | 添加 MCP 服务器                            |
-| **/del_mcp_server**                | <server_script>                                                                                      | 删除 MCP 服务器                            |
-| **/mcp_reload**                    | -                                                                                                    | 重载 MCP 服务                              |
+| **/mcp**                | stats [-d\|--details]<br>add <server_script><br>del <server_script><br>reload                                                                                     | 管理MCP服务                            |
