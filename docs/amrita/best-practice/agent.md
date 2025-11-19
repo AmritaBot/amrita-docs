@@ -34,7 +34,7 @@ Agent 模式的工作流程如下：
 [llm_config.tools]
 agent_mode_enable = true # 启用Agent模式
 agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
-agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理。
+agent_thought_mode = "chat"  # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理；reasoning-optional 可选的reasoning；reasoning-required 每轮工具调用一定进行reasoning。
 ...
 ```
 
