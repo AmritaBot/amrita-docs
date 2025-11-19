@@ -197,7 +197,7 @@ report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
 agent_mode_enable = false # 使用智能体模式
 agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
-agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理。
+agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理；reasoning-optional 可选的reasoning；reasoning-required 每轮工具调用一定进行reasoning。
 agent_mcp_client_enable = true # 是否启用MCP客户端
 agent_mcp_server_scripts = [] # MCP服务端脚本列表
 
