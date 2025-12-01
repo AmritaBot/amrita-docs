@@ -29,8 +29,6 @@ cd Amrita
 
 # 安装
 pip install .
-# 或安装完整依赖
-pip install .[full]
 ```
 
 ## 🏗️ 创建项目
@@ -39,7 +37,7 @@ pip install .[full]
 
 ```bash
 # 创建新项目
-amrita create mybot
+amrita create
 
 # 进入项目目录
 cd mybot
