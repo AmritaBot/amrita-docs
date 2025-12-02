@@ -5,7 +5,7 @@
 ## 📋 系统要求
 
 - Python 3.10 或更高版本
-- pip 或 uv (推荐使用 uv)
+- pip 或 uv 
 - 支持的系统: Windows, macOS, Linux
 
 ## 🚀 安装方式
@@ -13,11 +13,8 @@
 ### 方法一：使用 pip 安装（推荐）
 
 ```bash
-# 安装 Amrita CLI 工具
+# 安装 Amrita CLI 工具，对于操作系统全局环境的Python，请使用PIP安装amrita-cli
 pip install amrita
-
-# 或者使用 uv 安装（更快）
-uv pip install amrita
 ```
 
 ### 方法二：从源码安装
