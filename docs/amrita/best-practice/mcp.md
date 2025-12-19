@@ -103,16 +103,16 @@ Amrita提供了命令行接口来动态管理MCP服务器：
 
 ```bash
 # 查看MCP状态
-/mcp_stats
+/mcp stats
 
 # 添加MCP服务器
-/add_mcp_server /path/to/mcp_server.py
+/mcp add /path/to/mcp_server.py
 
 # 删除MCP服务器
-/del_mcp_server /path/to/mcp_server.py
+/mcp del /path/to/mcp_server.py
 
 # 重载所有MCP服务器
-/mcp_reload
+/mcp reload
 ```
 
 ## 5. 最佳实践

@@ -197,7 +197,7 @@ report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
 agent_mode_enable = false # 使用智能体模式
 agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
-agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理。
+agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理；reasoning-optional 可选的reasoning；reasoning-required 每轮工具调用一定进行reasoning。
 agent_mcp_client_enable = true # 是否启用MCP客户端
 agent_mcp_server_scripts = [] # MCP服务端脚本列表
 
@@ -284,6 +284,4 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 | **/insights**                      | [global]                                                                                             | 今日用户/全局用量统计                      |
 | **/test_preset**                   | [-d\|--details]                                                                                      | 测试所有预设                               |
 | **/mcp_stats**                     | [-d\|--details]                                                                                      | 获取 MCP 状态                              |
-| **/add_mcp_server**                | <server_script>                                                                                      | 添加 MCP 服务器                            |
-| **/del_mcp_server**                | <server_script>                                                                                      | 删除 MCP 服务器                            |
-| **/mcp_reload**                    | -                                                                                                    | 重载 MCP 服务                              |
+| **/mcp**                | stats [-d\|--details]<br>add <server_script><br>del <server_script><br>reload                                                                                     | 管理MCP服务                            |
