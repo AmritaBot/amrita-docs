@@ -1,6 +1,6 @@
 # 详细说明
 
-传入 LLM 的信息格式如下，（这里提供了 use_base_prompt 选项，如果启用了可以忽略，这个选项将自动在你的 prompt 前插入内容，对消息段作出解释）：
+传入 LLM 的信息格式如下，Amrita 有内置的 Prompt 会对内容进行解释：
 
 ::: details 点击查看详细格式
 
@@ -74,15 +74,15 @@ at+文字：
 
 ### **配置项完整说明**
 
-#### 配置文件(3.4.0+)
+#### 配置文件
 
 ```toml
 # ========================
 #      基本核心配置
 # ========================
-enable = false  # 是否启用 SuggarChat 主功能
+enable = true  # 是否启用 SuggarChat 主功能
 parse_segments = true  # 是否解析特殊消息段（如@提及/合并转发等）
-matcher_function = true  # 是否启用 SuggarMatcher 高级匹配功能
+matcher_function = true  # 是否启用 SuggarMatcher 事件钩子功能（Amrita Agent能力的核心功能）
 preset = "default"  # 默认使用的模型预设配置名称
 group_prompt_character = "default"  # 群聊场景使用的提示词模板名称
 private_prompt_character = "default"  # 私聊场景使用的提示词模板名称
@@ -143,8 +143,9 @@ keywords = [  # 触发自动回复的关键字列表
 [function]
 synthesize_forward_message = true  # 是否解析合并转发消息
 nature_chat_style = true  # 是否启用自然对话风格优化
+nature_chat_cut_pattern = "([。！？!?;；\\n]+)[\"\"\\'\\'\"\\s]*"  # 自然对话切分正则模式
 poke_reply = true  # 是否响应戳一戳事件
-enable_group_chat = true  # 是否启用群聊功能
+enable_group_chat = false  # 是否启用群聊功能
 enable_private_chat = true  # 是否启用私聊功能
 allow_custom_prompt = true  # 是否允许用户自定义提示词
 use_user_nickname = false  # 在群聊中使用QQ昵称而非群名片
@@ -161,21 +162,21 @@ say_after_self_msg_be_deleted = false  # 消息被撤回后是否自动回复
 group_added_msg = "你好，我是Suggar，欢迎使用SuggarAI聊天机器人..."  # 入群欢迎消息
 send_msg_after_be_invited = false  # 被邀请入群后是否主动发言
 after_deleted_say_what = [  # 消息被撤回后的随机回复列表
-    # ...（内置内容）
+
 ]
 
 # ========================
 #      管理员设置
 # ========================
 [admin]
-allow_send_to_admin = false  # 是否允许向管理群发送系统消息
+allow_send_to_admin = true  # 是否允许向管理群发送系统消息
 
 # ========================
 #   大语言模型(LLM)配置
 # ========================
 [llm_config]
 stream = false  # 是否启用流式响应（逐字输出）
-memory_lenth_limit = 50  # 记忆上下文的最大消息数量
+memory_lenth_limit = 5  # 记忆上下文的最大消息数量
 use_base_prompt = true  # 是否使用基础角色提示词
 max_tokens = 100  # 单次回复生成的最大token数
 tokens_count_mode = "bpe"  # Token计算模式：bpe(子词)/word(词语)/char(字符)
@@ -183,8 +184,10 @@ enable_tokens_limit = true  # 是否启用上下文长度限制
 llm_timeout = 60  # API请求超时时间（秒）
 auto_retry = true  # 请求失败时自动重试
 max_retries = 3  # 最大重试次数
+enable_memory_abstract = true  # 是否启用记忆摘要功能
+memory_abstract_proportion = 0.5  # 记忆摘要压缩比例
 block_msg = [  # 触发安全熔断时随机返回的提示消息
-    # ...(内置回复)
+
 ]
 
 # 工具调用子系统
@@ -195,9 +198,10 @@ report_exclude_system_prompt = false # 是否排除系统提示词
 report_exclude_context = false # 是否排除上下文
 report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
-agent_mode_enable = false # 使用智能体模式
+agent_mode_enable = true # 使用智能体模式
 agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
-agent_thought_mode = "chat" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理；reasoning-optional 可选的reasoning；reasoning-required 每轮工具调用一定进行reasoning。
+agent_tool_call_notice = "hide" # 智能体工具调用通知方式
+agent_thought_mode = "reasoning" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理；reasoning-optional 可选的reasoning；reasoning-required 每轮工具调用一定进行reasoning。
 agent_mcp_client_enable = true # 是否启用MCP客户端
 agent_mcp_server_scripts = [] # MCP服务端脚本列表
 
@@ -210,8 +214,9 @@ group_daily_limit = 100  # 单个群组每日最大使用次数
 user_daily_limit = 100  # 单个用户每日最大使用次数
 group_daily_token_limit = 200000  # 单个群组每日最大token消耗量
 user_daily_token_limit = 100000  # 单个用户每日最大token消耗量
-total_daily_limit = 1000 # 总使用次数限制
-total_daily_token_limit = 100000 # 总使用token消耗量限制
+total_daily_limit = 1500 # 总使用次数限制
+total_daily_token_limit = 1000000 # 总使用token消耗量限制
+global_insights_expire_days = 7  # 全局洞察数据过期天数
 
 # ========================
 #       扩展预留区
@@ -284,4 +289,4 @@ total_daily_token_limit = 100000 # 总使用token消耗量限制
 | **/insights**                      | [global]                                                                                             | 今日用户/全局用量统计                      |
 | **/test_preset**                   | [-d\|--details]                                                                                      | 测试所有预设                               |
 | **/mcp_stats**                     | [-d\|--details]                                                                                      | 获取 MCP 状态                              |
-| **/mcp**                | stats [-d\|--details]<br>add <server_script><br>del <server_script><br>reload                                                                                     | 管理MCP服务                            |
+| **/mcp**                           | stats [-d\|--details]<br>add <server_script><br>del <server_script><br>reload                        | 管理 MCP 服务                              |

@@ -4,7 +4,7 @@
 
 - **格式**：/lp
 - **功能**：显示插件帮助信息
-- **响应**：LP LitePerm 请输入参数： lp.user lp.chat_group lp.perm_group command
+- **响应**：LP LitePerm 请输入参数： lp.user lp.chat_group lp.perm_group
 
 ## 用户权限管理
 
@@ -16,7 +16,7 @@
 - **操作类型**：
   - `permission` - 权限节点操作
   - `parent` - 权限组继承操作
-  - `perm_group` - 权限组管理
+  - `perm_group` - 权限组关系操作
 
 #### 用户权限节点操作 (`permission`)
 
@@ -29,18 +29,18 @@
 
 #### 用户权限组继承操作 (`parent`)
 
-| 操作  | 格式                               | 示例                                 | 说明               |
-| ----- | ---------------------------------- | ------------------------------------ | ------------------ |
-| `add` | `lp.user <ID> parent add <权限组>` | `lp.user 123 parent add admin_group` | 添加继承的权限组   |
-| `del` | `lp.user <ID> parent del <权限组>` | `lp.user 123 parent del vip_group`   | 移除继承的权限组   |
-| `set` | `lp.user <ID> parent set <权限组>` | `lp.user 123 parent set admin_group` | 覆盖为权限组的权限 |
+| 操作  | 格式                               | 示例                                 | 说明                   |
+| ----- | ---------------------------------- | ------------------------------------ | ---------------------- |
+| `add` | `lp.user <ID> parent add <权限组>` | `lp.user 123 parent add admin_group` | 添加继承的权限组       |
+| `del` | `lp.user <ID> parent del <权限组>` | `lp.user 123 parent del vip_group`   | 移除继承的权限组       |
+| `set` | `lp.user <ID> parent set <权限组>` | `lp.user 123 parent set admin_group` | 完全覆盖为权限组的权限 |
 
-#### 用户权限组管理 (`perm_group`)
+#### 用户权限组关系操作 (`perm_group`)
 
-| 操作  | 格式                                   | 示例                               | 说明             |
-| ----- | -------------------------------------- | ---------------------------------- | ---------------- |
-| `add` | `lp.user <ID> perm_group add <权限组>` | `lp.user 123 perm_group add vip`   | 添加用户到权限组 |
-| `del` | `lp.user <ID> perm_group del <权限组>` | `lp.user 123 perm_group del guest` | 从权限组移除用户 |
+| 操作  | 格式                                   | 示例                               | 说明               |
+| ----- | -------------------------------------- | ---------------------------------- | ------------------ |
+| `add` | `lp.user <ID> perm_group add <权限组>` | `lp.user 123 perm_group add vip`   | 将用户添加到权限组 |
+| `del` | `lp.user <ID> perm_group del <权限组>` | `lp.user 123 perm_group del guest` | 将用户从权限组移除 |
 
 :::
 
@@ -48,37 +48,37 @@
 
 ::: details
 
-### `lp.group` - 群组权限管理
+### `lp.chat_group` - 群组权限管理
 
-- **格式**：`lp.group <群组ID> <操作类型> <操作> [目标] [值]`
+- **格式**：`lp.chat_group <群组ID> <操作类型> <操作> [目标] [值]`
 - **操作类型**：
   - `permission` - 权限节点操作
   - `parent` - 权限组继承操作
-  - `perm_group` - 权限组管理
+  - `perm_group` - 权限组关系操作
 
 #### 群权限节点操作 (`permission`)
 
-| 操作    | 格式                                               | 示例                                            | 说明             |
-| ------- | -------------------------------------------------- | ----------------------------------------------- | ---------------- |
-| `set`   | `lp.group <ID> permission set <节点> <true/false>` | `lp.group 456 permission set group.manage true` | 设置权限节点状态 |
-| `del`   | `lp.group <ID> permission del <节点>`              | `lp.group 456 permission del group.kick`        | 删除权限节点     |
-| `check` | `lp.group <ID> permission check <节点>`            | `lp.group 456 permission check plugin.admin`    | 检查是否拥有权限 |
-| `list`  | `lp.group <ID> permission list`                    | `lp.group 456 permission list`                  | 列出群组所有权限 |
+| 操作    | 格式                                                    | 示例                                                 | 说明             |
+| ------- | ------------------------------------------------------- | ---------------------------------------------------- | ---------------- |
+| `set`   | `lp.chat_group <ID> permission set <节点> <true/false>` | `lp.chat_group 456 permission set group.manage true` | 设置权限节点状态 |
+| `del`   | `lp.chat_group <ID> permission del <节点>`              | `lp.chat_group 456 permission del group.kick`        | 删除权限节点     |
+| `check` | `lp.chat_group <ID> permission check <节点>`            | `lp.chat_group 456 permission check plugin.admin`    | 检查是否拥有权限 |
+| `list`  | `lp.chat_group <ID> permission list`                    | `lp.chat_group 456 permission list`                  | 列出群组所有权限 |
 
 #### 群权限组继承操作 (`parent`)
 
-| 操作  | 格式                                | 示例                                  | 说明               |
-| ----- | ----------------------------------- | ------------------------------------- | ------------------ |
-| `add` | `lp.group <ID> parent add <权限组>` | `lp.group 456 parent add group_admin` | 添加继承的权限组   |
-| `del` | `lp.group <ID> parent del <权限组>` | `lp.group 456 parent del group_vip`   | 移除继承的权限组   |
-| `set` | `lp.group <ID> parent set <权限组>` | `lp.group 456 parent set group_admin` | 覆盖为权限组的权限 |
+| 操作  | 格式                                     | 示例                                       | 说明                   |
+| ----- | ---------------------------------------- | ------------------------------------------ | ---------------------- |
+| `add` | `lp.chat_group <ID> parent add <权限组>` | `lp.chat_group 456 parent add group_admin` | 添加继承的权限组       |
+| `del` | `lp.chat_group <ID> parent del <权限组>` | `lp.chat_group 456 parent del group_vip`   | 移除继承的权限组       |
+| `set` | `lp.chat_group <ID> parent set <权限组>` | `lp.chat_group 456 parent set group_admin` | 完全覆盖为权限组的权限 |
 
-#### 群权限组管理 (`perm_group`)
+#### 群权限组关系操作 (`perm_group`)
 
-| 操作  | 格式                                    | 示例                                | 说明             |
-| ----- | --------------------------------------- | ----------------------------------- | ---------------- |
-| `add` | `lp.group <ID> perm_group add <权限组>` | `lp.group 456 perm_group add vip`   | 添加群组到权限组 |
-| `del` | `lp.group <ID> perm_group del <权限组>` | `lp.group 456 perm_group del guest` | 从权限组移除群组 |
+| 操作  | 格式                                         | 示例                                     | 说明               |
+| ----- | -------------------------------------------- | ---------------------------------------- | ------------------ |
+| `add` | `lp.chat_group <ID> perm_group add <权限组>` | `lp.chat_group 456 perm_group add vip`   | 将群组添加到权限组 |
+| `del` | `lp.chat_group <ID> perm_group del <权限组>` | `lp.chat_group 456 perm_group del guest` | 将群组从权限组移除 |
 
 :::
 
@@ -92,7 +92,8 @@
 - **操作类型**：
   - `permission` - 权限节点操作
   - `parent` - 权限组继承操作
-  - `to` - 权限组管理
+  - `to` - 权限组创建/删除
+  - `list` - 列出所有权限组
 
 #### 权限节点操作 (`permission`)
 
@@ -105,11 +106,11 @@
 
 #### 权限组继承操作 (`parent`)
 
-| 操作  | 格式                                       | 示例                                 | 说明               |
-| ----- | ------------------------------------------ | ------------------------------------ | ------------------ |
-| `add` | `lp.perm_group <组名> parent add <权限组>` | `lp.perm_group vip parent add base`  | 添加继承的权限组   |
-| `del` | `lp.perm_group <组名> parent del <权限组>` | `lp.perm_group vip parent del base`  | 移除继承的权限组   |
-| `set` | `lp.perm_group <组名> parent set <权限组>` | `lp.perm_group vip parent set admin` | 覆盖为权限组的权限 |
+| 操作  | 格式                                       | 示例                                 | 说明                   |
+| ----- | ------------------------------------------ | ------------------------------------ | ---------------------- |
+| `add` | `lp.perm_group <组名> parent add <权限组>` | `lp.perm_group vip parent add base`  | 添加继承的权限组       |
+| `del` | `lp.perm_group <组名> parent del <权限组>` | `lp.perm_group vip parent del base`  | 移除继承的权限组       |
+| `set` | `lp.perm_group <组名> parent set <权限组>` | `lp.perm_group vip parent set admin` | 完全覆盖为权限组的权限 |
 
 #### 权限组管理 (`to`)
 
@@ -118,6 +119,12 @@
 | `create` | `lp.perm_group <组名> to create` | `lp.perm_group new_group to create` | 创建新权限组 |
 | `remove` | `lp.perm_group <组名> to remove` | `lp.perm_group old_group to remove` | 删除权限组   |
 
+#### 权限组列表 (`list`)
+
+| 操作   | 格式                 | 示例                 | 说明           |
+| ------ | -------------------- | -------------------- | -------------- |
+| `list` | `lp.perm_group list` | `lp.perm_group list` | 列出所有权限组 |
+
 :::
 
 ## 通用参数说明
@@ -125,7 +132,6 @@
 - 用户 ID：QQ 号或其他平台的用户标识
 - 群组 ID：QQ 群号或其他平台的群组标识
 - 权限组名：自定义的权限组名称
-- 命令名：插件中的命令名称（如 lp.user）
 - 权限节点：使用点分隔的权限标识（如 plugin.admin）
 - 值：true 或 false，表示权限状态
 

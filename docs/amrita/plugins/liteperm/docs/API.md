@@ -1,6 +1,6 @@
 # API 文档
 
-`amrita.plugins.perm.api.rules`
+`amrita.plugins.perm.API.rules`
 
 ## `PermissionChecker` 基类
 
@@ -10,7 +10,7 @@
 - **方法**：
 
   - `checker() -> Callable[[Event, str], Awaitable[bool]]`  
-    📌 生成供 NoneBot Matcher Permission 检查 使用的检查器闭包
+    📌 生成供 NoneBot Matcher Permission 检查使用的检查器闭包
 
     ```python
     async def _checker(event: Event, current_perm=current_perm) -> bool:
@@ -75,7 +75,7 @@ GroupEvent: TypeAlias = (
 ## 使用示例
 
 ```python
-from amrita.plugins.perm.rules import UserPermissionChecker, GroupPermissionChecker
+from amrita.plugins.perm.API.rules import UserPermissionChecker, GroupPermissionChecker
 
 # 创建用户权限检查器
 user_perm_checker = UserPermissionChecker(permission="plugin.admin")
@@ -95,9 +95,4 @@ async def handle_group_manage():
 
 ## 调试日志
 
-权限检查过程会输出调试日志：
-
-```shell
-DEBUG: checking user permission 123456 plugin.admin
-DEBUG: checking group permission 789012 group.manage
-```
+权限检查过程会输出调试日志，你可以在控制台查看。

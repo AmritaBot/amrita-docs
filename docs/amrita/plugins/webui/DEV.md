@@ -32,7 +32,6 @@ def on_page(
     path: str,
     page_name: str,
     category: str = "其他功能",
-    icon: str | None = None
 )
 ```
 
@@ -41,7 +40,6 @@ def on_page(
 - `path` (str): 页面的 URL 路径
 - `page_name` (str): 页面名称，将显示在侧边栏中
 - `category` (str, optional): 页面所属的分类，默认为"其他功能"
-- `icon` (str | None, optional): 页面图标，用于在侧边栏中显示
 
 ::: tip
 
