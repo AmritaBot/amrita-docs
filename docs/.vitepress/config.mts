@@ -39,7 +39,14 @@ export default withMermaid({
           { text: "社区支持", link: "/amrita/community" },
         ],
       },
-      { text: "配置", items: [{ text: "配置", link: "/amrita/config" }] },
+
+      {
+        text: "配置",
+        items: [
+          { text: "配置", link: "/amrita/config" },
+          { text: "对接到Bot", link: "/amrita/to_bot" },
+        ],
+      },
 
       {
         text: "模块",
@@ -84,7 +91,6 @@ export default withMermaid({
       {
         text: "最佳实践",
         items: [
-
           { text: "配置Amrita", link: "/amrita/best-practice/config" },
           { text: "提示工程", link: "/amrita/best-practice/prompt" },
           { text: "充分利用Agent功能", link: "/amrita/best-practice/agent" },
