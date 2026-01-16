@@ -6,18 +6,17 @@
 
 - **功能**：权限检查器的抽象基类
 - **参数**：
+
   - `permission: str` - 要检查的权限节点
 - **方法**：
 
-  - `checker() -> Callable[[Event, str], Awaitable[bool]]`  
-    📌 生成供 NoneBot Matcher Permission 检查使用的检查器闭包
+  - `checker() -> Callable[[Event, str], Awaitable[bool]]`📌 生成供 NoneBot Matcher Permission 检查 使用的检查器闭包
 
     ```python
     async def _checker(event: Event, current_perm=current_perm) -> bool:
         return await self._check_permission(event, current_perm)
     ```
-
-  - `_check_permission(event: Event, perm: str) -> bool`  
+  - `_check_permission(event: Event, perm: str) -> bool`
     ⚠️ 需子类实现的权限检查核心方法
 
 ## `UserPermissionChecker` 用户权限检查器
@@ -25,6 +24,7 @@
 - **继承**：`PermissionChecker`
 - **功能**：检查用户权限
 - **检查逻辑**：
+
   1. 获取事件中的用户 ID
   2. 查询用户数据
   3. 遍历用户的权限组
@@ -41,9 +41,11 @@
 
 - **继承**：`PermissionChecker`
 - **参数**：
+
   - `only_group: bool = True` - 是否仅限群组事件
 - **功能**：检查群组权限
 - **检查逻辑**：
+
   1. 验证事件是否为群组事件
   2. 获取群组 ID
   3. 查询群组数据
