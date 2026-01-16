@@ -2,137 +2,173 @@
 
 本文档提供了 Amrita 项目的核心 API 参考信息。
 
-## 📦 CLI 命令
-
-### 主命令
-
-#### `amrita create`
-
-创建新项目
-
-```bash
-amrita create PROJECT_NAME
-```
-
-#### `amrita init`
-
-初始化当前目录为 Amrita 项目
-
-```bash
-amrita init
-```
-
-#### `amrita run`
-
-运行项目
-
-```bash
-amrita run [OPTIONS]
-```
-
-选项：
-
-- `-r, --run` - 直接在当前环境中运行
-
-#### `amrita version`
-
-显示版本信息
-
-```bash
-amrita version
-```
-
-#### `amrita check-dependencies`
-
-检查依赖
-
-```bash
-amrita check-dependencies [OPTIONS]
-```
-
-选项：
-
-- `-s, --self` - 直接在当前环境中检查
-
-#### `amrita entry`
-
-在当前目录生成 bot.py 入口文件
-
-```bash
-amrita entry
-```
-
-#### `amrita proj-info`
-
-显示项目信息
-
-```bash
-amrita proj-info
-```
-
-#### `amrita nb`
-
-直接运行 nb-cli 命令
-
-```bash
-amrita nb [NB_ARGS]...
-```
-
-#### `amrita test`
-
-运行 Amrita 项目的加载测试
-
-```bash
-amrita test
-```
-
 ## 🧠 核心模块 API
 
-### amrita.config
+### 1. 配置管理 API
 
-#### `get_amrita_config()`
+#### BaseDataManager
 
-获取 Amrita 配置
+- **功能**: 配置数据管理器基类，实现基于类型注解的自动配置类推导
+- **用法**: 用于创建特定的配置管理器，支持单例模式
+- **重要方法**:
+  - `safe_get_config()`: 安全获取配置，等待配置加载完成
+  - `**__apost_init__**()`: 异步初始化后置处理方法
+
+#### UniConfigManager
+
+- **功能**: 为 Amrita/NoneBot 插件设计的统一配置管理器
+- **用法**: 提供配置文件管理、热重载、文件监控等功能
+- **重要方法**:
+  - `add_config()`: 添加配置类
+  - `get_config()`: 获取配置实例
+  - `get_config_by_class()`: 根据配置类获取配置实例
+  - `save_config()`: 保存配置
+  - `reload_config()`: 重新加载配置
+  - `add_file()`: 添加文件并监控变更
+  - `add_directory()`: 添加目录监视
+
+### 2. 机器人初始化 API
+
+#### init()
+
+- **功能**: 初始化 Amrita 框架，设置日志、适配器等
+- **位置**: `amrita/utils/bot_utils.py`
+- **用法**: 启动机器人前调用此函数
+
+### 3. 插件管理 API
+
+#### load_plugins()
+
+- **功能**: 加载内置插件和用户定义的插件
+- **位置**: `amrita/utils/plugins.py`
+- **用法**: 自动加载 pyproject.toml 中定义的插件
+
+### 4. 消息发送 API
+
+#### send_to_admin(msg: str, bot: Bot | None = None)
+
+- **功能**: 发送消息到管理员
+- **位置**: `amrita/utils/admin.py`
+- **参数**:
+  - `msg`: 消息内容
+  - `bot`: Bot 实例（可选）
+
+#### send_forward_msg_to_admin(bot: Bot, name: str, uin: str, msgs: list[MessageSegment])
+
+- **功能**: 发送合并转发消息到管理员
+- **参数**:
+  - `bot`: Bot 实例
+  - `name`: 发送者名称
+  - `uin`: 发送者 UID
+  - `msgs`: 消息列表
+
+#### send_forward_msg(bot: Bot, event: Event, name: str, uin: str, msgs: typing.Iterable[MessageSegment])
+
+- **功能**: 发送合并转发消息
+- **位置**: `amrita/utils/send.py`
+- **参数**:
+  - `bot`: Bot 实例
+  - `event`: 事件对象
+  - `name`: 发送者名称
+  - `uin`: 发送者 UID
+  - `msgs`: 消息列表
+
+### 5. 速率限制 API
+
+#### TokenBucket
+
+- **功能**: 令牌桶算法实现速率限制
+- **位置**: `amrita/utils/rate.py`
+- **方法**:
+  - `consume()`: 尝试消耗一个令牌，返回是否成功
+
+#### BucketRepoitory
+
+- **功能**: 令牌桶仓库，管理多个命名空间的令牌桶
+- **方法**:
+  - `get_bucket(key)`: 获取指定键的令牌桶
+
+#### get_bucket(namespace: str, rate: int, key: Any) -> TokenBucket
+
+- **功能**: 获取指定命名空间、速率和键的令牌桶
+
+### 6. 系统健康监测 API
+
+#### calculate_system_usage() -> dict
+
+- **功能**: 计算系统使用情况，包括 CPU、内存、磁盘等信息
+- **返回**: 包含系统使用情况的字典
+
+#### calculate_system_health() -> dict
+
+- **功能**: 计算系统健康值
+- **返回**: 包含总体健康值和详细指标的字典
+
+### 7. 版本信息 API
+
+#### get_amrita_version()
+
+- **功能**: 获取 Amrita 框架版本
+- **位置**: `amrita/utils/utils.py`
+- **返回**: 框架版本字符串
+
+## API 使用示例
+
+### 配置管理示例
 
 ```python
-from amrita.config import get_amrita_config
+from amrita.config_manager import BaseDataManager
+from pydantic import BaseModel
 
-config = get_amrita_config()
+class MyConfig(BaseModel):
+    api_key: str = "default_key"
+
+class MyDataManager(BaseDataManager[MyConfig]):
+    config: MyConfig
+
+    async def __apost_init__(self):
+        # 异步初始化后置处理
+        pass
+...
+# 使用配置管理器
+dm = MyDataManager()
+config = await dm.safe_get_config()
+print(config.api_key)
 ```
 
-返回:
-
-- `AmritaConfig` - Amrita 配置对象
-
-### amrita.utils
-
-#### `amrita.utils.bot_utils.init()`
-
-初始化 Amrita 机器人
+### 消息发送示例
 
 ```python
-from amritaimport init
+from amrita.utils.admin import send_to_admin
 
-init()
+# 发送消息到管理员
+await send_to_admin("系统启动成功")
 ```
 
-#### `amrita.utils.plugins.load_plugins()`
-
-加载插件
+### 速率限制示例
 
 ```python
-from amrita import load_plugins
+from amrita.utils.rate import get_bucket
 
-load_plugins()
+# 获取一个令牌桶并尝试消耗令牌
+bucket = get_bucket("login", 10, "user123")
+if bucket.consume():
+    # 允许操作
+    pass
+else:
+    # 拒绝操作
+    pass
 ```
 
-### `amrita.<module>.run()`
-
-运行 Amrita 项目
+### 系统健康监测示例
 
 ```python
-from amrita import run
-run()
+from amrita.utils.system_health import calculate_system_health
+
+# 获取系统健康状况
+health_info = calculate_system_health()
+print(f"总体健康值: {health_info['overall_health']}")
+print(f"健康等级: {health_info['health_level']}")
 ```
 
 ## 🤖 Chat 插件 API

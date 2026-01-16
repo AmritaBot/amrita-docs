@@ -1,6 +1,6 @@
 # API 文档
 
-`amrita.plugins.perm.api.rules`
+`amrita.plugins.perm.API.rules`
 
 ## `PermissionChecker` 基类
 
@@ -97,9 +97,4 @@ async def handle_group_manage():
 
 ## 调试日志
 
-权限检查过程会输出调试日志：
-
-```shell
-DEBUG: checking user permission 123456 plugin.admin
-DEBUG: checking group permission 789012 group.manage
-```
+权限检查过程会输出调试日志，你可以在控制台查看。

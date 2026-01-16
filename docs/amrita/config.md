@@ -24,13 +24,14 @@
 | DISABLED_BUILTIN_PLUGINS | List[str] | []                             | 禁用内置插件              |
 | AMRITA_LOG_LEVEL         | str       | WARNING                        | 日志等级                  |
 | MAX_EVENT_RECORD         | int       | 100                            | 最多的事件记录            |
+| **ONEBOT_ACCESS_TOKEN**  | str       | 无默认值                       | OneBot V11 访问令牌       |
 
 ### 直接配置的环境变量
 
-| 变量名                   | 类型      | 默认值                         | 说明                      |
-| ------------------------ | --------- | ------------------------------ | ------------------------- |
-| AMRITA_IGONRE_VENV | bool | - | 使得CLI忽略虚拟环境 |
-| AMRITA_IGNORE_AGENT_TOOLS | - | 忽略无效工具警告 |
+| 变量名                    | 类型 | 默认值           | 说明                  |
+| ------------------------- | ---- | ---------------- | --------------------- |
+| AMRITA_IGONRE_VENV        | bool | -                | 使得 CLI 忽略虚拟环境 |
+| AMRITA_IGNORE_AGENT_TOOLS | -    | 忽略无效工具警告 |
 
 ## 其他配置
 
