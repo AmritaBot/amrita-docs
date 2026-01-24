@@ -151,6 +151,8 @@ chat 插件支持多种大语言模型，关于 LLM 功能配置请参考[文档
 WEBUI_ENABLE=true
 ```
 
+(WEBUI位于Bot项目的监听地址，例如`http://127.0.0.1:8080/`)
+
 ### 用户认证
 
 ```dotenv

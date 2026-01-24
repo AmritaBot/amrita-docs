@@ -95,7 +95,6 @@ export default withMermaid({
           { text: "提示工程", link: "/amrita/best-practice/prompt" },
           { text: "充分利用Agent功能", link: "/amrita/best-practice/agent" },
           { text: "连接到MCP服务器", link: "/amrita/best-practice/mcp" },
-          //{ text: "对接Dify", link: "/amrita/best-practice/dify" },
         ],
       },
     ],

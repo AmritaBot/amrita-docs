@@ -113,7 +113,7 @@ multimodal = false  # 是否支持多模态输入（如图片识别）
 #       会话管理
 # ========================
 [session]
-session_control = false  # 是否启用会话超时自动清理
+session_control = true  # 是否启用会话超时自动清理
 session_control_time = 60  # 会话超时时间（单位：分钟）
 session_control_history = 10  # 会话历史记录最大保存条数
 session_max_tokens = 5000  # 单次会话上下文最大token容量
@@ -132,27 +132,28 @@ enable_cookie = false  # 是否启用Cookie泄露检测机制
 enable = false  # 是否启用自动回复系统
 global_enable = false  # 是否全局启用自动回复（无视会话状态）
 probability = 0.01  # 随机触发概率（0.01=1%）
-keywords_mode = "starts_with" # 自动回复配置(starts_with/contains)
 keywords = [  # 触发自动回复的关键字列表
     "at",  # 当被@时触发
 ]
+keywords_mode = "starts_with" # 关键词匹配模式(starts_with/contains)
 
 # ========================
 #      功能开关
 # ========================
 [function]
-synthesize_forward_message = true  # 是否解析合并转发消息
-nature_chat_style = true  # 是否启用自然对话风格优化
-nature_chat_cut_pattern = "([。！？!?;；\\n]+)[\"\"\\'\\'\"\\s]*"  # 自然对话切分正则模式
-poke_reply = true  # 是否响应戳一戳事件
-enable_group_chat = false  # 是否启用群聊功能
-enable_private_chat = true  # 是否启用私聊功能
-allow_custom_prompt = true  # 是否允许用户自定义提示词
-use_user_nickname = false  # 在群聊中使用QQ昵称而非群名片
 chat_pending_mode = "queue" # 当同一个Session实例进行会话(私聊/群聊视为一个Session)时，并发下所使用的模式。
 # queue: 队列模式，等待前一条消息处理完后继续；
 # single: 单个模式，仅处理当前消息，不处理后续消息；
 # single_with_report: 单个模式，但是回复用户一条消息表示正在处理。
+synthesize_forward_message = true  # 是否解析合并转发消息
+nature_chat_style = true  # 是否启用自然对话风格优化
+nature_chat_cut_pattern = "([。！？!?;；\\n]+)[\"\"\\'\\'\"\\s]*"  # 自然对话切分正则模式
+poke_reply = true  # 是否响应戳一戳事件
+enable_group_chat = true  # 是否启用群聊功能
+enable_private_chat = true  # 是否启用私聊功能
+allow_custom_prompt = true  # 是否允许用户自定义提示词
+use_user_nickname = false  # 在群聊中使用QQ昵称而非群名片
+chat_object_keep_count = 10  # 聊天对象保持数量
 
 # ========================
 #      扩展行为设置
@@ -162,22 +163,25 @@ say_after_self_msg_be_deleted = false  # 消息被撤回后是否自动回复
 group_added_msg = "你好，我是Suggar，欢迎使用SuggarAI聊天机器人..."  # 入群欢迎消息
 send_msg_after_be_invited = false  # 被邀请入群后是否主动发言
 after_deleted_say_what = [  # 消息被撤回后的随机回复列表
-
+    "抱歉啦，不小心说错啦～",
+    "嘿，发生什么事啦？我",
+    "唔，我是不是说错了什么？",
+    "纠错时间到，如果我说错了请告诉我！",
+    "发生了什么？我刚刚没听清楚呢~",
+    "我会记住的，绝对不再说错话啦~",
+    "哦，看来我又犯错了，真是不好意思！",
+    "哈哈，看来我得多读书了~",
+    "哎呀，真是个小口误，别在意哦~",
+    "哎呀，我也有尴尬的时候呢~",
+    "希望我能继续为你提供帮助，不要太在意我的小错误哦！",
 ]
-
-# ========================
-#      管理员设置
-# ========================
-[admin]
-allow_send_to_admin = true  # 是否允许向管理群发送系统消息
 
 # ========================
 #   大语言模型(LLM)配置
 # ========================
 [llm_config]
-stream = false  # 是否启用流式响应（逐字输出）
+stream = true  # 是否启用流式响应（逐字输出）
 memory_lenth_limit = 5  # 记忆上下文的最大消息数量
-use_base_prompt = true  # 是否使用基础角色提示词
 max_tokens = 100  # 单次回复生成的最大token数
 tokens_count_mode = "bpe"  # Token计算模式：bpe(子词)/word(词语)/char(字符)
 enable_tokens_limit = true  # 是否启用上下文长度限制
@@ -187,12 +191,13 @@ max_retries = 3  # 最大重试次数
 enable_memory_abstract = true  # 是否启用记忆摘要功能
 memory_abstract_proportion = 0.5  # 记忆摘要压缩比例
 block_msg = [  # 触发安全熔断时随机返回的提示消息
-
+    "嗨～你好，我们换个话题吧～"
 ]
 
 # 工具调用子系统
 [llm_config.tools]
 enable_tools = true  # 是否启用外部工具调用功能（关闭此选项不影响内容审查系统）
+use_minimal_context = true  # 使用最小化上下文
 enable_report = true  # 是否启用内容审查系统
 report_exclude_system_prompt = false # 是否排除系统提示词
 report_exclude_context = false # 是否排除上下文
@@ -200,10 +205,21 @@ report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
 agent_mode_enable = true # 使用智能体模式
 agent_tool_call_limit = 10 # 智能体模式下，每个会话最多调用的Tools次数
-agent_tool_call_notice = "hide" # 智能体工具调用通知方式
-agent_thought_mode = "reasoning" # 智能体模式下的思考模式，分为chat/reasoning。chat:聊天模式（直接运行Function Calling）；reasoning:先分析任务再进行处理；reasoning-optional 可选的reasoning；reasoning-required 每轮工具调用一定进行reasoning。
+agent_tool_call_notice = "notify" # 智能体工具调用通知方式
+# hide: 隐藏工具调用过程
+# notify: 工具调用时通知用户
+# verbose: 详细显示工具调用过程
+agent_thought_mode = "reasoning" # 智能体模式下的思考模式
+# chat: 聊天模式（直接运行Function Calling）
+# reasoning: 先分析任务再进行处理
+# reasoning-optional: 可选的reasoning
+# reasoning-required: 每轮工具调用一定进行reasoning
+agent_reasoning_hide = false  # 是否隐藏思考过程
+agent_middle_message = true  # 是否显示中间消息
 agent_mcp_client_enable = true # 是否启用MCP客户端
-agent_mcp_server_scripts = [] # MCP服务端脚本列表
+agent_mcp_server_scripts = [  # MCP服务端脚本列表
+    "http://192.168.1.25/e/305f1x4iiqyhpbws/sse",
+]
 
 # ========================
 #      使用限额配置
