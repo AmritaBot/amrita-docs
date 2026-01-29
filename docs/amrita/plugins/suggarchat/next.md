@@ -72,6 +72,10 @@ at+文字：
 
 :::
 
+### 前言
+
+本文档可能会更新不及时，WebUI的配置文件管理页面具有完整的配置项说明，Chat插件的字符串配置项支持环境变量占位符`{{KEY}}`与`${KEY}`
+
 ### **配置项完整说明**
 
 #### 配置文件
@@ -201,6 +205,7 @@ use_minimal_context = true  # 使用最小化上下文
 enable_report = true  # 是否启用内容审查系统
 report_exclude_system_prompt = false # 是否排除系统提示词
 report_exclude_context = false # 是否排除上下文
+report_invoke_level = "middle" # 审核的触发敏感度（low, middle, high）
 report_then_block = true  # 检测到违规内容后是否熔断会话
 require_tools = false  # 是否强制要求每次调用至少使用一个工具
 agent_mode_enable = true # 使用智能体模式
