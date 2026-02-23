@@ -91,7 +91,10 @@ export default withMermaid({
       {
         text: "高级主题",
         collapsed: true,
-        items: [{ text: "系统架构", link: "/amrita/advanced/architecture" }],
+        items: [
+          { text: "系统架构", link: "/amrita/advanced/architecture" },
+          { text: "功能扩展", link: "/amrita/advanced/extension" },
+        ],
       },
       {
         text: "最佳实践",
