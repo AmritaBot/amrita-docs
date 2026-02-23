@@ -1,0 +1,67 @@
+.
+├── index.md                 # 首页（概览、亮点）
+├── guide/                   # 入门指南
+│   ├── quick-start.md       # 5分钟快速开始
+│   ├── installation.md      # 安装（整合原有部署）
+│   ├── configuration.md     # 基础配置（环境变量、核心配置）
+│   └── first-bot.md         # 创建第一个对话机器人（场景化教程）
+│
+├── features/                # 功能使用指南（原“使用”版块）
+│   ├── chat/                # 聊天功能
+│   │   ├── index.md         # 功能概述
+│   │   ├── basic.md         # 基础对话
+│   │   ├── advanced.md      # 高级对话（上下文、记忆）
+│   │   ├── tools.md         # 工具调用（Function Calling）
+│   │   └── mcp.md           # MCP服务器集成
+│   │
+│   ├── permission/          # 权限管理
+│   │   ├── index.md         # 权限模型介绍
+│   │   ├── commands.md      # 命令参考
+│   │   ├── api.md           # 权限API
+│   │   └── best-practice.md # 权限设计最佳实践（可移至最佳实践）
+│   │
+│   ├── webui/               # Web界面
+│   │   ├── index.md         # 功能介绍
+│   │   ├── customization.md # 页面定制/开发
+│   │   ├── frontend-api.md  # 前端API
+│   │   └── components.md    # UI组件库
+│   │
+│   └── other-modules/       # 其他内置功能（如Menu）
+│       └── menu.md
+│
+├── advanced/                 # 高级主题
+│   ├── architecture.md       # 系统架构
+│   ├── deployment/           # 部署专题（原“部署”拆分细化）
+│   │   ├── docker.md
+│   │   ├── kubernetes.md
+│   │   ├── production.md     # 生产环境调优
+│   │   └── monitoring.md     # 监控与日志
+│   │
+│   ├── configuration/        # 配置深度解析
+│   │   ├── env-vars.md       # 环境变量全表
+│   │   ├── cache.md          # 缓存配置
+│   │   ├── database.md       # 数据库配置
+│   │   └── plugins.md        # 插件系统配置
+│   │
+│   └── integration/          # 对接外部系统
+│       ├── bot-platforms.md  # 对接各聊天平台（原“对接到Bot”）
+│       └── external-apis.md  # 调用外部API
+│
+├── best-practices/           # 最佳实践（原版块）
+│   ├── prompt-engineering.md # 提示词工程
+│   ├── agent-design.md       # Agent设计模式
+│   ├── permission-design.md  # 权限策略
+│   └── performance.md        # 性能优化
+│
+├── developer/                # 开发者文档（可选）
+│   ├── contributing.md       # 贡献指南
+│   ├── api-reference/        # API参考（自动生成）
+│   │   └── index.md
+│   └── plugin-dev.md         # 插件开发指南
+│
+├── community/                # 社区相关
+│   ├── support.md            # 获取帮助（原“社区支持”）
+│   ├── changelog.md          # 更新日志
+│   └── roadmap.md            # 路线图
+│
+└── faq.md                    # 常见问题（独立）

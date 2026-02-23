@@ -29,78 +29,104 @@ export default withMermaid({
 
     sidebar: [
       {
-        text: "指南",
+        text: "介绍",
+        collapsed: true,
         items: [
-          { text: "项目介绍", link: "/amrita/" },
-          { text: "快速开始", link: "/amrita/quick-start" },
-          { text: "部署", link: "/amrita/deployment" },
-          { text: "高级用法", link: "/amrita/advanced-usage" },
-          { text: "高级功能", link: "/amrita/advanced-features" },
-          { text: "社区支持", link: "/amrita/community" },
+          { text: "快速开始", link: "/amrita/guide/quick-start" },
+          { text: "进一步部署", link: "/amrita/guide/installation" },
+          { text: "配置参考", link: "/amrita/guide/configuration" },
+          { text: "连接机器人", link: "/amrita/guide/to_bot" },
+          { text: "创建第一个对话机器人", link: "/amrita/guide/first-bot" },
         ],
       },
-
       {
-        text: "配置",
-        items: [
-          { text: "配置", link: "/amrita/config" },
-          { text: "对接到Bot", link: "/amrita/to_bot" },
-        ],
-      },
-
-      {
-        text: "模块",
+        text: "功能使用",
+        collapsed: true,
         items: [
           {
-            text: "权限模块",
+            text: "聊天功能",
+            collapsed: true,
             items: [
-              { text: "简介", link: "/amrita/plugins/liteperm/" },
-              { text: "命令", link: "/amrita/plugins/liteperm/docs/commands" },
-              { text: "API", link: "/amrita/plugins/liteperm/docs/API" },
+              { text: "概述", link: "/amrita/features/chat/" },
+              { text: "基础对话", link: "/amrita/features/chat/basic" },
+              { text: "高级对话", link: "/amrita/features/chat/advanced" },
+              { text: "工具调用", link: "/amrita/features/chat/tools" },
+              { text: "MCP服务集成", link: "/amrita/features/chat/mcp" },
             ],
           },
           {
-            text: "聊天模块",
+            text: "权限管理",
+            collapsed: true,
             items: [
-              { text: "简介", link: "/amrita/plugins/suggarchat/" },
-              { text: "详细介绍", link: "/amrita/plugins/suggarchat/next" },
-              { text: "高级功能", link: "/amrita/plugins/suggarchat/advanced" },
+              { text: "概述", link: "/amrita/features/permission/" },
               {
-                text: "Tools调用",
-                link: "/amrita/plugins/suggarchat/function_calling",
+                text: "命令参考",
+                link: "/amrita/features/permission/commands",
               },
+              { text: "API", link: "/amrita/features/permission/API" },
             ],
           },
           {
-            text: "WebUI",
-            link: "/amrita/plugins/webui/",
+            text: "Web界面",
+            collapsed: true,
             items: [
-              { text: "介绍", link: "/amrita/plugins/webui/" },
-              { text: "页面开发", link: "/amrita/plugins/webui/DEV" },
-              { text: "前端API", link: "/amrita/plugins/webui/frontendAPI" },
-              { text: "CSS组件库", link: "/amrita/plugins/webui/css" },
+              { text: "功能介绍", link: "/amrita/features/webui/" },
+              {
+                text: "页面扩展",
+                link: "/amrita/features/webui/customization",
+              },
+              { text: "前端API", link: "/amrita/features/webui/frontend-api" },
+              { text: "UI组件库", link: "/amrita/features/webui/components" },
             ],
           },
-          { text: "Menu", link: "/amrita/plugins/menu/" },
+          {
+            text: "其他功能",
+            collapsed: true,
+            items: [
+              { text: "Menu", link: "/amrita/features/other-modules/menu" },
+            ],
+          },
         ],
       },
       {
-        text: "API参考",
-        items: [{ text: "API参考", link: "/amrita/api/reference" }],
+        text: "高级主题",
+        collapsed: true,
+        items: [{ text: "系统架构", link: "/amrita/advanced/architecture" }],
       },
       {
         text: "最佳实践",
+        collapsed: true,
         items: [
-          { text: "配置Amrita", link: "/amrita/best-practice/config" },
-          { text: "提示工程", link: "/amrita/best-practice/prompt" },
-          { text: "充分利用Agent功能", link: "/amrita/best-practice/agent" },
-          { text: "连接到MCP服务器", link: "/amrita/best-practice/mcp" },
+          {
+            text: "提示词工程",
+            link: "/amrita/best-practices/prompt",
+          },
+          {
+            text: "Agent设计模式",
+            link: "/amrita/best-practices/agent",
+          },
+          { text: "配置优化", link: "/amrita/best-practices/config" },
         ],
       },
+      {
+        text: "开发者",
+        collapsed: true,
+        items: [
+          { text: "贡献指南", link: "/amrita/developer/contributing" },
+          { text: "API参考", link: "/amrita/developer/api-reference/" },
+          { text: "插件开发指南", link: "/amrita/developer/plugin-dev" },
+        ],
+      },
+      {
+        text: "社区",
+        collapsed: true,
+        items: [{ text: "获取帮助", link: "/amrita/community/support" }],
+      },
+      { text: "常见问题", link: "/amrita/faq" },
     ],
     footer: {
       message: `MIT License 发布`,
-      copyright: `© Amrita 2025-${new Date().getFullYear()}`,
+      copyright: `© AmritaBot 2025-${new Date().getFullYear()}`,
     },
     socialLinks: [
       { icon: "github", link: "https://github.com/AmritaBot/amrita-docs" },

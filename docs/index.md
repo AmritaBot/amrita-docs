@@ -2,7 +2,7 @@
 layout: home
 hero:
   name: "Amrita"
-  text: "基于 NoneBot 的 LLM 聊天机器人框架"
+  text: "基于 NoneBot 与 AmritaCore 的\nLLM 聊天机器人"
   tagline: 强大、灵活、开箱即用的聊天机器人解决方案
   image:
     src: /Amrita.png
@@ -15,13 +15,16 @@ hero:
     - theme: alt
       text: 前往GitHub
       link: https://github.com/AmritaBot/Amrita
+    - theme: alt
+      text: AmritaCore
+      link: https://amrita-core.suggar.top/zh/
 
 features:
-  - title: 多模型支持
-    details: 支持 OpenAI、DeepSeek、Gemini 等多种大语言模型，通过统一接口轻松切换和扩展 AI 能力，满足不同场景的对话需求。
+  - title: Agent
+    details: 基于 AmritaCore 的智能体构建，支持多模型、多协议、多预设，支持自定义模型、协议、预设。
   - title: 插件化架构
     details: 基于 NoneBot2 的插件系统，内置权限管理、机器人管理、菜单系统等核心插件，支持自定义插件开发，灵活扩展功能。
-  - title: 完整生态
-    details: 提供从项目创建、开发调试到部署运维的全生命周期工具链，集成 WebUI 管理界面，拥有完善的文档和活跃的社区支持。
+  - title: 高性能
+    details: 内置强大的缓存设计，与AmritaCore的轻量级/原生异步带来的高性能。
 
 ---
