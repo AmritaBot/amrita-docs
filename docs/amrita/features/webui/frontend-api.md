@@ -1,6 +1,6 @@
-# Amrita WebUI API 文档
+# AmritaBot WebUI API 文档
 
-本文档包含前端 JavaScript API 和后端网络 API 请求接口的详细说明，用于 Amrita WebUI 页面开发。
+本文档包含前端 JavaScript API 和后端网络 API 请求接口的详细说明，用于 AmritaBot WebUI 页面开发。
 
 ## 1. 前端 API (JavaScript)
 

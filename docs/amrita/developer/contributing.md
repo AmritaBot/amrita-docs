@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢您对 Amrita 项目的兴趣！本指南将帮助您了解如何为项目做出贡献。
+感谢您对 AmritaBot 项目的兴趣！本指南将帮助您了解如何为项目做出贡献。
 
 ## 📋 目录
 
@@ -15,13 +15,13 @@
 
 ## 项目概述
 
-Amrita 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大聊天机器人，专为快速构建和部署 LLM 驱动的智能 QQ 机器人而设计。它以 [AmritaCore](https://core.amritabot.com) 作为 Agent 引擎，以 [AmritaSense](https://sense.amritabot.com) 作为底层工作流运行时，构建了完整的终端应用层。
+AmritaBot 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大聊天机器人，专为快速构建和部署 LLM 驱动的智能 QQ 机器人而设计。它以 [AmritaCore](https://core.amritabot.com) 作为 Agent 引擎，以 [AmritaSense](https://sense.amritabot.com) 作为底层工作流运行时，构建了完整的终端应用层。
 
 ### 相关仓库
 
 | 仓库                                                                      | 说明                                                  |
 | ------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [Amrita](https://github.com/AmritaBot/Amrita)                             | **应用层** — 集成 NoneBot2 + WebUI + 插件（本文档）   |
+| [AmritaBot](https://github.com/AmritaBot/Amrita)                             | **应用层** — 集成 NoneBot2 + WebUI + 插件（本文档）   |
 | [AmritaCore](https://github.com/AmritaBot/AmritaCore)                     | **Agent 运行时** — 策略、会话、工具、MCP、适配器      |
 | [AmritaSense](https://github.com/AmritaBot/AmritaSense)                   | **工作流引擎** — 指令集 VM、事件总线、依赖注入        |
 | [Amctl](https://github.com/AmritaBot/Amctl)                               | **CLI 脚手架** — 项目创建、模板管理                   |
@@ -133,7 +133,7 @@ Amrita/
 
 ### 插件系统
 
-Amrita 使用插件化架构，内置插件包括：
+AmritaBot 使用插件化架构，内置插件包括：
 
 - **chat**: 核心聊天功能，集成 AmritaCore Agent 运行时，支持流式响应、多模型、Agent 模式、MCP
 - **manager**: 机器人管理功能，包括自动清理、封禁解封、日志推送

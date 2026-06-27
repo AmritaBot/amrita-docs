@@ -1,14 +1,14 @@
-# Amrita 项目架构分析
+# AmritaBot 项目架构分析
 
 ## 1. 项目概述
 
-Amrita 的技术栈分为三层：
+AmritaBot 的技术栈分为三层：
 
 - **AmritaSense** — 底层工作流编排引擎。采用**指令集架构**替代传统图模型，将控制流（IF/WHILE/GOTO/CALL/TRY）编译为线性指令序列，由轻量 VM（`PointerVector` + 调用栈）逐条执行。核心约 300 LOC，支持原生异步挂起/恢复。
 - **AmritaCore** — Agent 运行时层。构建于 AmritaSense 之上，提供厂商无关的适配器系统（OpenAI / Anthropic / 可扩展）、工具系统（`@simple_tool`、`@on_tools`、MCP 客户端）、事件驱动钩子、上下文窗口与 Token 自动管理。
 - **Amrita** — 终端应用层。集成 NoneBot2 + OneBot V11 适配器 + WebUI + 插件系统，提供开箱即用的 QQ 机器人体验。
 
-三者的关系类似于：**AmritaSense = 操作系统内核 → AmritaCore = 中间件/运行时 → Amrita = 桌面环境/应用**。
+三者的关系类似于：**AmritaSense = 操作系统内核 → AmritaCore = 中间件/运行时 → AmritaBot = 桌面环境/应用**。
 
 ## 2. 整体架构拓扑图
 
@@ -19,7 +19,7 @@ graph TD
         Browser[浏览器] -->|HTTP| FastAPI[FastAPI 路由]
     end
 
-    subgraph "Amrita 应用层"
+    subgraph "AmritaBot 应用层"
         OneBotAdapter -->|事件分发| NoneBot2[NoneBot2 框架]
         FastAPI --> NoneBot2
         NoneBot2 --> PluginMgr[插件管理器]

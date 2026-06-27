@@ -1,6 +1,6 @@
-# Amrita 框架配置建议
+# AmritaBot 框架配置建议
 
-Amrita 的聊天功能配置文件位于 `config/chat/config.toml`，基于 Pydantic 模型分层组织。本文档介绍关键配置项的用途与优化建议。
+AmritaBot 的聊天功能配置文件位于 `config/chat/config.toml`，基于 Pydantic 模型分层组织。本文档介绍关键配置项的用途与优化建议。
 
 ## 配置结构概览
 
@@ -286,4 +286,4 @@ DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
 | 工具调用失败     | MCP 服务器未启动            | 检查 MCP 服务器状态 |
 | 自动回复过于频繁 | `probability` 过高          | 降低至 0.01-0.05    |
 
-通过合理配置和持续优化这些参数，可以显著提升 Amrita 框架的性能、稳定性和用户体验。建议根据实际使用场景，采用小步快跑的方式逐步调优。
+通过合理配置和持续优化这些参数，可以显著提升 AmritaBot 框架的性能、稳定性和用户体验。建议根据实际使用场景，采用小步快跑的方式逐步调优。

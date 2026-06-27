@@ -1,6 +1,6 @@
-# 充分利用 Amrita Agent 功能
+# 充分利用 AmritaBot Agent 功能
 
-Amrita 的 Agent 模式基于 **AmritaCore 的 Agent 运行时** 与 **AmritaSense 的指令集执行模型**。AmritaSense 将控制流（IF/WHILE/TRY 等）编译为线性指令序列，由轻量 VM 逐条执行；AmritaCore 在此基础上提供了策略（`AgentStrategy`）、工具管理（`ToolsManager`）、MCP 客户端和事件钩子。
+AmritaBot 的 Agent 模式基于 **AmritaCore 的 Agent 运行时** 与 **AmritaSense 的指令集执行模型**。AmritaSense 将控制流（IF/WHILE/TRY 等）编译为线性指令序列，由轻量 VM 逐条执行；AmritaCore 在此基础上提供了策略（`AgentStrategy`）、工具管理（`ToolsManager`）、MCP 客户端和事件钩子。
 
 这种架构意味着：Agent 的每一次思考-行动循环都不是用轮询或图遍历实现的，而是由 AmritaSense 的程序计数器（`PointerVector`）自然驱动 —— 零调度开销，原生支持挂起/恢复。
 
@@ -27,7 +27,7 @@ AmritaCore 根据 `tool_calling_mode` 选择策略执行方式：
 
 ## 2. 启用与配置 Agent 模式
 
-Amrita 的 Agent 模式无需显式开关——只要在 `config/chat/config.toml` 中正确配置 AmritaCore 层即可生效。配置分布在 `core.function_config` 和 `llm.tools` 两个位置：
+AmritaBot 的 Agent 模式无需显式开关——只要在 `config/chat/config.toml` 中正确配置 AmritaCore 层即可生效。配置分布在 `core.function_config` 和 `llm.tools` 两个位置：
 
 ```toml
 # ── AmritaCore 层（core.function_config）──
@@ -179,4 +179,4 @@ FunctionDefinitionSchema(
 5. **工具结果净化**：自定义工具返回给模型的内容应简洁、无内部格式标记——这会直接影响后续推理质量。
 6. **监控 `reasoning_pc`**：如果频繁触发 `loop_reasoning_trigger`，检查提示词设计是否导致模型陷入循环。
 
-通过深入理解上述架构、流程与工具职责，您可以充分发挥 Amrita Agent 模式的潜力，构建出既能处理复杂任务又稳定可靠的智能体应用。
+通过深入理解上述架构、流程与工具职责，您可以充分发挥 AmritaBot Agent 模式的潜力，构建出既能处理复杂任务又稳定可靠的智能体应用。

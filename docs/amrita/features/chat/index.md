@@ -1,6 +1,6 @@
 # 聊天功能概述
 
-Amrita 的聊天功能以 AmritaCore 作为 Agent 引擎，以 AmritaSense 作为底层工作流运行时，提供了从基础对话到高级工具调用和 MCP 集成的完整能力。
+AmritaBot 的聊天功能以 AmritaCore 作为 Agent 引擎，以 AmritaSense 作为底层工作流运行时，提供了从基础对话到高级工具调用和 MCP 集成的完整能力。
 
 ## 核心设计
 

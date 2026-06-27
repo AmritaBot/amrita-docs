@@ -6,8 +6,8 @@
 
 确保你已经完成以下步骤：
 
-- [安装 Amrita](./quick-start.md)
-- [启动 Amrita](./installation.md)
+- [安装 AmritaBot](./quick-start.md)
+- [启动 AmritaBot](./installation.md)
 - [环境配置](./configuration.md)
 
 ## 对接到OneBot V11协议实现

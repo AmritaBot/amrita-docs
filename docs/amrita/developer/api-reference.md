@@ -1,6 +1,6 @@
 # API 参考
 
-本文档提供了 Amrita 项目的核心 API 参考信息。完整 API 请参阅各模块源码。
+本文档提供了 AmritaBot 项目的核心 API 参考信息。完整 API 请参阅各模块源码。
 
 ## 🧠 框架入口 API
 
@@ -9,7 +9,7 @@
 ### init()
 
 - **位置**: `amrita/utils/bot_utils.py`
-- **功能**: 初始化 Amrita 框架（日志、配置、适配器）
+- **功能**: 初始化 AmritaBot 框架（日志、配置、适配器）
 
 ### load_plugins()
 
@@ -31,7 +31,7 @@
 ### AmritaConfig
 
 - **位置**: `amrita/config.py`
-- **功能**: Amrita 核心配置 Pydantic 模型，定义 `log_dir`、`admin_group`、`bot_name`、`rate_limit` 等字段
+- **功能**: AmritaBot 核心配置 Pydantic 模型，定义 `log_dir`、`admin_group`、`bot_name`、`rate_limit` 等字段
 
 ### get_amrita_config()
 
@@ -212,4 +212,4 @@ print(f"健康等级: {health_info['health_level']}")
 
 此处请参考 [NoneBot 官方文档](hhttps://nonebot.dev/docs/tutorial/handler)
 
-这些 API 提供了 Amrita 的核心功能接口。有关更详细的使用方法，请参考其他文档部分。
+这些 API 提供了 AmritaBot 的核心功能接口。有关更详细的使用方法，请参考其他文档部分。

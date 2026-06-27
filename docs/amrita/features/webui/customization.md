@@ -2,7 +2,7 @@
 
 ## 概述
 
-Amrita 的 WebUI 模块提供了一个基于 FastAPI 的 Web 管理界面，允许用户通过浏览器管理机器人。该模块包含了一套完整的 API 和页面装饰器，方便开发者快速创建新的管理页面。
+AmritaBot 的 WebUI 模块提供了一个基于 FastAPI 的 Web 管理界面，允许用户通过浏览器管理机器人。该模块包含了一套完整的 API 和页面装饰器，方便开发者快速创建新的管理页面。
 
 ## 核心组件
 
@@ -54,10 +54,10 @@ def on_page(
 #### 使用示例
 
 ```python
-@on_page(path="/path/to/your/page", page_name="我的Amrita 页面", category="其他功能")
+@on_page(path="/path/to/your/page", page_name="我的AmritaBot 页面", category="其他功能")
 async def _(ctx: PageContext):
     return PageResponse(
-        name="my_page.html.jinja2", context={"title": "我的Amrita 页面"}
+        name="my_page.html.jinja2", context={"title": "我的AmritaBot 页面"}
     )
 
 ```
@@ -151,10 +151,10 @@ TemplatesManager().add_templates_dir(
 
 
 # 创建页面
-@on_page(path="/path/to/your/page", page_name="我的Amrita 页面", category="其他功能")
+@on_page(path="/path/to/your/page", page_name="我的AmritaBot 页面", category="其他功能")
 async def _(ctx: PageContext):
     return PageResponse(
-        name="my_page.html.jinja2", context={"title": "我的Amrita 页面"}
+        name="my_page.html.jinja2", context={"title": "我的AmritaBot 页面"}
     )
 
 ```

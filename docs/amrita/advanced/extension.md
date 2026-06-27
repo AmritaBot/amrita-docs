@@ -2,7 +2,7 @@
 
 ## 前言
 
-此页面介绍了 Amrita 的官方插件，以及如何使用它们来扩展 Amrita 的功能。
+此页面介绍了 AmritaBot 的官方插件，以及如何使用它们来扩展 AmritaBot 的功能。
 
 ## 官方插件
 
@@ -22,6 +22,6 @@ DeepSeek 模型目前在工具调用中存在DSML标签对泄露的问题，因�
 
 ## plugin-exec
 
-Amrita 的命令执行插件，这是一个为Amrita框架开发的命令执行插件，允许授权用户/LLM在聊天中执行服务器命令。
+AmritaBot 的命令执行插件，这是一个为Amrita框架开发的命令执行插件，允许授权用户/LLM在聊天中执行服务器命令。
 
 详情请查看 [plugin-exec](https://github.com/AmritaBot/plugin-exec)

@@ -1,6 +1,6 @@
 # 基础对话
 
-Amrita 的基础对话功能基于 AmritaCore 的 `ChatObject` / `ChatManager` 体系，让你的机器人能够进行自然、流畅的流式对话。
+AmritaBot 的基础对话功能基于 AmritaCore 的 `ChatObject` / `ChatManager` 体系，让你的机器人能够进行自然、流畅的流式对话。
 
 ## 核心概念
 
@@ -19,7 +19,7 @@ Amrita 的基础对话功能基于 AmritaCore 的 `ChatObject` / `ChatManager` �
 
 ### 上下文窗口
 
-Amrita 会自动维护对话上下文，解析的消息段包括：文字、@、合并转发。
+AmritaBot 会自动维护对话上下文，解析的消息段包括：文字、@、合并转发。
 
 消息格式示例：
 
@@ -27,7 +27,7 @@ Amrita 会自动维护对话上下文，解析的消息段包括：文字、@、
 - **群聊普通消息**：`[管理员/群主/自己/群员][YYYY-MM-DD weekday hh:mm:ss AM/PM][昵称（QQ号）]说:<内容>`
 - **引用消息**：在普通消息格式后添加 `<REFERRED>引用消息内其他消息段解析后内容</REFERRED>`
 
-Amrita 内置了基础提示词，因此您无需在提示词中而外对格式进行描述。
+AmritaBot 内置了基础提示词，因此您无需在提示词中而外对格式进行描述。
 
 ## 个性化设置
 

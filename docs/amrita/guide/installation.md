@@ -1,13 +1,13 @@
 # 部署指南
 
-本文档将指导您如何部署 Amrita 机器人到生产环境。
+本文档将指导您如何部署 AmritaBot 机器人到生产环境。
 
 ## 🎯 部署前准备
 
 在部署之前，请确保您已完成以下准备工作：
 
 1. 已安装 amctl 工具
-2. 已创建 Amrita 项目
+2. 已创建 AmritaBot 项目
 3. 已配置好所需的环境变量
 4. 已选择合适的部署平台
 
@@ -49,7 +49,7 @@ uv run ambot run
 
 ### 环境变量说明
 
-Amrita 使用以下环境变量进行配置：
+AmritaBot 使用以下环境变量进行配置：
 
 | 变量名             | 默认值                  | 说明                       |
 | ------------------ | ----------------------- | -------------------------- |
@@ -60,7 +60,7 @@ Amrita 使用以下环境变量进行配置：
 | LOCALSTORE_USE_CWD | true                    | 是否使用当前目录存储数据   |
 | DATABASE_URL       | aiosqlite:///db.sqlite3 | 数据库连接 URL             |
 | LOG_DIR            | logs                    | 日志目录                   |
-| BOT_NAME           | Amrita                  | 机器人名称                 |
+| BOT_NAME           | AmritaBot                  | 机器人名称                 |
 | RATE_LIMIT         | 5                       | 请求速率限制               |
 | ADMIN_GROUP        | 123456789               | 管理员群组                 |
 | WEBUI_ENABLE       | true                    | 是否启用 WebUI             |
@@ -103,7 +103,7 @@ WEBUI_PASSWORD=your_secure_password
 ### 网络安全
 
 1. 限制访问来源
-2. 使用 HTTPS 代理到 Amrita WebUI
+2. 使用 HTTPS 代理到 AmritaBot WebUI
 3. 定期更新依赖
 
 ## 🧪 故障排除

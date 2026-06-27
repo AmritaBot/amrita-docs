@@ -1,10 +1,10 @@
 # 管理仪表板组件库文档
 
-Amrita WebUI 基于 [Tailwind CSS](https://tailwindcss.com/) 构建，使用 Utility-First 方式实现组件样式。以下列出常用的组件模式。
+AmritaBot WebUI 基于 [Tailwind CSS](https://tailwindcss.com/) 构建，使用 Utility-First 方式实现组件样式。以下列出常用的组件模式。
 
 ## 概述
 
-Amrita 的管理仪表板使用 Tailwind CSS + Glassmorphism（毛玻璃）设计语言，内置亮色/暗色主题支持（通过 `dark:` 前缀类）。所有 Tailwind 类可直接在 Jinja2 模板中使用。
+AmritaBot 的管理仪表板使用 Tailwind CSS + Glassmorphism（毛玻璃）设计语言，内置亮色/暗色主题支持（通过 `dark:` 前缀类）。所有 Tailwind 类可直接在 Jinja2 模板中使用。
 
 ## 常用组件模式
 

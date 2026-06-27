@@ -1,10 +1,10 @@
-# Amrita 项目文档
+# AmritaBot 项目文档
 
-Amrita 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大智能聊天机器人，专为快速构建和部署 LLM 驱动的聊天机器人而设计。它以 [AmritaCore](https://core.amritabot.com) 作为核心 Agent 引擎，以 [AmritaSense](https://sense.amritabot.com) 作为底层工作流编排引擎，构建了从底层运行时到上层应用的完整技术栈。
+AmritaBot 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大智能聊天机器人，专为快速构建和部署 LLM 驱动的聊天机器人而设计。它以 [AmritaCore](https://core.amritabot.com) 作为核心 Agent 引擎，以 [AmritaSense](https://sense.amritabot.com) 作为底层工作流编排引擎，构建了从底层运行时到上层应用的完整技术栈。
 
 ## 介绍
 
-Amrita 提供了一套完整的聊天机器人开发和部署解决方案，具有以下核心特性：
+AmritaBot 提供了一套完整的聊天机器人开发和部署解决方案，具有以下核心特性：
 
 ### 🌟 核心特性
 
@@ -28,7 +28,7 @@ Amrita 提供了一套完整的聊天机器人开发和部署解决方案，具�
 1. **CLI 工具链**
    - `amctl` — 项目脚手架，负责创建、管理、修复项目
    - `ambot`（ambot-inlinectl）— 运行时管理，提供 `run`、`nb`、`orm` 等命令
-   - `amctl-template-ambot` — 部署模板，一键安装即可创建 Amrita 项目
+   - `amctl-template-ambot` — 部署模板，一键安装即可创建 AmritaBot 项目
 
 2. **核心插件系统**
    - `chat`: 主要聊天功能插件，支持多种大语言模型
@@ -41,7 +41,7 @@ Amrita 提供了一套完整的聊天机器人开发和部署解决方案，具�
 
 ```mermaid
 graph TD
-    subgraph "Amrita 应用层"
+    subgraph "AmritaBot 应用层"
         NoneBot2[NoneBot2 框架]
         OneBot[OneBot V11 适配器]
         WebUI[WebUI 管理界面]
@@ -65,7 +65,7 @@ graph TD
         Stream[SuspendObjectStream<br/>全双工异步流]
     end
 
-    Amrita 应用层 --> AmritaCore Agent 运行时
+    AmritaBot 应用层 --> AmritaCore Agent 运行时
     AmritaCore Agent 运行时 --> AmritaSense 工作流引擎
 ```
 
@@ -79,4 +79,4 @@ graph TD
 - 使用 SQLAlchemy ORM 进行数据持久化
 - 使用 FastAPI 进行 API 接口开发
 
-开始使用 Amrita 之前，建议先阅读 [快速开始](./guide/quick-start.md) 部分。
+开始使用 AmritaBot 之前，建议先阅读 [快速开始](./guide/quick-start.md) 部分。

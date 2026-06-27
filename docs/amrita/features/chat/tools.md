@@ -2,7 +2,7 @@
 
 ## 前言
 
-Amrita 内置了 Tools 能力与 Agent 能力，本章主要介绍Tools相关的配置，关于Agent的使用，请参考[Agent 最佳实践](../../best-practices/agent.md)
+AmritaBot 内置了 Tools 能力与 Agent 能力，本章主要介绍Tools相关的配置，关于Agent的使用，请参考[Agent 最佳实践](../../best-practices/agent.md)
 
 ## 配置
 

@@ -1,4 +1,4 @@
-# Amrita Menu 文档
+# AmritaBot Menu 文档
 
 ## API(`amrita.plugins.menu.models`)
 

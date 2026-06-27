@@ -1,6 +1,6 @@
 # Web界面
 
-Amrita WebUI是Amrita原生的轻量级UI，用于信息显示与管理Bot本体，提供直观的操作体验。
+AmritaBot WebUI是Amrita原生的轻量级UI，用于信息显示与管理Bot本体，提供直观的操作体验。
 
 ## 访问
 
@@ -8,7 +8,7 @@ Amrita WebUI是Amrita原生的轻量级UI，用于信息显示与管理Bot本体
 
 ## 安全警告
 
-Amrita WebUI并没有过多的安全防护，请**不要**直接把Amrita WebUI暴露给公网，这可能会导致您的Bot被攻击。同时，也请您设置一个安全的账号与密码，来避免安全问题。
+AmritaBot WebUI并没有过多的安全防护，请**不要**直接把AmritaBot WebUI暴露给公网，这可能会导致您的Bot被攻击。同时，也请您设置一个安全的账号与密码，来避免安全问题。
 
 ## 快速导航
 
