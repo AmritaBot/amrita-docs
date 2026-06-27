@@ -60,7 +60,7 @@ AmritaBot 使用以下环境变量进行配置：
 | LOCALSTORE_USE_CWD | true                    | 是否使用当前目录存储数据   |
 | DATABASE_URL       | aiosqlite:///db.sqlite3 | 数据库连接 URL             |
 | LOG_DIR            | logs                    | 日志目录                   |
-| BOT_NAME           | AmritaBot                  | 机器人名称                 |
+| BOT_NAME           | AmritaBot               | 机器人名称                 |
 | RATE_LIMIT         | 5                       | 请求速率限制               |
 | ADMIN_GROUP        | 123456789               | 管理员群组                 |
 | WEBUI_ENABLE       | true                    | 是否启用 WebUI             |

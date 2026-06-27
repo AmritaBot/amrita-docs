@@ -21,7 +21,7 @@ AmritaBot 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大聊天机器
 
 | 仓库                                                                      | 说明                                                  |
 | ------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [AmritaBot](https://github.com/AmritaBot/Amrita)                             | **应用层** — 集成 NoneBot2 + WebUI + 插件（本文档）   |
+| [AmritaBot](https://github.com/AmritaBot/Amrita)                          | **应用层** — 集成 NoneBot2 + WebUI + 插件（本文档）   |
 | [AmritaCore](https://github.com/AmritaBot/AmritaCore)                     | **Agent 运行时** — 策略、会话、工具、MCP、适配器      |
 | [AmritaSense](https://github.com/AmritaBot/AmritaSense)                   | **工作流引擎** — 指令集 VM、事件总线、依赖注入        |
 | [Amctl](https://github.com/AmritaBot/Amctl)                               | **CLI 脚手架** — 项目创建、模板管理                   |
