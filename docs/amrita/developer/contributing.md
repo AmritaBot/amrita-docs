@@ -15,18 +15,32 @@
 
 ## 项目概述
 
-Amrita 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大聊天机器人框架，专为快速构建和部署智能聊天机器人而设计。它不仅是一个 CLI 工具，更是一个完整的 LLM 聊天机器人解决方案，支持多种大语言模型和适配器。
+Amrita 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大聊天机器人，专为快速构建和部署 LLM 驱动的智能 QQ 机器人而设计。它以 [AmritaCore](https://core.amritabot.com) 作为 Agent 引擎，以 [AmritaSense](https://sense.amritabot.com) 作为底层工作流运行时，构建了完整的终端应用层。
+
+### 相关仓库
+
+| 仓库                                                                      | 说明                                                  |
+| ------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [Amrita](https://github.com/AmritaBot/Amrita)                             | **应用层** — 集成 NoneBot2 + WebUI + 插件（本文档）   |
+| [AmritaCore](https://github.com/AmritaBot/AmritaCore)                     | **Agent 运行时** — 策略、会话、工具、MCP、适配器      |
+| [AmritaSense](https://github.com/AmritaBot/AmritaSense)                   | **工作流引擎** — 指令集 VM、事件总线、依赖注入        |
+| [Amctl](https://github.com/AmritaBot/Amctl)                               | **CLI 脚手架** — 项目创建、模板管理                   |
+| [ambot-inlinectl](https://github.com/AmritaBot/ambot-inlinectl)           | **运行时 CLI** — `ambot run`、`ambot nb`、`ambot orm` |
+| [amctl-template-ambot](https://github.com/AmritaBot/amctl-template-ambot) | **部署模板** — `amctl create -t ambot`                |
 
 ## 技术栈
 
 - **Python 3.10+**
-- **[NoneBot2](https://nonebot.dev/)** - 机器人框架
-- **FastAPI** - Web 框架（用于 Web UI）
-- **Jinja2** - 模板引擎
-- **Pydantic** - 数据验证
-- **SQLAlchemy** - ORM（通过 `nonebot-plugin-orm`）
-- **UV** - 包管理器
-- **Ruff** - 代码格式化和 linting
+- **[NoneBot2](https://nonebot.dev/)** — 机器人框架
+- **[AmritaCore](https://core.amritabot.com)** — Agent 运行时（策略、会话、工具、MCP）
+- **[AmritaSense](https://sense.amritabot.com)** — 工作流引擎（指令集 VM、事件总线、依赖注入）
+- **FastAPI** — Web 框架（WebUI 后端）
+- **Jinja2 + Tailwind CSS** — 模板引擎与 UI 框架
+- **Pydantic** — 数据验证
+- **SQLAlchemy** — ORM（通过 `nonebot-plugin-orm`）
+- **Alembic** — 数据库迁移
+- **uv** — 包管理器
+- **Ruff** — 代码格式化和 linting
 
 ## 开发环境设置
 
@@ -69,52 +83,63 @@ cp example/.env.example .env
 ### 4. 运行项目
 
 ```bash
-# 创建Bot.py后运行
-uv run amrita entry
+# 直接运行源码中的 bot.py
 uv run bot.py
-
-# 使用CLI运行
-uv run amrita run
 ```
 
 ## 项目结构
 
 ```plaintext
 Amrita/
-├── amrita/                 # 核心包
-│   ├── API.py              # API 接口定义
-│   ├── __init__.py         # 包初始化
-│   ├── bot.py              # 机器人主入口
-│   ├── cli.py              # CLI 命令行工具
-│   ├── cmds/               # CLI 命令实现
-│   ├── config.py           # 配置定义
-│   ├── config_manager.py   # 配置管理器
-│   ├── load_test.py        # 负载测试工具
-│   ├── plugins/            # 插件系统
-│   │   ├── chat/           # 聊天功能
-│   │   ├── manager/        # 管理功能
-│   │   ├── menu/           # 菜单系统
-│   │   ├── perm/           # 权限系统
-│   │   └── webui/          # Web UI
-│   ├── resource.py         # 资源管理
+├── amrita/                  # 核心包
+│   ├── __init__.py          # 框架入口，暴露 init() / load_plugins() / prepare_nb_cli() 等
+│   ├── __main__.py          # CLI 入口（已废弃，跳转至 amctl）
+│   ├── API.py               # API 透传
+│   ├── bot.py               # 机器人主入口
+│   ├── cache.py             # LRU / TTL / LFU 缓存实现
+│   ├── config.py            # AmritaConfig 核心配置模型
+│   ├── config_manager.py    # BaseDataManager 配置管理器
+│   ├── load_test.py         # 负载测试工具
+│   ├── on.py                # 带权限的 on_command / on_notice 封装
+│   ├── models/              # Pydantic 数据模型
+│   │   └── pyproject.py     # pyproject.toml 解析模型
+│   ├── plugins/             # 内置插件系统
+│   │   ├── chat/            # 聊天功能（含 Agent、MCP、会话、审查）
+│   │   ├── manager/         # 机器人管理（清理、封禁等）
+│   │   ├── menu/            # 菜单系统（命令注册与展示）
+│   │   ├── perm/            # 权限控制（lp.admin / Bukkit 式节点）
+│   │   └── webui/           # WebUI（FastAPI + Tailwind CSS）
 │   └── utils/              # 通用工具
-├── migrations/             # 数据库迁移
-├── data/                   # 数据目录
-├── logs/                   # 日志目录
-├── pyproject.toml          # 项目配置
-├── README.md               # 项目说明
-└── LICENSE                 # 许可证
+│       ├── admin.py         # 管理员消息推送
+│       ├── bot_utils.py     # 机器人初始化
+│       ├── dbmetadata.py    # 数据库元数据查询
+│       ├── dependencies.py  # 可选依赖检查
+│       ├── logging.py       # 日志事件模型
+│       ├── plugins.py       # 插件加载
+│       ├── rate.py          # 令牌桶速率限制
+│       ├── send.py          # 消息发送（含转发）
+│       ├── system_health.py # 系统健康监测
+│       └── utils.py         # 杂项工具
+├── migrations/              # Alembic 数据库迁移
+├── config/                  # 插件运行时配置（TOML）
+├── data/                    # 持久化数据目录
+├── logs/                    # 日志目录
+├── plugins/                 # 用户自定义插件目录
+├── pyproject.toml           # 项目配置
+├── bot.py                   # 快速入口脚本（init + load_plugins + run）
+├── tailwind.config.js       # Tailwind CSS 配置
+└── LICENSE
 ```
 
 ### 插件系统
 
-Amrita 使用插件化架构，主要插件包括：
+Amrita 使用插件化架构，内置插件包括：
 
-- **chat**: 核心聊天功能，支持多种 LLM、会话管理、消息处理
-- **manager**: 机器人管理功能，包括自动清理、封禁解封等
-- **menu**: 菜单系统，提供命令菜单展示
-- **perm**: 权限控制系统，支持细粒度权限节点
-- **webui**: Web 可视化界面，提供配置和管理界面
+- **chat**: 核心聊天功能，集成 AmritaCore Agent 运行时，支持流式响应、多模型、Agent 模式、MCP
+- **manager**: 机器人管理功能，包括自动清理、封禁解封、日志推送
+- **menu**: 菜单系统，提供命令注册与展示（基于 `MatcherData`）
+- **perm**: 权限控制系统，支持 `lp.admin` 等细粒度权限节点（Bukkit 式）
+- **webui**: Web 可视化界面，基于 FastAPI + Jinja2 + Tailwind CSS
 
 ## 贡献流程
 
@@ -227,6 +252,6 @@ git push origin feature/your-feature-name
 ## 联系方式
 
 - [GitHub Issues](https://github.com/LiteSuggarDEV/Amrita/issues)
-- 项目文档: `https://amrita.suggar.top`
+- 项目文档: `https://bot.amritabot.com`
 
 感谢您的贡献！

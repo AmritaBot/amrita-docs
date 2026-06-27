@@ -10,72 +10,80 @@
 
 ## 安装步骤
 
-### 1. 安装 Amrita (CLI)
+### 0. 安装 amctl 工具
 
 ```bash
-pip install amrita
+pip install amctl
 ```
 
-### 2. 初始化项目
+> `amctl` 是 Amrita 的项目脚手架工具，用于创建和管理项目。
+
+### 1. 安装项目模板
 
 ```bash
-amrita create
-# 根据提示创建完bot
-cd your-bot # 替换为你实际的Bot文件夹
+pip install amctl-template-ambot
 ```
 
-::: details
+### 2. 创建项目
 
-<pre>$ amrita create
+```bash
+amctl create -t ambot
+# 根据提示完成创建（输入项目名称、描述等）
+cd your-bot  # 进入项目目录
+```
+
+::: details 创建过程示例
+
+<pre>$ amctl create -t ambot
 <font color="#12488B">[?]</font> 项目名称: Test
-<font color="#12488B">[?]</font> 项目描述 []: My first robot
-<font color="#26A269">[+]</font> 正在创建项目 Test...
-已初始化空的 Git 仓库于 /home/johnrichard/Test/.git/
-<font color="#12488B">[?]</font> 您现在想要安装依赖吗? [Y/n]: y
-<font color="#26A269">[+]</font> 正在安装依赖......
-<font color="#12488B">[?]</font> 您想要使用虚拟环境吗（这通常是推荐的做法）? [Y/n]: y
-Using CPython <font color="#2AA1B3">3.12.9</font>
-Creating virtual environment at: <font color="#2AA1B3">.venv</font>
+<font color="#12488B">[?]</font> 描述 []: My first robot
+<font color="#12488B">[?]</font> 选择一个许可证:
+  [1] MIT
+  [2] Apache-2.0
+  [3] GPL-3.0
+  [4] None (skip)
+<font color="#26A269">[+]</font> 正在创建项目 Test (v1.3.2)...
+<font color="#26A269">[+]</font> 项目 'Test' 创建于 /home/user/Test
+
+  cd Test
+<font color="#12488B">[?]</font> 是否现在安装依赖? [Y/n]: y
+<font color="#26A269">[+]</font> 正在运行 uv sync...
 <font color="#AAAAAA">Resolved </font><font color="#AAAAAA"><b>154 packages</b></font> in 2.86s
-      <font color="#26A269"><b>Built</b></font> test @ file:///home/user/Test
-<font color="#AAAAAA">Prepared </font><font color="#AAAAAA"><b>17 packages</b></font> in 16.22s
-<font color="#AAAAAA">Installed </font><font color="#AAAAAA"><b>149 packages</b></font> in 190ms
-...
-<font color="#26A269">[+]</font> 您的项目 Test 已完成创建!
-<font color="#26A269">[+]</font> 您接下来可以运行以下命令启动项目:
-<font color="#26A269">[+]</font>   cd Test
-<font color="#26A269">[+]</font>   amrita run
+<font color="#26A269">[+]</font> 依赖安装完成。
 $ 
 </pre>
 
 :::
 
 ### 3. 配置`.env`
+
 ```dotenv
 PORT=8080
 ONEBOT_ACCESS_TOKEN=your-onebot-access-token # 你需要设置一个安全的访问令牌，就像密码一样。
-WEBUI_USE_RNAME=admin
+WEBUI_USER_NAME=admin
 WEBUI_PASSWORD=your-webui-password # 你需要为Amrita的WebUI设置一个安全的密码。
 ```
 
 ### 4. 启动机器人
+
 ```bash
-amrita run
+uv run ambot run
 ```
 
+> **提示**：`ambot` 命令来自 `ambot-inlinectl` 包（项目依赖中已包含），通过 `uv run` 调用。也可使用 `amctl man run` 快捷启动。激活虚拟环境 (`source .venv/bin/activate`) 后可直接 `ambot run`。
 
 ## 验证安装
 
 访问`http://127.0.0.1:8080`可打开WebUI。
 
-![WebUI](/webui.png)
+<!-- TODO: WebUI首页截图，显示成功运行后的主界面 -->
 
 如果成功打开，恭喜你！Amrita 已成功运行。
 
 ## 下一步
 
 - [部署与配置](./installation.md)
-- [基础配置](./configuration.md)  
+- [基础配置](./configuration.md)
 - [创建第一个对话机器人](./first-bot.md)
 
 > **提示**：遇到问题？查看我们的 [常见问题](../faq.md) 或 [获取社区支持](../community/support.md)。

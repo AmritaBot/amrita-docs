@@ -2,61 +2,73 @@
 
 ## 1. 项目概述
 
-`Amrita` 使用 `AmritaCore` 作为其核心引擎。`AmritaCore` 提供了基础的 LLM 集成、上下文管理和工具调用能力，而 `Amrita` 在此基础上构建了完整的 QQ 机器人应用，包括插件系统、权限管理、WebUI 等功能模块。
+Amrita 的技术栈分为三层：
 
-`Amrita` 与 `AmritaCore` 的关系类似于 Linux 发行版与 Linux 内核的关系：`AmritaCore` 作为Agent底层核心引擎提供基础能力，`Amrita` 作为上层应用框架提供完整的用户交互和管理功能。
+- **AmritaSense** — 底层工作流编排引擎。采用**指令集架构**替代传统图模型，将控制流（IF/WHILE/GOTO/CALL/TRY）编译为线性指令序列，由轻量 VM（`PointerVector` + 调用栈）逐条执行。核心约 300 LOC，支持原生异步挂起/恢复。
+- **AmritaCore** — Agent 运行时层。构建于 AmritaSense 之上，提供厂商无关的适配器系统（OpenAI / Anthropic / 可扩展）、工具系统（`@simple_tool`、`@on_tools`、MCP 客户端）、事件驱动钩子、上下文窗口与 Token 自动管理。
+- **Amrita** — 终端应用层。集成 NoneBot2 + OneBot V11 适配器 + WebUI + 插件系统，提供开箱即用的 QQ 机器人体验。
+
+三者的关系类似于：**AmritaSense = 操作系统内核 → AmritaCore = 中间件/运行时 → Amrita = 桌面环境/应用**。
 
 ## 2. 整体架构拓扑图
 
 ```mermaid
 graph TD
     subgraph "用户交互层"
-        QQ[协议实现端] -->|OneBot V11协议| Adapter[OneBot适配器]
-        WebUI[Web管理界面] -->|HTTP请求| FastAPI
+        QQ[QQ / NapCat / LLOneBot] -->|OneBot V11| OneBotAdapter[OneBot V11 适配器]
+        Browser[浏览器] -->|HTTP| FastAPI[FastAPI 路由]
     end
 
-    subgraph "应用框架层"
-        Adapter -->|事件分发| NoneBot2[NoneBot2框架]
-        FastAPI -->|路由处理| NoneBot2
-        NoneBot2 -->|插件加载| PluginManager[插件管理器]
+    subgraph "Amrita 应用层"
+        OneBotAdapter -->|事件分发| NoneBot2[NoneBot2 框架]
+        FastAPI --> NoneBot2
+        NoneBot2 --> PluginMgr[插件管理器]
+        PluginMgr --> ChatPlugin[Chat 插件]
+        PluginMgr --> PermPlugin[Perm 插件]
+        PluginMgr --> ManagerPlugin[Manager 插件]
+        PluginMgr --> MenuPlugin[Menu 插件]
+        PluginMgr --> WebUIPlugin[WebUI 插件]
     end
 
-    subgraph "插件系统"
-        PluginManager --> ChatPlugin[Chat插件]
-        PluginManager --> ManagerPlugin[Manager插件]
-        PluginManager --> PermPlugin[Perm插件]
-        PluginManager --> MenuPlugin[Menu插件]
-        PluginManager --> WebUIPlugin[WebUI插件]
+    subgraph "AmritaCore Agent 运行时"
+        ChatPlugin -->|调用| ChatManager[ChatManager]
+        ChatManager --> ChatObject[ChatObject 会话单元]
+        ChatObject --> ContextMgr[上下文管理器]
+        ChatObject --> SessionMgr[会话归档/恢复]
+        ChatManager --> AgentRuntime[AgentRuntime 策略引擎]
+        AgentRuntime --> ToolsMgr[ToolsManager]
+        AgentRuntime --> MCPClient[MCP 客户端]
+        ToolsMgr -->|@simple_tool| BuiltinTools[内置工具]
+        MCPClient -->|SSE/Stdio| ExternalTools[外部 MCP 服务器]
     end
 
-    subgraph "核心引擎层"
-        ChatPlugin --> AmritaCore[AmritaCore引擎]
-        AmritaCore -->|LLM调用| LLMProviders[LLM提供商]
-        LLMProviders --> OpenAI[OpenAI]
-        LLMProviders --> DeepSeek[DeepSeek]
-        LLMProviders --> Gemini[Gemini]
+    subgraph "AmritaSense 工作流引擎"
+        AgentRuntime -->|编译为指令| VM[指令集 VM]
+        VM --> PointerVector[PointerVector 程序计数器]
+        VM --> CallStack[调用栈]
+        VM --> Stream[SuspendObjectStream 异步流]
+        VM --> Events[事件总线]
     end
 
-    subgraph "数据存储层"
-        ChatPlugin -->|读写| Database[数据库]
-        Database --> UserMetadata[用户元数据]
-        Database --> Memory[会话记忆]
-        Database --> Sessions[会话归档]
-        Database --> Insights[用量统计]
-        Database --> Config[配置数据]
+    subgraph "LLM 提供商"
+        ChatObject -->|HTTP/SSE| LLMRouter[适配器路由器]
+        LLMRouter --> OpenAI[OpenAI]
+        LLMRouter --> Anthropic[Anthropic]
+        LLMRouter --> Custom[自定义兼容 API]
+    end
+
+    subgraph "数据层"
+        ChatPlugin -->|ORM| Database[SQLAlchemy]
+        Database --> SQLite[(SQLite)]
+        Database --> MySQL[(MySQL)]
+        Database --> PostgreSQL[(PostgreSQL)]
+        PermPlugin --> Database
     end
 
     subgraph "缓存层"
-        ChatPlugin --> Cache[缓存系统]
-        Cache --> LRUCache[LRU缓存]
-        Cache --> WeakValueCache[弱引用缓存]
-    end
-
-    subgraph "工具扩展层"
-        AmritaCore --> Tools[工具系统]
-        Tools --> MCP[MCP协议]
-        Tools --> BuiltinTools[内置工具]
-        Tools --> ExternalTools[外部工具]
+        ChatPlugin -->|async-lru| LRUCache[LRU 缓存]
+        ChatPlugin -->|weakref| WeakCache[弱引用缓存]
+        PermPlugin --> LRUCache
     end
 ```
 

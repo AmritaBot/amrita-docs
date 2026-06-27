@@ -6,7 +6,7 @@
 
 在部署之前，请确保您已完成以下准备工作：
 
-1. 已安装 Amrita CLI 工具
+1. 已安装 amctl 工具
 2. 已创建 Amrita 项目
 3. 已配置好所需的环境变量
 4. 已选择合适的部署平台
@@ -18,7 +18,7 @@
 对于本地部署，只需在项目目录中运行：
 
 ```bash
-amrita run
+uv run ambot run
 ```
 
 这将在本地启动机器人服务，默认监听 `127.0.0.1:8080`。
@@ -38,7 +38,7 @@ amrita run
 
 2. 运行生产环境：
    ```bash
-   amrita run
+   uv run ambot run
    ```
 
 ### 一键部署脚本/容器化部署
@@ -113,8 +113,10 @@ WEBUI_PASSWORD=your_secure_password
 1. **依赖问题**：
 
    ```bash
-   amrita check-dependencies
+   uv sync
    ```
+
+   或使用 pip 重新安装依赖。
 
 2. **端口占用**：
    修改 `.env` 文件中的 PORT 变量

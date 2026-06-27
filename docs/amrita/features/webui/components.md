@@ -1,82 +1,14 @@
 # 管理仪表板组件库文档
 
-::: details base.css
+Amrita WebUI 基于 [Tailwind CSS](https://tailwindcss.com/) 构建，使用 Utility-First 方式实现组件样式。以下列出常用的组件模式。
 
-### Base CSS 目录
+## 概述
 
-- [概述](#概述)
-- [主题与变量](#主题与变量)
-- [布局组件](#布局组件)
-  - [仪表板容器](#仪表板容器)
-  - [主内容区域](#主内容区域)
-- [基础组件](#基础组件)
-  - [卡片](#卡片)
-  - [按钮](#按钮)
-  - [表格](#表格)
-  - [表单元素](#表单元素)
-  - [警告框](#警告框)
-- [信息展示组件](#信息展示组件)
-  - [信息网格](#信息网格)
-  - [信息卡片](#信息卡片)
-  - [图表卡片](#图表卡片)
-  - [状态指示器](#状态指示器)
-- [工具类](#工具类)
-- [响应式设计](#响应式设计)
-- [使用示例](#使用示例)
+Amrita 的管理仪表板使用 Tailwind CSS + Glassmorphism（毛玻璃）设计语言，内置亮色/暗色主题支持（通过 `dark:` 前缀类）。所有 Tailwind 类可直接在 Jinja2 模板中使用。
 
-### 概述
+## 常用组件模式
 
-这是 Amrita 的管理仪表板组件库，提供完整的亮色/暗色主题支持，响应式设计和丰富的 UI 组件。所有组件都采用 CSS 变量实现主题定制。
-
-### 主题与变量
-
-组件库使用 CSS 变量实现主题系统，支持亮色和暗色模式切换。
-
-###### 亮色主题变量
-
-```css
-:root {
-  --primary-color: #3498db;
-  --secondary-color: #2980b9;
-  --accent-color: #1abc9c;
-  --text-color: #333;
-  --text-light: #fff;
-  --bg-color: #f8f9fa;
-  --sidebar-bg: #2c3e50;
-  --sidebar-hover: #34495e;
-  --header-height: 60px;
-  --transition-speed: 0.3s;
-}
-```
-
-###### 暗色主题变量
-
-```css
-:root {
-  --dark-bg-color: #1a1a1a;
-  --dark-text-color: #f0f0f0;
-  --dark-sidebar-bg: #121212;
-  --dark-sidebar-hover: #1e1e1e;
-  --dark-header-bg: #2d2d2d;
-  --dark-card-bg: #252525;
-  --dark-button-bg: #3b424b;
-  --dark-border-color: #444;
-}
-```
-
-###### 主题切换
-
-通过给 body 添加/移除`.dark-mode`类来切换主题：
-
-```javascript
-document.body.classList.toggle("dark-mode");
-```
-
-### 布局组件
-
-###### 仪表板容器
-
-仪表板的主要容器，采用 flex 布局。
+### 仪表板容器
 
 ```html
 <div class="dashboard-container">
@@ -84,19 +16,77 @@ document.body.classList.toggle("dark-mode");
 </div>
 ```
 
-###### 主内容区域
-
-右侧主要内容区域。
+### 信息卡片（Glassmorphism 风格）
 
 ```html
-<main class="main-content">
-  <!-- 顶部导航栏和内容 -->
-</main>
+<div
+  class="glass-card p-5 flex items-center transition-transform hover:-translate-y-1 hover:shadow-lg"
+>
+  <div
+    class="w-[50px] h-[50px] rounded-lg flex items-center justify-center mr-4 text-2xl flex-shrink-0 bg-blue-500/10 text-primary dark:text-primary"
+  >
+    <!-- 图标 -->
+  </div>
+  <div>
+    <h3 class="text-2xl font-bold dark:text-gray-100">数值</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">标签</p>
+  </div>
+</div>
 ```
 
-**状态类**：
+### 图表容器
 
-- `.expanded` - 侧边栏折叠时主内容扩展状态
+```html
+<div
+  class="h-[300px] bg-gray-50/50 dark:bg-gray-800/50 rounded-lg border border-black/5 dark:border-white/5 p-2"
+>
+  <!-- Canvas 图表 -->
+</div>
+```
+
+### 按钮
+
+```html
+<!-- 普通按钮 -->
+<button
+  class="px-4 py-2 rounded border bg-blue-500 text-white hover:bg-blue-600"
+>
+  确认
+</button>
+
+<!-- 玻璃态按钮 -->
+<button
+  class="p-1 rounded border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-black/10 dark:hover:bg-white/20"
+>
+  操作
+</button>
+```
+
+### 表单元素
+
+```html
+<input
+  type="text"
+  class="input-glass py-2 px-3 rounded"
+  placeholder="请输入..."
+/>
+<select class="ml-1 input-glass py-1 px-2 text-sm">
+  <option value="10">10</option>
+</select>
+```
+
+## 主题切换
+
+通过给 `body` 添加/移除 `.dark-mode` 类来切换主题，Tailwind `dark:` 前缀类会自动生效：
+
+```javascript
+document.body.classList.toggle("dark-mode");
+```
+
+## 布局
+
+- `.main-content` — 右侧主内容区域
+- `.expanded` — 侧边栏折叠时主内容扩展状态
 
 ### 基础组件
 

@@ -10,13 +10,13 @@
 
 需要检查以下配置：
 
-- 确保已安装完整依赖：`amrita check-dependencies`
+- 确保已安装完整依赖：在项目目录运行 `uv sync`
 - 检查环境变量是否正确配置
 - 确认端口未被占用，默认端口为 8080
 
 ## 如何进行生产环境部署？
 
-1. 确保已安装 Amrita CLI 工具
+1. 确保已安装 amctl 工具
 2. 创建或初始化项目
 3. 配置生产环境变量，特别是：
    - `ENVIRONMENT=prod`
@@ -24,7 +24,7 @@
    - `ADMIN_GROUP=您的管理员群组ID`
 4. 运行命令启动服务：
    ```bash
-   amrita run
+   uv run ambot run
    ```
 
 ## 如何修改默认的 WebUI 密码？
@@ -50,15 +50,13 @@ DATABASE_URL=aiosqlite:///db.sqlite3
 
 您可以使用以下命令检查依赖：
 
-```bash
-amrita check-dependencies
-```
+在项目目录中运行 `uv sync` 即可同步所有依赖。
 
 如果发现依赖问题，请重新安装完整依赖：
 
 ```bash
-uv add amrita[full] --reinstall
-# 或 `pip install amrita[full] --force-reinstall`
+uv sync --reinstall
+# 或 `pip install -r requirements.txt --force-reinstall`
 ```
 
 如果无法解决，可以考虑重建整个虚拟环境
@@ -82,4 +80,5 @@ uv sync # 同步依赖
 **我们会尽快响应并解决您遇到的问题。**
 
 ---
+
 如果以上 FAQ 未能解决您的问题，请[提交 Issue](https://github.com/AmritaBot/Amrita/issues) 或联系社区支持。

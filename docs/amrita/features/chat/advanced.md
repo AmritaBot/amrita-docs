@@ -12,15 +12,13 @@ Cookie反注入是一种安全检测机制，通过在提示词（prompt）的�
 
 1. 登录 AmritaWebUI ，进入 `chat` 插件的配置页面，展开`cookie`配置块
 
-![Cookie-Config](/chat-conf-cookie.png)
+<!-- TODO: Cookie/子用户配置页面截图，显示cookie内容及关联提示词配置 -->
 
 2. 在cookie输入框填写一个用于cookie检测的字符串（不填将自动生成一个随机字符串），并将enable勾选
 
-![Cookie-Content](/chat-conf-cookie-content.png)
-
 3. 在Prompt内填写`{cookie}`占位符
 
-![Cookie-Prompt](/chat-conf-cookie-prompt.png)
+<!-- TODO: Prompt中cookie占位符配置截图 -->
 
 > 此处同样可用的占位符还有 `{self_id}`,`{user_id}`,`{user_name}`。
 
@@ -53,7 +51,7 @@ Amrita 的内容审查功能基于内部定义的工具调用机制实现，通�
 
 1. 登录 Amrita WebUI，转到`chat`插件的配置页面，展开`llm`配置组，此处有内容审查的配置项。
 
-![report-config](/chat-conf-report.png)
+<!-- TODO: 会话与用量控制页面截图，显示报告推送、用量限制、会话管理配置 -->
 
 2. 修改对应配置项并保存。
 
@@ -107,7 +105,7 @@ Amrita 内置了额度限制功能，用于控制用户的对话使用量。该�
 1. 以同样方式打开WebUI，展开`usage_limit`配置块。
 2. 配置对应配置项
 
-![conf-usage-limit](/chat-conf-usage-limit.png)
+<!-- TODO: 用量限制配置截图 -->
 
 ## 预设列表
 
@@ -153,7 +151,7 @@ graph TD
 
 2. 配置对应配置项
 
-![conf-session](/chat-conf-session.png)
+<!-- TODO: 会话管理配置截图 -->
 
 **提示**
 
@@ -171,7 +169,7 @@ Amrita 内置了上下文摘要功能，当对话历史过长导致token消耗�
 
 2. 展开 `llm` 配置组
 
-![chat-conf-abstract](/chat-conf-abstract.png)
+<!-- TODO: 记忆抽象与回复控制页面截图，显示记忆抽象、自动回复、消息截断配置 -->
 
 **配置项说明**
 
@@ -191,7 +189,7 @@ Amrita内置了一个简单的概率性（主动）回复群消息的功能，�
 
 导航到 `chat` 插件的配置页面，展开`autoreply`配置组，如图。
 
-![pic](/chat-conf-autoreply.png)
+<!-- TODO: 自动回复配置截图 -->
 
 对于非Global模式，群内启用此功能需要使用指令`/autochat off`来启用自动回复。
 
@@ -199,6 +197,6 @@ Amrita内置了一个简单的概率性（主动）回复群消息的功能，�
 
 Amrita内置了一个切句回复的功能，为了使得LLM回复内容更加拟人与自然化，可以在配置内启用。
 
-配置方法同概率性自动回复。如图：
+配置方法同概率性自动回复。
 
-![pic](/chat-conf-cut.png)
+<!-- TODO: 消息截断配置截图 -->

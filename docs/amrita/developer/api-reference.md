@@ -1,121 +1,157 @@
 # API 参考
 
-本文档提供了 Amrita 项目的核心 API 参考信息。
+本文档提供了 Amrita 项目的核心 API 参考信息。完整 API 请参阅各模块源码。
 
-## 🧠 核心模块 API
+## 🧠 框架入口 API
 
-### 1. 配置管理 API
+这些是 `amrita/__init__.py` 暴露的顶层 API，供 `ambot-inlinectl` 等外部 CLI 调用。
 
-参考 [Uniconf](https://github.com/LiteSuggarDEV/nonebot_plugin_uniconf)
+### init()
 
-### 2. 机器人初始化 API
-
-#### init()
-
-- **功能**: 初始化 Amrita 框架，设置日志、适配器等
 - **位置**: `amrita/utils/bot_utils.py`
-- **用法**: 启动机器人前调用此函数
+- **功能**: 初始化 Amrita 框架（日志、配置、适配器）
 
-### 3. 插件管理 API
+### load_plugins()
 
-#### load_plugins()
-
-- **功能**: 加载内置插件和用户定义的插件
 - **位置**: `amrita/utils/plugins.py`
-- **用法**: 自动加载 pyproject.toml 中定义的插件
+- **功能**: 加载 `pyproject.toml` 中 `[tool.amrita].plugins` 定义的插件
 
-### 4. 消息发送 API
+### prepare_nb_cli()
 
-#### send_to_admin(msg: str, bot: Bot | None = None)
+- **功能**: 初始化框架后返回 nb-cli 原生 CLI 入口函数，供 `ambot nb` 透传
 
-- **功能**: 发送消息到管理员
+### prepare_orm()
+
+- **功能**: 初始化框架并加载 ORM 插件后，返回 `nonebot_plugin_orm` CLI 入口函数，供 `ambot orm` 透传
+
+---
+
+## ⚙️ 配置 API
+
+### AmritaConfig
+
+- **位置**: `amrita/config.py`
+- **功能**: Amrita 核心配置 Pydantic 模型，定义 `log_dir`、`admin_group`、`bot_name`、`rate_limit` 等字段
+
+### get_amrita_config()
+
+- **功能**: 获取当前 AmritaConfig 实例
+
+### BaseDataManager
+
+- **位置**: `amrita/config_manager.py`
+- **功能**: 配置管理器基类，提供 TOML 配置文件的读写和 WebUI 集成
+
+---
+
+## 🔌 带权限的事件注册
+
+### on_command / on_notice / on_message / on_keyword
+
+- **位置**: `amrita/on.py`
+- **功能**: 对 NoneBot 原生 `on_command` 等函数的封装，内置权限检查
+- **权限模式**: `group`（仅群）| `user`（仅用户）| `union`（任一）
+
+---
+
+## 📨 消息发送 API
+
+### send_to_admin(msg: str, bot: Bot | None = None)
+
 - **位置**: `amrita/utils/admin.py`
-- **参数**:
-  - `msg`: 消息内容
-  - `bot`: Bot 实例（可选）
+- **功能**: 发送消息到管理员群组
 
-#### send_forward_msg_to_admin(bot: Bot, name: str, uin: str, msgs: list[MessageSegment])
+### send_forward_msg(bot: Bot, event: Event, name: str, uin: str, msgs: Iterable[MessageSegment])
 
-- **功能**: 发送合并转发消息到管理员
-- **参数**:
-  - `bot`: Bot 实例
-  - `name`: 发送者名称
-  - `uin`: 发送者 UID
-  - `msgs`: 消息列表
-
-#### send_forward_msg(bot: Bot, event: Event, name: str, uin: str, msgs: typing.Iterable[MessageSegment])
-
-- **功能**: 发送合并转发消息
 - **位置**: `amrita/utils/send.py`
-- **参数**:
-  - `bot`: Bot 实例
-  - `event`: 事件对象
-  - `name`: 发送者名称
-  - `uin`: 发送者 UID
-  - `msgs`: 消息列表
+- **功能**: 发送合并转发消息
 
-### 5. 速率限制 API
+### send_forward_msg_to_admin(bot: Bot, name: str, uin: str, msgs: list[MessageSegment])
 
-#### TokenBucket
+- **位置**: `amrita/utils/admin.py`
+- **功能**: 发送合并转发消息到管理员
 
-- **功能**: 令牌桶算法实现速率限制
+---
+
+## 🗄️ 数据库元数据
+
+### ConnectionStats / TableInfo / DatabaseMetadata 等
+
+- **位置**: `amrita/utils/dbmetadata.py`
+- **功能**: 查询数据库连接统计、表信息、锁状态等运行时元数据
+
+---
+
+## 📊 系统健康监测
+
+### calculate_system_usage() -> dict
+
+- **位置**: `amrita/utils/system_health.py`
+- **功能**: 返回 CPU、内存、磁盘、网络 IO 等系统指标
+
+---
+
+## ⏱️ 速率限制
+
+### TokenBucket / BucketRepository / get_bucket()
+
 - **位置**: `amrita/utils/rate.py`
-- **方法**:
-  - `consume()`: 尝试消耗一个令牌，返回是否成功
+- **功能**: 基于令牌桶算法的请求速率限制
 
-#### BucketRepoitory
+---
 
-- **功能**: 令牌桶仓库，管理多个命名空间的令牌桶
-- **方法**:
-  - `get_bucket(key)`: 获取指定键的令牌桶
+## 🗃️ 缓存
 
-#### get_bucket(namespace: str, rate: int, key: Any) -> TokenBucket
+### LRUCache / TTLCache / LFUCache
 
-- **功能**: 获取指定命名空间、速率和键的令牌桶
+- **位置**: `amrita/cache.py`
+- **功能**: 多种缓存策略实现，LRUCache 基于 OrderedDict，WeakValueLRUCache 基于 amrita_sense
 
-### 6. 系统健康监测 API
+---
 
-#### calculate_system_usage() -> dict
+## 🔍 依赖检查
 
-- **功能**: 计算系统使用情况，包括 CPU、内存、磁盘等信息
-- **返回**: 包含系统使用情况的字典
+### check_dependency_package(name: str) -> bool
 
-#### calculate_system_health() -> dict
+- **位置**: `amrita/utils/dependencies.py`
+- **功能**: 检查指定 pip 包是否已安装
 
-- **功能**: 计算系统健康值
-- **返回**: 包含总体健康值和详细指标的字典
+---
 
-### 7. 版本信息 API
+## 📝 日志事件
 
-#### get_amrita_version()
+### LoggingEvent
 
-- **功能**: 获取 Amrita 框架版本
-- **位置**: `amrita/utils/utils.py`
-- **返回**: 框架版本字符串
+- **位置**: `amrita/utils/logging.py`
+- **功能**: 结构化日志事件模型，支持级别、描述、时间戳等字段
 
-## API 使用示例
+---
 
-### 配置管理示例
+## 🧩 插件开发 API
 
-```python
+参见 [权限 API](../features/permission/API.md) | [菜单 API](../features/other-modules/menu.md) | [WebUI API](../features/webui/customization.md)
 from amrita.config_manager import BaseDataManager
 from pydantic import BaseModel
 
 class MyConfig(BaseModel):
-    api_key: str = "default_key"
+api_key: str = "default_key"
 
 class MyDataManager(BaseDataManager[MyConfig]):
-    config: MyConfig
+config: MyConfig
 
     async def __apost_init__(self):
         # 异步初始化后置处理
         pass
+
 ...
+
 # 使用配置管理器
+
 dm = MyDataManager()
 config = await dm.safe_get_config()
 print(config.api_key)
-```
+
+````
 
 ### 消息发送示例
 
@@ -124,7 +160,7 @@ from amrita.utils.admin import send_to_admin
 
 # 发送消息到管理员
 await send_to_admin("系统启动成功")
-```
+````
 
 ### 速率限制示例
 
@@ -154,7 +190,7 @@ print(f"健康等级: {health_info['health_level']}")
 
 ## 🤖 Chat 插件 API
 
-此处请参考聊天插件的 AmritaCore 的文档：[Docs](https://amrita-core.suggar.top/zh)
+此处请参考聊天插件的 AmritaCore 的文档：[Docs](https://core.amritabot.com/zh)
 
 ## 🔐 权限插件 API
 

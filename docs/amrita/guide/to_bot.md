@@ -24,7 +24,6 @@
 
 :::
 
-
 ### 反向 WebSocket 连接
 
 1. 启动 Amrita 项目
@@ -41,13 +40,13 @@
 
 打开 NapCat 的 WebUI，选择 `网络配置` -> `新建` -> `WebSocket 客户端`
 
-![nc-0](/nc-0.png)
+<!-- TODO: NapCat WebUI → 网络配置 → 新建 WebSocket 客户端 - 步骤截图1 -->
 
-![nc-1](/nc-1.png)
+<!-- TODO: NapCat → 选择 WebSocket 客户端类型 - 步骤截图2 -->
 
 配置 Amrita 项目的监听地址和端口。
 
-![nc-2](/nc-2.png)
+<!-- TODO: NapCat → 填写 Amrita WebSocket 连接地址 - 步骤截图3 -->
 
 **注意**: 此处连接的URL应在末端添加 `/onebot/v11/ws` 否则将无法连接。因此此处正确的链接URL为 `ws://127.0.0.1:8082/onebot/v11/ws`
 

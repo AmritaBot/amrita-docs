@@ -45,11 +45,10 @@ Amrita内置了WebUI，提供图形化配置方式：
 3. 点击 "添加 MCP 服务器" 或类似按钮
 4. 填写MCP服务器的脚本/地址，并保存
 
-
 ::: tip
 使用以上方式都需要先启用MCP服务
 
-![2](/chat-conf-tool-2.png)
+<!-- TODO: MCP服务器配置页面截图，显示MCP工具列表及连接状态 -->
 
 将这里的enable改为true
 :::

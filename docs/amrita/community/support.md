@@ -4,7 +4,7 @@
 
 ## 加入 QQ 群
 
-AmritaBot 是 [LiteSuggarDEV](https://docs.suggar.top) 的附属团队，如果您在使用 Amrita 的过程中遇到问题，或者想要与其他用户交流经验，欢迎加入我们的 QQ 群：
+AmritaConstant 是 [LiteSuggarDEV](https://docs.suggar.top) 的附属团队，如果您在使用 Amrita 的过程中遇到问题，或者想要与其他用户交流经验，欢迎加入我们的 QQ 群：
 
 - QQ 群：1006893368
 - QQ 群链接：[点击链接加入群聊【「雾见茶屋」：](https://qm.qq.com/q/IvG8Dm7W4m)
@@ -18,12 +18,11 @@ AmritaBot 是 [LiteSuggarDEV](https://docs.suggar.top) 的附属团队，如果�
 
 ## Discord 社区
 
-AmritaBot 有一个单独的Discord服务器，此服务器内区分简体中文与English（国际频道），从下方链接可以加入：
+AmritaConstant 有一个单独的Discord服务器，此服务器内区分简体中文与English（国际频道），从下方链接可以加入：
 
- - [Discord](https://discord.gg/byAD3sbjjj)
+- [Discord](https://discord.gg/byAD3sbjjj)
 
 社区规则请见[社区守则](./discord-rules.md)
-
 
 ## 贡献代码
 

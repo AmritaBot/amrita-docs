@@ -8,11 +8,7 @@ Amrita 内置了 Tools 能力与 Agent 能力，本章主要介绍Tools相关的
 
 导航到 `chat` 插件的配置页面，展开`llm`配置组，如图，以下配置项与Tools调用有关：
 
-![0](/chat-conf-tool-0.png)
-
-![1](/chat-conf-tool-1.png)
-
-![3](/chat-conf-tool-3.png)
+<!-- TODO: 工具调用(Function Calling)配置页面截图，显示工具启用、参数及权限配置 -->
 
 配置项额外说明：
 

@@ -7,8 +7,8 @@
 确保你已经完成以下步骤：
 
 - [安装 Amrita](./quick-start.md)
-- [部署 Amrita](./installation.md)
-- [配置 Amrita](./configuration.md)
+- [启动 Amrita](./installation.md)
+- [环境配置](./configuration.md)
 
 ## 对接到OneBot V11协议实现
 
@@ -22,66 +22,43 @@
 
 输入用户名和密码登录
 
-![Login](/login.png)
+<!-- TODO: WebUI登录页截图，显示用户名密码输入框 -->
 
 ### 2. 编辑预设
 
-
-![Preset](/preset.png)
+<!-- TODO: 预设管理主页面截图，显示预设列表和"创建预设"按钮 -->
 
 进入此页面，点击`创建预设`
 
-![Create](/create_preset.png)
-
-在此处填写预设信息：
-
-![Edit](/edit_preset.png)
+<!-- TODO: 编辑预设表单截图，显示填写完整后的表单 -->
 
 完成后点击`保存`
 
-![Save](/save_preset.png)
-
 您可以看到您的预设已保存
 
-![view](/view_preset.png)
+<!-- TODO: 预设列表视图截图，显示已保存的预设 -->
 
 ### 3. 使用预设
 
 在sidebar找到`系统管理`->`配置管理`
 
-![conf](/conf.png)
-
 进入后点击`chat`进入聊天模块的配置页面
 
-![chat](/conf-chat.png)
-
-![chat-conf](/chat-conf.png)
+<!-- TODO: chat模块配置页面截图，显示preset字段、启用开关及保存按钮 -->
 
 将预设的名称填入`preset`字段中
 
-![chat-conf-preset](/chat-conf-preset.png)
-
 启用聊天能力
 
-![chat-conf-enable](/chat-conf-enable.png)
-
 保存配置
-
-![chat-conf-save](/chat-conf-save.png)
 
 ### 4. 设置Prompt
 
 找到`聊天管理`->`提示词预设`
 
-![prompt](/prompt.png)
-
 点击`编辑`
 
-![prompt-edit](/prompt-edit.png)
-
-填写提示词并保存
-
-![prompt-content](/prompt-content.png)
+<!-- TODO: 提示词预设编辑页面截图，显示提示词内容编辑区及保存按钮 -->
 
 ### 结束
 
@@ -90,5 +67,5 @@
 ## 下一步学习
 
 - [聊天功能详解](../features/chat/index.md)
-- [权限管理深入](../features/permission/index.md)  
+- [权限管理深入](../features/permission/index.md)
 - [WebUI 扩展](../features/webui/index.md)

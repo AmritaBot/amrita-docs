@@ -1,26 +1,38 @@
 # 插件开发指南
 
-Amrita 提供了完整的插件开发支持，让开发者能够轻松扩展机器人的功能。
+Amrita 基于 NoneBot2 的插件系统，支持开发自定义插件来扩展机器人功能。
 
 ## 创建新插件
 
-### 使用命令行工具
-
-在已有项目中，可以使用以下命令创建一个新的 demo 插件：
-
-```bash
-amrita plugin new
-```
-
-该命令会引导您完成插件的基本配置，并生成一个可运行的插件模板。
-
 ### 使用插件模板仓库
 
-您也可以直接使用我们的官方插件模板仓库作为起点：
+使用官方插件模板仓库作为起点：
 
 - 访问 [Amrita 插件模板仓库](https://github.com/AmritaBot/plugin-template)
 - 克隆仓库到本地
 - 根据模板中的说明进行自定义开发
+
+### 直接创建 NoneBot2 插件
+
+Amrita 兼容所有 NoneBot2 插件规范。在项目根目录 `plugins/` 下创建 Python 包即可：
+
+```
+plugins/
+└── my_plugin/
+    ├── __init__.py
+    └── handlers.py
+```
+
+然后在 `pyproject.toml` 中注册：
+
+```toml
+[tool.amrita]
+plugins = [
+    "amrita.plugins.chat",
+    "amrita.plugins.perm",
+    "my_plugin",  # 新增
+]
+```
 
 ## 系统要求
 
@@ -33,7 +45,7 @@ amrita plugin new
 
 ## 命名规范
 
-对于错Amrita 插件建议遵循统一的命名规范：
+对于 Amrita 插件建议遵循统一的命名规范：
 
 - 插件包名必须以 `amrita_plugin_` 为前缀
 - 例如：`amrita_plugin_weather`、`amrita_plugin_reminder`

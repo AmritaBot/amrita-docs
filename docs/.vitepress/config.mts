@@ -129,7 +129,7 @@ export default withMermaid({
     ],
     footer: {
       message: `MIT License 发布`,
-      copyright: `© AmritaBot 2025-${new Date().getFullYear()}`,
+      copyright: `© AmritaConstant 2025-${new Date().getFullYear()}`,
     },
     socialLinks: [
       { icon: "github", link: "https://github.com/AmritaBot/amrita-docs" },

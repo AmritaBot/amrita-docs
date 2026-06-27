@@ -1,7 +1,7 @@
 ---
 layout: home
 hero:
-  name: "Amrita"
+  name: "AmritaBot"
   text: "基于 NoneBot 与 AmritaCore 的\nLLM 聊天机器人"
   tagline: 强大、灵活、开箱即用的聊天机器人解决方案
   image:
@@ -14,10 +14,10 @@ hero:
       link: /amrita/
     - theme: alt
       text: 前往GitHub
-      link: https://github.com/AmritaBot/Amrita
+      link: https://github.com/AmritaBot/AmritaBot
     - theme: alt
       text: AmritaCore
-      link: https://amrita-core.suggar.top/zh/
+      link: https://core.amritabot.com
 
 features:
   - title: Agent
@@ -26,5 +26,4 @@ features:
     details: 基于 NoneBot2 的插件系统，内置权限管理、机器人管理、菜单系统等核心插件，支持自定义插件开发，灵活扩展功能。
   - title: 高性能
     details: 内置强大的缓存设计，与AmritaCore的轻量级/原生异步带来的高性能。
-
 ---
