@@ -10,12 +10,36 @@ export default withMermaid({
   description:
     "AmritaBot 文档 — 基于 NoneBot2 与 AmritaCore 的 LLM 聊天机器人。快速开始、部署指南、Agent 配置、插件开发、权限管理、MCP 集成、WebUI 定制。",
   lang: "zh-CN",
+  vite: {
+    build: {
+      rollupOptions: {
+        onLog(level, log, handler) {
+          if (log.message?.includes("points to missing source files")) return;
+          handler(level, log);
+        },
+      },
+    },
+    optimizeDeps: {
+      exclude: [
+        "@nolebase/vitepress-plugin-enhanced-readabilities/client",
+        "vitepress",
+        "@nolebase/ui",
+      ],
+    },
+    ssr: {
+      noExternal: [
+        "@nolebase/vitepress-plugin-enhanced-readabilities",
+        "@nolebase/ui",
+      ],
+    },
+  },
+  sitemap: {
+    hostname: "https://bot.amritabot.com",
+  },
+
   head: [
     // favicon
-    [
-      "link",
-      { rel: "icon", href: "/Amrita.png" },
-    ],
+    ["link", { rel: "icon", href: "/Amrita.png" }],
     // SEO meta
     [
       "meta",
@@ -25,23 +49,11 @@ export default withMermaid({
           "AmritaBot,Amrita,NoneBot,QQ机器人,LLM聊天机器人,AmritaCore,Agent,AmritaSense,OneBot,MCP,大语言模型,智能体",
       },
     ],
-    [
-      "meta",
-      { name: "author", content: "AmritaBot Team" },
-    ],
-    [
-      "meta",
-      { name: "robots", content: "index, follow" },
-    ],
+    ["meta", { name: "author", content: "AmritaBot Team" }],
+    ["meta", { name: "robots", content: "index, follow" }],
     // Open Graph
-    [
-      "meta",
-      { property: "og:type", content: "website" },
-    ],
-    [
-      "meta",
-      { property: "og:locale", content: "zh_CN" },
-    ],
+    ["meta", { property: "og:type", content: "website" }],
+    ["meta", { property: "og:locale", content: "zh_CN" }],
     [
       "meta",
       {
@@ -57,15 +69,9 @@ export default withMermaid({
           "AmritaBot 是一个基于 NoneBot2 的强大智能聊天机器人。以 AmritaCore 为 Agent 引擎、AmritaSense 为工作流运行时，支持多模型、Agent 模式、MCP、权限管理、WebUI。",
       },
     ],
-    [
-      "meta",
-      { property: "og:image", content: "/Amrita.png" },
-    ],
+    ["meta", { property: "og:image", content: "/Amrita.png" }],
     // Twitter Card
-    [
-      "meta",
-      { name: "twitter:card", content: "summary" },
-    ],
+    ["meta", { name: "twitter:card", content: "summary" }],
     [
       "meta",
       {
@@ -77,14 +83,10 @@ export default withMermaid({
       "meta",
       {
         name: "twitter:description",
-        content:
-          "AmritaBot — 强大、灵活、开箱即用的 LLM 聊天机器人解决方案。",
+        content: "AmritaBot — 强大、灵活、开箱即用的 LLM 聊天机器人解决方案。",
       },
     ],
-    [
-      "meta",
-      { name: "twitter:image", content: "/Amrita.png" },
-    ],
+    ["meta", { name: "twitter:image", content: "/Amrita.png" }],
   ],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
@@ -94,30 +96,9 @@ export default withMermaid({
       { text: "文档", link: "/amrita" },
     ],
     logo: "/Amrita.png",
-
     search: {
       provider: "local",
-      options: {
-        translations: {
-          button: {
-            buttonText: "搜索文档",
-            buttonAriaLabel: "搜索文档",
-          },
-          modal: {
-            displayDetails: "显示详情",
-            resetButtonTitle: "重置",
-            backButtonTitle: "返回",
-            noResultsText: "未找到相关结果",
-            footer: {
-              selectText: "选择",
-              navigateText: "切换",
-              closeText: "关闭",
-            },
-          },
-        },
-      },
     },
-
     docFooter: {
       prev: "上一页",
       next: "下一页",
@@ -154,7 +135,10 @@ export default withMermaid({
               { text: "概述", link: "/amrita/features/chat/" },
               { text: "基础对话", link: "/amrita/features/chat/basic" },
               { text: "高级对话功能", link: "/amrita/features/chat/advanced" },
-              { text: "工具调用 (Function Calling)", link: "/amrita/features/chat/tools" },
+              {
+                text: "工具调用 (Function Calling)",
+                link: "/amrita/features/chat/tools",
+              },
               { text: "MCP 服务集成", link: "/amrita/features/chat/mcp" },
             ],
           },
@@ -163,7 +147,10 @@ export default withMermaid({
             collapsed: true,
             items: [
               { text: "概述", link: "/amrita/features/permission/" },
-              { text: "指令参考", link: "/amrita/features/permission/commands" },
+              {
+                text: "指令参考",
+                link: "/amrita/features/permission/commands",
+              },
               { text: "权限 API", link: "/amrita/features/permission/API" },
             ],
           },
@@ -172,16 +159,25 @@ export default withMermaid({
             collapsed: true,
             items: [
               { text: "功能介绍", link: "/amrita/features/webui/" },
-              { text: "页面扩展开发", link: "/amrita/features/webui/customization" },
+              {
+                text: "页面扩展开发",
+                link: "/amrita/features/webui/customization",
+              },
               { text: "前端 API", link: "/amrita/features/webui/frontend-api" },
-              { text: "UI 组件库 (Tailwind CSS)", link: "/amrita/features/webui/components" },
+              {
+                text: "UI 组件库 (Tailwind CSS)",
+                link: "/amrita/features/webui/components",
+              },
             ],
           },
           {
             text: "其他内置模块",
             collapsed: true,
             items: [
-              { text: "菜单系统 (Menu)", link: "/amrita/features/other-modules/menu" },
+              {
+                text: "菜单系统 (Menu)",
+                link: "/amrita/features/other-modules/menu",
+              },
             ],
           },
         ],
