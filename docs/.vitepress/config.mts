@@ -160,12 +160,15 @@ export default withMermaid({
             items: [
               { text: "功能介绍", link: "/amrita/features/webui/" },
               {
-                text: "页面扩展开发",
+                text: "页面扩展开发 (TODO)",
                 link: "/amrita/features/webui/customization",
               },
-              { text: "前端 API", link: "/amrita/features/webui/frontend-api" },
               {
-                text: "UI 组件库 (Tailwind CSS)",
+                text: "前端 API (TODO)",
+                link: "/amrita/features/webui/frontend-api",
+              },
+              {
+                text: "UI 组件库 (TODO)",
                 link: "/amrita/features/webui/components",
               },
             ],

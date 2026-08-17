@@ -12,6 +12,8 @@ AmritaBot WebUI并没有过多的安全防护，请**不要**直接把AmritaBot 
 
 ## 快速导航
 
-- [页面开发](./customization.md)
-- [前端API](./frontend-api.md)
-- [UI组件库](./components.md)
+> 🚧 WebUI 已重构为前端 SPA（React + Vite + Tailwind），以下开发文档为 TODO 占位页，待按新架构重写。
+
+- [页面开发](./customization.md)（TODO）
+- [前端API](./frontend-api.md)（TODO）
+- [UI组件库](./components.md)（TODO）

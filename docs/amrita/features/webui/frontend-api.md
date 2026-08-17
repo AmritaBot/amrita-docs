@@ -1,74 +1,18 @@
-# AmritaBot WebUI API 文档
+# 前端 API
 
-本文档包含前端 JavaScript API 和后端网络 API 请求接口的详细说明，用于 AmritaBot WebUI 页面开发。
+::: warning 🚧 施工中（TODO）
 
-## 1. 前端 API (JavaScript)
+本文档为 **TODO 占位符页面**，内容尚未编写。
 
-以下是在 base.html 模板中定义的可以直接在页面中调用的 JavaScript 函数和对象。
+**背景**：Amrita 的 WebUI 已重构为前端 SPA（React + Vite + Tailwind），前端代码位于 `frontend/` 目录（`src/hooks/`、`src/components/` 等），不再有 `base.html` 中全局注入的 JavaScript 函数。原文档描述的 `showLoading` / `getOnetimeToken` / `checkTokenExpired` 等 JS API 已被移除，需按新前端架构重新编写本文档。
 
-### 1.1 加载状态管理
+:::
 
-```javascript
-// 显示加载状态
-showLoading();
+## 待编写内容
 
-// 更新加载进度 (0-100)
-updateLoading(progress);
+- 新前端模块结构（`frontend/src/`）概览
+- React Hooks API（认证 `use-auth`、主题 `use-theme` 等）
+- 后端认证接口（`/api/auth/login`、`/api/auth/me`、`/api/auth/logout`、`/api/auth/otk`）
+- 其他 REST API 与 WebSocket 接口说明
 
-// 隐藏加载状态
-hideLoading();
-```
-
-### 1.2 主题管理
-
-```javascript
-// 切换主题 (亮色/暗色)
-toggleTheme();
-
-// 设置主题 ("light" 或 "dark")
-setTheme(theme);
-
-// 检测系统主题偏好
-detectSystemTheme();
-
-// 初始化主题 (从localStorage或系统偏好)
-initTheme();
-```
-
-### 1.3 侧边栏控制
-
-侧边栏通过 CSS 类和 JavaScript 事件自动控制折叠和展开，无需直接调用 API。
-
-### 1.4 认证相关
-
-```javascript
-// 获取一次性令牌 (用于某些需要额外认证的操作)
-async function getOnetimeToken()
-```
-
-### 1.5 工具函数
-
-```javascript
-// 检查令牌是否过期 (通过URL参数)
-checkTokenExpired();
-```
-
-## 2. 网络 API 请求
-
-以下是后端提供的 RESTful API 接口，可通过 AJAX 请求调用。
-
-### 2.1 认证接口
-
-#### 获取一次性令牌
-
-- **URL**: `GET /api/auth/otk`
-- **说明**: 获取一次性令牌，用于某些需要额外认证的操作
-- **请求头**: 需要包含有效的 access_token cookie
-- **响应**:
-  ```json
-  {
-    "token": "一次性令牌字符串"
-  }
-  ```
-
-其他请访问Swagger文档(address:port/docs)。
+<!-- TODO: 前端 API 文档待按新 SPA 架构重写（旧 base.html JS API 内容已删除） -->
