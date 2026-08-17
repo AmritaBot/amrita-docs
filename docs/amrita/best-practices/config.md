@@ -103,7 +103,8 @@ report_then_block = true             # 触发后熔断会话
 
 ```toml
 [llm]
-agent_strategy = "react"  # react / hybrid-react / no-action
+agent_strategy = "react"  # react / hybrid-react(已弃用) / no-action
+agent_workflow = "react"  # react / step-react（Step 驱动的 ReAct 循环）
 ```
 
 ### 2.5 会话管理

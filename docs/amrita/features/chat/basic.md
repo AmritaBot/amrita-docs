@@ -1,13 +1,13 @@
 # 基础对话
 
-AmritaBot 的基础对话功能基于 AmritaCore 的 `ChatObject` / `ChatManager` 体系，让你的机器人能够进行自然、流畅的流式对话。
+AmritaBot 的基础对话功能基于 AmritaCore 的 Agent 引擎，让你的机器人能够进行自然、流畅的流式对话。
 
 ## 核心概念
 
-- **ChatObject**：会话的最小单元，维护单次对话的上下文、工具调用状态和响应生成
-- **ChatManager**：管理 ChatObject 生命周期，支持挂起/恢复（`SuspendEnum`）
-- **流式响应**：所有消息输出均为异步流，用户可实时看到 LLM 逐字生成的内容
-- **适配器系统**：通过 AmritaCore 的 `AdapterManager`，统一的 API 调用接口屏蔽不同模型厂商的差异
+- **会话上下文**：每个私聊/群聊拥有独立且互不干扰的上下文（Session），系统自动维护上下文窗口
+- **流式响应**：消息输出默认为流式，用户可实时看到 LLM 逐字生成的内容（可在 `llm.stream` 中关闭）
+- **适配器系统**：统一的 API 调用接口屏蔽不同模型厂商的差异（OpenAI 兼容协议）
+- **消息段解析**：自动解析文字、@、合并转发、引用消息，并转换为上下文格式
 
 ## 启用基础对话
 
@@ -65,20 +65,22 @@ AmritaBot 内置了基础提示词，因此您无需在提示词中而外对格�
 
 :::
 
+模型预设的更多用法（切换、测试、备份自动切换）见[高级对话功能](./advanced.md)。
+
 ## 指令使用
 
 > (全部指令请参考`/menu`或Bot启动时的输出，指令权限详见各指令说明)
 
-| 指令名称      | 参数                                                                                                      | 解释                           | 权限       |
-| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- |
-| **/model**    | `/model list` 可用模型<br>`/model switch <名>` 切换<br>`/model info` 详情<br>`/model test [名] [-d]` 测试 | 查看、切换与测试模型           | `lp.admin` |
-| **/prompt**   | `/prompt set <文本>` 设置<br>`/prompt clear` 清空<br>`/prompt template [group\|private] [名称]` 模板      | 设置自定义提示词与切换模板     | 群管理     |
-| **/session**  | `/session info\|list\|use <编号>\|del <编号>\|archive\|clear\|compact [force]\|forget\|abstract [clear]`  | 会话信息、历史、压缩与记忆管理 | 群管理     |
-| **/chat**     | `/chat on\|off` 聊天开关<br>`/chat auto <on\|off>` 自动回复<br>`/chat status` 状态                        | 开启/关闭聊天与自动回复        | 群管理     |
-| **/debug**    | `/debug <on\|off\|status>`                                                                                | 调试模式开关                   | `lp.admin` |
-| **/insights** | `/insights [global\|top10 <--group\|private\|all>]`                                                       | 查看今日AI用量统计             | 所有用户   |
-| **/mcp**      | `/mcp <stats [-d\|--details];add <server_script>;del <server_script>;reload>`                             | 管理MCP服务                    | `lp.admin` |
-| **/chatobj**  | `/chatobj status` 状态<br>`/chatobj terminate\|kill <ID前缀>` 终止<br>`/chatobj clear` 清除               | 管理聊天对话（会话进程）       | 群管理     |
+| 指令名称      | 参数                                                                                                      | 解释                                                    | 权限       |
+| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ---------- |
+| **/model**    | `/model list` 可用模型<br>`/model switch <名>` 切换<br>`/model info` 详情<br>`/model test [名] [-d]` 测试 | 查看、切换与测试模型                                    | `lp.admin` |
+| **/prompt**   | `/prompt set <文本>` 设置<br>`/prompt clear` 清空<br>`/prompt template [group\|private] [名称]` 模板      | 设置自定义提示词与切换模板                              | 群管理     |
+| **/session**  | `/session info\|list\|use <编号>\|del <编号>\|archive\|clear\|compact [force]\|forget\|abstract [clear]`  | 会话信息、历史、压缩与记忆管理                          | 群管理     |
+| **/chat**     | `/chat on\|off` 聊天开关<br>`/chat auto <on\|off>` 自动回复<br>`/chat status` 状态                        | 开启/关闭聊天与自动回复                                 | 群管理     |
+| **/debug**    | `/debug <on\|off\|status>`                                                                                | 调试模式开关                                            | `lp.admin` |
+| **/insights** | `/insights [global\|top10]`                                                                               | 查看今日AI用量统计（`global` 与 `top10` 需 `lp.admin`） | 所有用户   |
+| **/mcp**      | `/mcp <stats [-d\|--details];add <server_script>;del <server_script>;reload;deep-reload>`                 | 管理MCP服务                                             | `lp.admin` |
+| **/chatobj**  | `/chatobj [status]\|terminate\|kill <ID前缀>\|clear`                                                      | 查看会话进程状态、终止会话                              | 群管理     |
 
 ## 找到配置文件
 

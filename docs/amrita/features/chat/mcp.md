@@ -38,7 +38,8 @@ agent_mcp_server_scripts = [
 /mcp add <server_script>     # 添加 MCP 服务器
 /mcp del <server_script>     # 移除 MCP 服务器
 /mcp reload                  # 重载 MCP 配置
-/mcp stats [-d|--details]    # 查看 MCP 服务器状态
+/mcp deep-reload             # 深度重载（重建 MCP 客户端会话）
+/mcp stats [-d|--details]    # 查看 MCP 服务器状态（-d 仅私聊可用）
 ```
 
 ### 方法三：通过Web UI添加（图形化配置）

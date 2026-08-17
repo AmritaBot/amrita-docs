@@ -61,8 +61,10 @@ $
 PORT=8080
 ONEBOT_ACCESS_TOKEN=your-onebot-access-token # 你需要设置一个安全的访问令牌，就像密码一样。
 WEBUI_USER_NAME=admin
-WEBUI_PASSWORD=your-webui-password # 你需要为Amrita的WebUI设置一个安全的密码。
+WEBUI_PASSWORD=your-webui-password # 你必须为Amrita的WebUI设置一个非默认的安全密码，否则WebUI将处于锁定状态。
 ```
+
+> **注意**：WebUI 默认密码为 `admin123`，未设置 `WEBUI_PASSWORD`（即保持默认密码）时 WebUI 会锁定并拒绝所有访问（423），设置非默认密码并重启后才会解锁。
 
 ### 4. 启动机器人
 

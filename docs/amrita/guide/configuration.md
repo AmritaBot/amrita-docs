@@ -23,11 +23,11 @@ AmritaBot 使用的环境变量分为两类：AmritaBot 自身定义的配置项
 
 ### WebUI 配置（`WEBUI_` 前缀）
 
-| 变量名            | 类型 | 默认值     | 说明             |
-| ----------------- | ---- | ---------- | ---------------- |
-| `WEBUI_ENABLE`    | bool | `true`     | 是否启用 WebUI   |
-| `WEBUI_USER_NAME` | str  | `admin`    | WebUI 登录用户名 |
-| `WEBUI_PASSWORD`  | str  | `admin123` | WebUI 登录密码   |
+| 变量名            | 类型 | 默认值     | 说明                                                                                           |
+| ----------------- | ---- | ---------- | ---------------------------------------------------------------------------------------------- |
+| `WEBUI_ENABLE`    | bool | `true`     | 是否启用 WebUI                                                                                 |
+| `WEBUI_USER_NAME` | str  | `admin`    | WebUI 登录用户名                                                                               |
+| `WEBUI_PASSWORD`  | str  | `admin123` | WebUI 登录密码。**保持默认密码（未设置）时 WebUI 锁定（423）**，必须设置非默认密码并重启后解锁 |
 
 ### NoneBot / 适配器 / 插件提供
 

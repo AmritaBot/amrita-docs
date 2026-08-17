@@ -49,12 +49,12 @@ graph TD
     end
 
     subgraph "AmritaCore Agent 运行时"
-        Agent[AgentRuntime 策略引擎]
-        Chat[ChatManager 会话管理]
+        Agent[ReActAgentStrategy 策略引擎<br/>react / step-react]
+        Chat[ChatObject 会话工作流编排器<br/>AgentSession 生命周期]
         Tools[ToolsManager 工具系统]
         MCPClient[MCP 客户端]
         Adapters[厂商适配器<br/>OpenAI · Anthropic · 可扩展]
-        Hooks[事件钩子系统<br/>on_completion · on_event]
+        Hooks[事件钩子系统<br/>on_precompletion · on_completion]
     end
 
     subgraph "AmritaSense 工作流引擎"

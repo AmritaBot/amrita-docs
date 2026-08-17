@@ -29,12 +29,18 @@
 
 ## 如何修改默认的 WebUI 密码？
 
-为了安全起见，您应该修改默认的 WebUI 密码。在环境配置文件中设置：
+为了安全起见，您必须修改默认的 WebUI 密码。**只要密码仍为默认值（`admin123`），WebUI 就会处于锁定状态**，所有请求都会被拒绝（返回 423，提示需要设置密码）。
+
+在环境配置文件中设置：
 
 ```dotenv
 WEBUI_USER_NAME=your_username
 WEBUI_PASSWORD=your_secure_password
 ```
+
+修改后重启 Amrita 即可解锁 WebUI。
+
+> 注意：环境变量名为 `WEBUI_USER_NAME`（用户名）与 `WEBUI_PASSWORD`（密码），与 `webui_user_name` / `webui_password` 配置项对应。配置文件中若已有同名配置，请同步修改。
 
 ## 为什么数据库连接失败？
 

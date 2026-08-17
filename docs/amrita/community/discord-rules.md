@@ -38,7 +38,7 @@
 
 ### 举报与处理
 
-如遇到骚扰、虐待或其他违规行为，请通过邮件向社区管理员举报：admin@suggar.top。
+如遇到骚扰、虐待或其他违规行为，请通过邮件向社区管理员举报：admin@amritabot.com。
 
 所有投诉将被及时、公正地审查与调查。管理员有义务尊重举报人的隐私与安全。
 
@@ -69,4 +69,4 @@
 
 ### 联系我们
 
-如有疑问或需要举报，请联系：[admin@suggar.top](mailto:admin@suggar.top)
+如有疑问或需要举报，请联系：[admin@amritabot.com](mailto:admin@amritabot.com)

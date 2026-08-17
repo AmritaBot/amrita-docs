@@ -2,75 +2,82 @@
 
 ## 1. 项目概述
 
-AmritaBot 的技术栈分为三层：
+AmritaBot 的技术栈分为四层：
 
-- **AmritaSense** — 底层工作流编排引擎。采用**指令集架构**替代传统图模型，将控制流（IF/WHILE/GOTO/CALL/TRY）编译为线性指令序列，由轻量 VM（`PointerVector` + 调用栈）逐条执行。核心约 300 LOC，支持原生异步挂起/恢复。
-- **AmritaCore** — Agent 运行时层。构建于 AmritaSense 之上，提供厂商无关的适配器系统（OpenAI / Anthropic / 可扩展）、工具系统（`@simple_tool`、`@on_tools`、MCP 客户端）、事件驱动钩子、上下文窗口与 Token 自动管理。
-- **Amrita** — 终端应用层。集成 NoneBot2 + OneBot V11 适配器 + WebUI + 插件系统，提供开箱即用的 QQ 机器人体验。
+- **AmritaBot 应用层（NoneBot2 的 Amrita 子系统）** — 终端应用层。集成 NoneBot2 + OneBot V11 适配器 + WebUI + 插件系统，通过 `AgentSession` 管理会话生命周期、`AmritaMemoryBackend` 对接数据库持久化、`SessionDepends` 提供依赖注入工厂。
+- **AmritaCore** — Agent 运行时层。构建于 AmritaSense 之上，提供会话级工作流编排器（`ChatObject`）、策略节点编排（`LOAD_STATE` / `AGENT_ENTRY` / `LLM`）、ReAct 思考-行动循环（`ReActAgentStrategy`）、厂商无关的适配器系统（OpenAI / Anthropic / 可扩展）、工具系统（`ToolsManager` / MCP 客户端）、上下文裁剪与摘要（`MemoryLimiter`）以及事件钩子（Pre/Post Completion）。
+- **AmritaSense** — 底层工作流编排引擎。采用**指令集架构**替代传统图模型，将控制流（IF/WHILE/GOTO/CALL/TRY）编译为线性指令序列，由轻量 VM（`WorkflowInterpreter` + `PointerVector` + 调用栈）逐条执行。核心约 300 LOC，支持原生异步挂起/恢复。
 
-三者的关系类似于：**AmritaSense = 操作系统内核 → AmritaCore = 中间件/运行时 → AmritaBot = 桌面环境/应用**。
+四者的关系类似于：**AmritaSense = 操作系统内核 → AmritaCore = 中间件/运行时 → AmritaBot = 桌面环境/应用**。
 
 ## 2. 整体架构拓扑图
 
 ```mermaid
 graph TD
-    subgraph "用户交互层"
-        QQ[QQ / NapCat / LLOneBot] -->|OneBot V11| OneBotAdapter[OneBot V11 适配器]
-        Browser[浏览器] -->|HTTP| FastAPI[FastAPI 路由]
+    %% 定义样式
+    classDef plugin fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+    classDef core fill:#e3f2fd,stroke:#1565c0,stroke-width:2px;
+    classDef sense fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+    classDef infra fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
+
+    %% 1. 应用与插件接入层 (Plugin/Adapter Layer)
+    subgraph Application_Plugin_Layer [NoneBot2的Amrita子系统]
+        direction TB
+        A[NoneBot2 事件/配置] --> B[AgentSession<br>（会话生命周期管理）]
+        B --> C[AmritaMemoryBackend<br>（数据库适配器）]
+        C --> D[UserDataExecutor<br>（事务性持久化）]
+        B --> E[SessionDepends<br>（依赖注入工厂）]
     end
 
-    subgraph "AmritaBot 应用层"
-        OneBotAdapter -->|事件分发| NoneBot2[NoneBot2 框架]
-        FastAPI --> NoneBot2
-        NoneBot2 --> PluginMgr[插件管理器]
-        PluginMgr --> ChatPlugin[Chat 插件]
-        PluginMgr --> PermPlugin[Perm 插件]
-        PluginMgr --> ManagerPlugin[Manager 插件]
-        PluginMgr --> MenuPlugin[Menu 插件]
-        PluginMgr --> WebUIPlugin[WebUI 插件]
+    %% 2. AmritaCore 运行时层 (Agent Runtime Layer)
+    subgraph Core_Runtime_Layer [AmritaCore 运行时层]
+        direction TB
+        B -- 创建/绑定 --> F[ChatObject<br>（会话级工作流编排器）]
+        F -- 内置预编译工作流 --> G[ReAct 策略节点编排<br>（LOAD_STATE / AGENT_ENTRY / LLM）]
+        G --> H[ReActAgentStrategy<br>（思考-行动循环逻辑）]
+        H --> I[ToolsManager / MCP Client<br>（工具并发执行）]
+        H --> J[MemoryLimiter<br>（上下文裁剪与摘要）]
+        F --> K[事件钩子系统<br>（Pre/Post Completion）]
     end
 
-    subgraph "AmritaCore Agent 运行时"
-        ChatPlugin -->|调用| ChatManager[ChatManager]
-        ChatManager --> ChatObject[ChatObject 会话单元]
-        ChatObject --> ContextMgr[上下文管理器]
-        ChatObject --> SessionMgr[会话归档/恢复]
-        ChatManager --> AgentRuntime[AgentRuntime 策略引擎]
-        AgentRuntime --> ToolsMgr[ToolsManager]
-        AgentRuntime --> MCPClient[MCP 客户端]
-        ToolsMgr -->|@simple_tool| BuiltinTools[内置工具]
-        MCPClient -->|SSE/Stdio| ExternalTools[外部 MCP 服务器]
+    %% 3. AmritaSense 流程调度层 (Meta-Framework Layer)
+    subgraph Sense_Orchestration_Layer [AmritaSense 流程调度引擎]
+        direction TB
+        F -- 调用 .run() --> L[WorkflowInterpreter<br>（指令虚拟机）]
+        L --> M[PointerVector + 调用栈<br>（程序计数器与寻址）]
+        M --> N[原生控制流指令<br>（NATIVE_DO/WHILE/IF）]
+        N --> O[节点原子执行 & DI 注入<br>（_call 与依赖解析）]
+        O --> P[Suspend/Resume 挂起恢复<br>（协作式中断与调试）]
     end
 
-    subgraph "AmritaSense 工作流引擎"
-        AgentRuntime -->|编译为指令| VM[指令集 VM]
-        VM --> PointerVector[PointerVector 程序计数器]
-        VM --> CallStack[调用栈]
-        VM --> Stream[SuspendObjectStream 异步流]
-        VM --> Events[事件总线]
+    %% 4. 基础设施层 (Infrastructure Layer)
+    subgraph Infrastructure_Layer [基础设施层]
+        direction TB
+        D --> Q[(SQLite/PostgreSQL<br>SQLAlchemy ORM)]
+        C --> R[LRU Cache / Lock Pool<br>（WeakValueLRUCache）]
+        I --> S[外部 API / MCP Servers]
+        P --> T[asyncio 事件循环]
     end
 
-    subgraph "LLM 提供商"
-        ChatObject -->|HTTP/SSE| LLMRouter[适配器路由器]
-        LLMRouter --> OpenAI[OpenAI]
-        LLMRouter --> Anthropic[Anthropic]
-        LLMRouter --> Custom[自定义兼容 API]
-    end
+    %% 跨层连接
+    G -.->|策略节点展开| N
+    H -- 工具调用结果 --> O
+    K -- 修改上下文 --> F
 
-    subgraph "数据层"
-        ChatPlugin -->|ORM| Database[SQLAlchemy]
-        Database --> SQLite[(SQLite)]
-        Database --> MySQL[(MySQL)]
-        Database --> PostgreSQL[(PostgreSQL)]
-        PermPlugin --> Database
-    end
-
-    subgraph "缓存层"
-        ChatPlugin -->|async-lru| LRUCache[LRU 缓存]
-        ChatPlugin -->|weakref| WeakCache[弱引用缓存]
-        PermPlugin --> LRUCache
-    end
+    %% 样式应用
+    class Application_Plugin_Layer plugin;
+    class Core_Runtime_Layer core;
+    class Sense_Orchestration_Layer sense;
+    class Infrastructure_Layer infra;
 ```
+
+> **架构要点**：
+>
+> - `AgentSession`（`nonebot_plugin_amrita.agent`）是应用层会话入口，负责会话生命周期（创建/加载/销毁），并注入 `SessionDepends` 供各插件按依赖获取会话
+> - `ChatObject`（`amrita_core.chatmanager`）是会话级工作流编排器：将内置的预编译工作流（`REACT_ONLY = LOAD_STATE >> JINJA2_RENDER >> BUILD_MESSAGE >> REACT_BLOCK`、`STEP_REACT_ONLY` 等，见 `builtins/workflows.py`）交给 `WorkflowInterpreter` 执行
+> - `AGENT_ENTRY` 节点将控制权交给 `ReActAgentStrategy`，策略通过 `tools_caller` 并发执行工具（`ToolsManager` / MCP Client），并用 `MemoryLimiter` 控制上下文窗口
+> - 记忆的读写由 `LOAD_STATE` / `COMMIT_MEMORY` 节点触发应用层 `AmritaMemoryBackend`（或同构的 `ChatMemoryBackend`），经 `CachedUserDataRepository` → `UserDataExecutor` 事务性落库
+> - 缓存层使用 `WeakValueLRUCache`（弱引用 + LRU），权限 / 管理模块用其实现细粒度锁池（`_lock_pool`）
 
 ## 3. Chat插件详细架构
 
@@ -93,25 +100,17 @@ graph TD
     end
 
     subgraph "业务逻辑层"
-        RuleEngine --> ChatHandler[Chat处理器]
-        ChatHandler --> AmritaChatObject[聊天对象]
-        AmritaChatObject --> ContextManager[上下文管理器]
-        AmritaChatObject --> SessionManager[会话管理器]
-        AmritaChatObject --> ResponseHandler[响应处理器]
+        RuleEngine --> ChatHandler[Chat处理器<br>（handlers/chat.py）]
+        ChatHandler --> AgentSession[AgentSession<br>（会话生命周期）]
+        AgentSession --> ChatObject[ChatObject<br>（AmritaCore 会话工作流）]
+        ChatObject --> Strategy[ReActAgentStrategy<br>（思考-行动循环）]
+        ChatObject --> MemoryBackend[ChatMemoryBackend<br>（记忆读写）]
     end
 
     subgraph "数据访问层"
-        ContextManager --> CachedUserDataRepository[缓存数据仓库]
-        SessionManager --> CachedUserDataRepository
-        CachedUserDataRepository --> UserDataExecutor[数据执行器]
+        MemoryBackend --> CachedUserDataRepository[缓存数据仓库]
+        CachedUserDataRepository --> UserDataExecutor[UserDataExecutor]
         UserDataExecutor --> Database[SQLAlchemy ORM]
-    end
-
-    subgraph "核心引擎层"
-        AmritaChatObject --> AmritaCore[AmritaCore引擎]
-        AmritaCore --> PresetManager[预设管理器]
-        AmritaCore --> ToolSystem[工具系统]
-        AmritaCore --> MemorySystem[记忆系统]
     end
 
     subgraph "配置管理层"
@@ -132,9 +131,10 @@ sequenceDiagram
     participant Matcher as MatcherGroup
     participant Rule as 规则引擎
     participant Chat as Chat处理器
-    participant Object as AmritaChatObject
-    participant Core as AmritaCore
-    participant Cache as 缓存系统
+    participant Session as AgentSession
+    participant Object as ChatObject
+    participant WF as WorkflowInterpreter
+    participant Backend as ChatMemoryBackend
     participant DB as 数据库
 
     User->>Adapter: 发送消息
@@ -144,15 +144,16 @@ sequenceDiagram
     Rule-->>Matcher: 允许/拒绝
     alt 允许处理
         Matcher->>Chat: 调用处理器
-        Chat->>Object: 创建聊天对象
-        Object->>Cache: 获取用户数据
-        Cache-->>DB: 缓存未命中时查询
-        DB-->>Cache: 返回数据
-        Cache-->>Object: 返回缓存数据
-        Object->>Core: 调用核心引擎
-        Core->>Object: 返回响应
-        Object->>Cache: 更新缓存
-        Cache->>DB: 异步持久化
+        Chat->>Session: 创建/复用会话
+        Session->>Object: 创建 ChatObject
+        Object->>WF: 执行内置工作流
+        WF->>Object: LOAD_STATE（加载记忆）
+        Object->>Backend: load_memory(session_id)
+        Backend-->>Object: 返回记忆
+        Object->>WF: LLM 推理 + 策略循环
+        WF-->>Object: 流式响应
+        Object->>Backend: commit_memory（增量写回）
+        Backend->>DB: 事务性持久化
         Object->>Chat: 返回响应内容
         Chat->>User: 发送回复消息
     end
@@ -160,19 +161,19 @@ sequenceDiagram
 
 ## 4. 核心组件分析
 
-### 4.1 运行时核心 (runtime.py)
+### 4.1 运行时核心 (chatmanager + runtime_session)
 
 **职责**：处理单次聊天会话的完整生命周期。
 
 **核心组件**：
 
-- **AmritaChatObject**：聊天处理对象，封装完整会话逻辑
-- **ChatObjectMeta**：聊天对象元数据模型
-- **SessionTempManager**：会话临时状态管理
+- **ChatObject**（`amrita_core.chatmanager.chat_object`）：会话级工作流编排器，绑定预设、记忆后端与策略，调用 `WorkflowInterpreter` 执行内置工作流
+- **SessionTempManager**（`amrita/plugins/chat/runtime_session.py`）：会话临时状态管理（`chat_manager` 单例）
+- **AgentSession**（`nonebot_plugin_amrita.agent`）：应用层会话生命周期管理（创建/加载/销毁）
 
 **主要功能**：
 
-- 会话超时管理
+- 会话超时管理（`session.session_control`）
 - 上下文恢复（"继续"功能）
 - 异常处理和管理员通知
 - 会话状态快照
@@ -280,11 +281,23 @@ graph LR
 
 ### 6.1 钩子系统
 
-**预完成钩子** (`on_precompletion`)：
+钩子系统由 `amrita_core.hook` 提供，基于 AmritaSense 的事件总线（`on_event`），支持优先级排序与 `block` 阻断：
 
-- 在LLM调用前执行自定义逻辑
+**预完成钩子** (`on_precompletion` → `PreCompletionEvent`)：
+
+- 在LLM调用前执行自定义逻辑（`EventTypeEnum.BEFORE_COMPLETION`）
 - 支持优先级排序
 - 可修改输入上下文
+
+**完成钩子** (`on_completion` → `CompletionEvent`)：
+
+- 在LLM调用完成后执行自定义逻辑（`EventTypeEnum.COMPLETION`）
+- 可读取/修改最终输出
+- 支持优先级排序与阻断
+
+**预设回退钩子** (`on_preset_fallback` → `FallbackContext`)：
+
+- 预设缺失/回退时触发（`EventTypeEnum.PRESET_FALLBACK`）
 
 **工具注册** (`on_tools`)：
 
