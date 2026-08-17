@@ -140,6 +140,10 @@ export default withMermaid({
                 link: "/amrita/features/chat/tools",
               },
               { text: "MCP 服务集成", link: "/amrita/features/chat/mcp" },
+              {
+                text: "长期记忆与知识库",
+                link: "/amrita/features/chat/memory",
+              },
             ],
           },
           {

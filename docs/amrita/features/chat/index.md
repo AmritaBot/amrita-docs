@@ -66,4 +66,5 @@ AmritaBot 的聊天功能以 AmritaCore 作为 Agent 引擎，提供了从基础
 - [基础对话使用](./basic.md)
 - [高级对话功能](./advanced.md)
 - [工具调用详解](./tools.md)
+- [长期记忆与知识库](./memory.md)
 - [MCP 服务器集成](./mcp.md)
