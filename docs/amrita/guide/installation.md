@@ -51,21 +51,21 @@ uv run ambot run
 
 AmritaBot 使用以下环境变量进行配置：
 
-| 变量名             | 默认值                  | 说明                       |
-| ------------------ | ----------------------- | -------------------------- |
-| ENVIRONMENT        | dev                     | 运行环境 (dev/prod)        |
-| DRIVER             | ~fastapi                | NoneBot 驱动器（无需更改） |
-| PORT               | 8080                    | NoneBot 端口               |
-| HOST               | 127.0.0.1               | NoneBot 监听主机           |
-| LOCALSTORE_USE_CWD | true                    | 是否使用当前目录存储数据   |
-| DATABASE_URL       | aiosqlite:///db.sqlite3 | 数据库连接 URL             |
-| LOG_DIR            | logs                    | 日志目录                   |
-| BOT_NAME           | AmritaBot               | 机器人名称                 |
-| RATE_LIMIT         | 5                       | 请求速率限制               |
-| ADMIN_GROUP        | 123456789               | 管理员群组                 |
-| WEBUI_ENABLE       | true                    | 是否启用 WebUI             |
-| WEBUI_USER_NAME    | admin                   | WebUI 用户名               |
-| WEBUI_PASSWORD     | admin123                | WebUI 密码                 |
+| 变量名                  | 默认值                                    | 说明                       |
+| ----------------------- | ----------------------------------------- | -------------------------- |
+| ENVIRONMENT             | dev                                       | 运行环境 (dev/prod)        |
+| DRIVER                  | ~fastapi                                  | NoneBot 驱动器（无需更改） |
+| PORT                    | 8080                                      | NoneBot 端口               |
+| HOST                    | 127.0.0.1                                 | NoneBot 监听主机           |
+| LOCALSTORE_USE_CWD      | true                                      | 是否使用当前目录存储数据   |
+| SQLALCHEMY_DATABASE_URL | sqlite+aiosqlite:///<数据目录>/db.sqlite3 | 数据库连接 URL             |
+| LOG_DIR                 | logs                                      | 日志目录                   |
+| BOT_NAME                | Amrita                                    | 机器人名称                 |
+| RATE_LIMIT              | 5                                         | 请求速率限制               |
+| ADMIN_GROUP             | -1                                        | 管理员群组（默认关闭推送） |
+| WEBUI_ENABLE            | true                                      | 是否启用 WebUI             |
+| WEBUI_USER_NAME         | admin                                     | WebUI 用户名               |
+| WEBUI_PASSWORD          | admin123                                  | WebUI 密码                 |
 
 ### 生产环境配置示例
 
@@ -76,7 +76,7 @@ ENVIRONMENT=prod
 PORT=8080
 HOST=0.0.0.0
 LOCALSTORE_USE_CWD=true
-DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
+SQLALCHEMY_DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
 LOG_DIR=./logs
 BOT_NAME=MyBot
 RATE_LIMIT=10
@@ -122,7 +122,7 @@ WEBUI_PASSWORD=your_secure_password
    修改 `.env` 文件中的 PORT 变量
 
 3. **数据库连接失败**：
-   检查 DATABASE_URL 配置是否正确
+   检查 SQLALCHEMY_DATABASE_URL 配置是否正确
 
 4. **权限问题**：
    确保机器人有足够的权限访问所需资源

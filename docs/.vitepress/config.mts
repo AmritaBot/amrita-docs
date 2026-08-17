@@ -214,7 +214,10 @@ export default withMermaid({
       {
         text: "社区",
         collapsed: true,
-        items: [{ text: "获取帮助", link: "/amrita/community/support" }],
+        items: [
+          { text: "获取帮助", link: "/amrita/community/support" },
+          { text: "Discord 社区守则", link: "/amrita/community/discord-rules" },
+        ],
       },
       { text: "常见问题 (FAQ)", link: "/amrita/faq" },
     ],

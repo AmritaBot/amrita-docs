@@ -33,7 +33,7 @@ AmritaBot 内置了基础提示词，因此您无需在提示词中而外对格�
 
 ### 提示词设置
 
-提示词文件位于控制台打印的 config 文件夹中的 `group_prompts` 目录与 `private_prompts` 目录，内文件格式为 `提示词.txt`，分别对应群聊和私聊的提示词，在WebUI中，我们提供了完整的编辑功能。
+提示词文件位于 localstore 插件配置目录（机器人启动时打印，或运行 `ambot nb localstore` 查看）下的 `group_prompts` 目录与 `private_prompts` 目录，内文件格式为 `提示词.txt`，分别对应群聊和私聊的提示词，在WebUI中，我们提供了完整的编辑功能。
 
 - 默认会生成 `default.txt` 文件
 - 通常只需要修改 `default.txt` 即可
@@ -48,13 +48,18 @@ AmritaBot 内置了基础提示词，因此您无需在提示词中而外对格�
 ```json
 {
   "model": "auto",
-  "name": "",
+  "name": "default",
   "base_url": "",
   "api_key": "",
-  "procotol": "__main__",
-  "thought_chain_model": false,
-  "multimodal": false,
-  "extra": {}
+  "protocol": "__main__",
+  "config": {
+    "top_k": 50,
+    "top_p": 0.8,
+    "temperature": 0.6,
+    "stream": false,
+    "multimodal": false,
+    "cot_model": false
+  }
 }
 ```
 
@@ -62,16 +67,18 @@ AmritaBot 内置了基础提示词，因此您无需在提示词中而外对格�
 
 ## 指令使用
 
-> (全部指令请参考`/menu`或Bot启动时的输出)
+> (全部指令请参考`/menu`或Bot启动时的输出，指令权限详见各指令说明)
 
-| 指令名称                           | 参数                                                                          | 解释                                       |
-| ---------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------ |
-| **/del_memory** 系列指令           | 无                                                                            | 删除当前会话的聊天上下文                   |
-| **/enable_chat** 或 **/启用聊天**  | 无                                                                            | 在群聊中启用聊天功能（需管理员权限）       |
-| **/disable_chat** 或 **/禁用聊天** | 无                                                                            | 在群聊中禁用聊天功能（需管理员权限）       |
-| **/presets**                       | 无                                                                            | 查看可用模型预设列表                       |
-| **/set_preset** 系列指令           | `[模型预设名称]`                                                              | 设置使用的模型预设（不填参数则重置为默认） |
-| **/choose_prompt**                 | `group` 查看群组预设<br>`private` 查看私聊预设<br>`[提示词预设名称]` 设置预设 | 选择群组/私聊提示词预设                    |
+| 指令名称      | 参数                                                                                                      | 解释                           | 权限       |
+| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- |
+| **/model**    | `/model list` 可用模型<br>`/model switch <名>` 切换<br>`/model info` 详情<br>`/model test [名] [-d]` 测试 | 查看、切换与测试模型           | `lp.admin` |
+| **/prompt**   | `/prompt set <文本>` 设置<br>`/prompt clear` 清空<br>`/prompt template [group\|private] [名称]` 模板      | 设置自定义提示词与切换模板     | 群管理     |
+| **/session**  | `/session info\|list\|use <编号>\|del <编号>\|archive\|clear\|compact [force]\|forget\|abstract [clear]`  | 会话信息、历史、压缩与记忆管理 | 群管理     |
+| **/chat**     | `/chat on\|off` 聊天开关<br>`/chat auto <on\|off>` 自动回复<br>`/chat status` 状态                        | 开启/关闭聊天与自动回复        | 群管理     |
+| **/debug**    | `/debug <on\|off\|status>`                                                                                | 调试模式开关                   | `lp.admin` |
+| **/insights** | `/insights [global\|top10 <--group\|private\|all>]`                                                       | 查看今日AI用量统计             | 所有用户   |
+| **/mcp**      | `/mcp <stats [-d\|--details];add <server_script>;del <server_script>;reload>`                             | 管理MCP服务                    | `lp.admin` |
+| **/chatobj**  | `/chatobj status` 状态<br>`/chatobj terminate\|kill <ID前缀>` 终止<br>`/chatobj clear` 清除               | 管理聊天对话（会话进程）       | 群管理     |
 
 ## 找到配置文件
 

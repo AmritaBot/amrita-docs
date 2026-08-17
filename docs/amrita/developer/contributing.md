@@ -35,7 +35,7 @@ AmritaBot 是一个基于 [NoneBot2](https://nonebot.dev/) 的强大聊天机器
 - **[AmritaCore](https://core.amritabot.com)** — Agent 运行时（策略、会话、工具、MCP）
 - **[AmritaSense](https://sense.amritabot.com)** — 工作流引擎（指令集 VM、事件总线、依赖注入）
 - **FastAPI** — Web 框架（WebUI 后端）
-- **Jinja2 + Tailwind CSS** — 模板引擎与 UI 框架
+- **React + Vite + Tailwind CSS** — WebUI 前端框架（SPA）
 - **Pydantic** — 数据验证
 - **SQLAlchemy** — ORM（通过 `nonebot-plugin-orm`）
 - **Alembic** — 数据库迁移
@@ -65,18 +65,12 @@ source .venv/bin/activate  # Linux/macOS
 .venv\Scripts\activate     # Windows
 ```
 
-或者使用 pip:
-
-```bash
-pip install -e ".[full]"
-```
-
 ### 3. 设置配置文件
 
-复制 `.env` 示例文件并根据需要进行修改：
+复制环境变量示例文件（仓库自带 `.env` / `.env.dev` / `.env.prod`）并根据需要进行修改：
 
 ```bash
-cp example/.env.example .env
+cp .env.dev .env
 # 编辑 .env 文件以设置您的配置
 ```
 
@@ -108,7 +102,7 @@ Amrita/
 │   │   ├── manager/         # 机器人管理（清理、封禁等）
 │   │   ├── menu/            # 菜单系统（命令注册与展示）
 │   │   ├── perm/            # 权限控制（lp.admin / Bukkit 式节点）
-│   │   └── webui/           # WebUI（FastAPI + Tailwind CSS）
+│   │   └── webui/           # WebUI（FastAPI + React SPA）
 │   └── utils/              # 通用工具
 │       ├── admin.py         # 管理员消息推送
 │       ├── bot_utils.py     # 机器人初始化
@@ -139,7 +133,7 @@ AmritaBot 使用插件化架构，内置插件包括：
 - **manager**: 机器人管理功能，包括自动清理、封禁解封、日志推送
 - **menu**: 菜单系统，提供命令注册与展示（基于 `MatcherData`）
 - **perm**: 权限控制系统，支持 `lp.admin` 等细粒度权限节点（Bukkit 式）
-- **webui**: Web 可视化界面，基于 FastAPI + Jinja2 + Tailwind CSS
+- **webui**: Web 可视化界面，基于 FastAPI + React SPA（Vite + Tailwind CSS）
 
 ## 贡献流程
 

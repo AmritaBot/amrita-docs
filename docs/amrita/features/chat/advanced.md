@@ -10,7 +10,7 @@ Cookie反注入是一种安全检测机制，通过在提示词（prompt）的�
 
 ### 使用
 
-1. 登录 AmritaWebUI ，进入 `chat` 插件的配置页面，展开`cookie`配置块
+1. 登录 AmritaWebUI ，进入 `chat` 插件的配置页面，展开`core.cookie`配置块
 
 <!-- TODO: Cookie/子用户配置页面截图，显示cookie内容及关联提示词配置 -->
 
@@ -49,7 +49,7 @@ AmritaBot 的内容审查功能基于内部定义的工具调用机制实现，�
 
 ### 使用
 
-1. 登录 AmritaBot WebUI，转到`chat`插件的配置页面，展开`llm`配置组，此处有内容审查的配置项。
+1. 登录 AmritaBot WebUI，转到`chat`插件的配置页面，展开`llm.tools`配置组，此处有内容审查的配置项。
 
 <!-- TODO: 会话与用量控制页面截图，显示报告推送、用量限制、会话管理配置 -->
 
@@ -59,7 +59,7 @@ AmritaBot 的内容审查功能基于内部定义的工具调用机制实现，�
 
 - 默认情况下，AmritaBot 使用的是`medium`模式，即仅对对话内容进行标准地检查，可能触发敏感度会略微偏高，您可以在prompt中补充对于LLM的提示。
 
-- **tools.report_exclude_system_prompt**: 是否排除系统提示，默认为`false`。**这表示什么含义？**
+- **llm.tools.report_exclude_system_prompt**: 是否排除系统提示，默认为`false`。**这表示什么含义？**
   假设您有如下对话：
 
   ```text
@@ -75,7 +75,7 @@ AmritaBot 的内容审查功能基于内部定义的工具调用机制实现，�
   > 什么时候会使用到？
   > 当您认为系统prompt可能会干扰内容审查时模型的判断，那么您可以启用这个配置项。
 
-- **tools.report_exclude_context**: 是否排除上下文，默认为`false`。**这表示什么含义？**
+- **llm.tools.report_exclude_context**: 是否排除上下文，默认为`false`。**这表示什么含义？**
   假设您有如下对话：
 
   ```text
@@ -155,7 +155,7 @@ graph TD
 
 **提示**
 
-- 配置项`session_max_tokens`已弃用，它不会有任何作用，请改用`llm.session_token_windows`来配置最大上下文窗口Tokens
+- 配置项`session_max_tokens`已弃用，它不会有任何作用，请改用`core.llm.session_tokens_windows`来配置最大上下文窗口Tokens
 
 ## 上下文压缩
 
@@ -167,7 +167,7 @@ AmritaBot 内置了上下文摘要功能，当对话历史过长导致token消�
 
 1. 打开WebUI，导航到 `chat` 插件的配置页面
 
-2. 展开 `llm` 配置组
+2. 展开 `core.llm` 配置组
 
 <!-- TODO: 记忆抽象与回复控制页面截图，显示记忆抽象、自动回复、消息截断配置 -->
 
@@ -191,7 +191,7 @@ Amrita内置了一个简单的概率性（主动）回复群消息的功能，�
 
 <!-- TODO: 自动回复配置截图 -->
 
-对于非Global模式，群内启用此功能需要使用指令`/autochat off`来启用自动回复。
+对于非Global模式，群内启用此功能需要使用指令`/chat auto on`来启用自动回复。
 
 ## 切句回复
 

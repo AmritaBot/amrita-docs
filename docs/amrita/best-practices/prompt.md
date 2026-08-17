@@ -17,10 +17,10 @@
 
 AmritaBot 通过 WebUI 提供提示词管理功能：
 
-1. **分类管理**: 群聊提示词和私聊提示词分别管理（`config/group_prompts/` 和 `config/private_prompts/` 目录）
+1. **分类管理**: 群聊提示词和私聊提示词分别管理（localstore 插件配置目录下的 `group_prompts/` 和 `private_prompts/` 目录，可通过 `ambot nb localstore` 查看）
 2. **预设机制**: 支持多种提示词预设，WebUI 中可创建、编辑、切换
 3. **动态配置**: 支持运行时通过 WebUI 修改提示词预设
-4. **持久化存储**: 提示词以 `.txt` 文件保存在配置目录，便于备份和复用
+4. **持久化存储**: 提示词以 `.txt` 文件保存在 localstore 插件配置目录，便于备份和复用
 5. **内置提示词**: AmritaBot 已内置基础格式提示词，无需额外描述消息格式
 
 ## 2. 提示词设计原则

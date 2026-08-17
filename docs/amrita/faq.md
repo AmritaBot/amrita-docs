@@ -4,7 +4,7 @@
 
 ::: tip
 
-从`0.3.5`开始, `ADMIN_GROUP` 变量不再强制要求填写，未填写时推送消息将以Warning方式提示在控制台。
+`ADMIN_GROUP` 变量不强制要求填写，未填写时推送消息将以 Warning 方式提示在控制台。
 
 :::
 
@@ -38,10 +38,10 @@ WEBUI_PASSWORD=your_secure_password
 
 ## 为什么数据库连接失败？
 
-请检查您的 DATABASE_URL 配置是否正确。默认使用 SQLite 数据库：
+请检查您的 SQLALCHEMY_DATABASE_URL 配置是否正确。默认使用 SQLite 数据库：
 
 ```dotenv
-DATABASE_URL=aiosqlite:///db.sqlite3
+SQLALCHEMY_DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
 ```
 
 对于生产环境，建议使用 MySQL 或 PostgreSQL 以获得更好的性能。
@@ -56,7 +56,6 @@ DATABASE_URL=aiosqlite:///db.sqlite3
 
 ```bash
 uv sync --reinstall
-# 或 `pip install -r requirements.txt --force-reinstall`
 ```
 
 如果无法解决，可以考虑重建整个虚拟环境

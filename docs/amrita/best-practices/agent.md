@@ -58,7 +58,7 @@ agent_strategy = "react"         # react / hybrid-react / no-action
 - **`hybrid-react`**：混合 ReAct 策略，结合结构化推理增强
 - **`no-action`**：跳过 Agent 运行，直接进行普通对话
 
-> AmritaCore 还提供了 `ReactConfig` 配置块（`core.react_config`），支持以下高级选项：
+> AmritaCore 还提供了 `ReactConfig` 配置块（`core.builtin.react_config`），支持以下高级选项：
 >
 > - `structured_reasoning` — 启用 `[Step N/M] [phase]` 分步推理
 > - `reasoning_depth` — 推理最大步数（默认 3）
@@ -67,7 +67,7 @@ agent_strategy = "react"         # react / hybrid-react / no-action
 
 ## 3. 内置工具详解：Agent 的"思维器官"
 
-AmritaCore 提供了**四个**内置工具来支撑 Agent 的思维流程。`REASONING_TOOL`、`PROCESS_MESSAGE`、`STOP_TOOL` 在任何 Agent 模式下可用，`REFLECTION_TOOL` 需要额外启用 `react_config.enable_reflection`。
+AmritaCore 提供了**四个**内置工具来支撑 Agent 的思维流程。`REASONING_TOOL`、`PROCESS_MESSAGE`、`STOP_TOOL` 在任何 Agent 模式下可用，`REFLECTION_TOOL` 需要额外启用 `core.builtin.react_config.enable_reflection`。
 
 ### 3.1 REASONING_TOOL (`think_and_reason`) — "思考与规划"
 

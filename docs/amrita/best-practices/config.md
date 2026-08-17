@@ -26,19 +26,20 @@ AmritaBot 的聊天功能配置文件位于 `config/chat/config.toml`，基于 P
 
 ```toml
 [core.llm]
-temperature = 0.7       # 生成温度 (0-2，越高越随机)
-max_tokens = 4096       # 单次最大生成 token
-top_p = 1.0             # 核采样概率
-
-[core.llm.memory]
-memory_length_limit = 20     # 原始记忆轮数上限
-enable_memory_abstract = false  # 是否启用上下文摘要
+max_tokens = 1000            # 单次最大生成 token
+session_tokens_windows = 5000  # 会话上下文窗口（tokens）
+enable_tokens_limit = true   # 是否启用 token 上限
+tokens_count_mode = "bpe"    # token 计数方式
+memory_length_limit = 50     # 原始记忆轮数上限
+enable_memory_abstract = true   # 是否启用上下文摘要
 memory_abstract_proportion = 0.5  # 摘要截取比例
 ```
 
+> 温度（`temperature`）、采样（`top_p`/`top_k`）等生成参数不在 `[core.llm]` 下，而是位于第 6 节的 `[default_preset.config]` 中。
+
 优化建议：
 
-- **对话型应用**：temperature 0.7–1.0；**工具调用/严谨场景**：0–0.3
+- **对话型应用**：temperature 0.7–1.0；**工具调用/严谨场景**：0–0.3（在 `default_preset.config` 中调整）
 - 长对话建议启用 `enable_memory_abstract`，比例 0.3–0.6
 
 ### 1.2 Agent 工具调用
@@ -146,13 +147,13 @@ keywords_mode = "starts_with"   # starts_with / contains
 
 ## 3. 性能优化要点
 
-| 场景           | 建议                                                                  |
-| -------------- | --------------------------------------------------------------------- |
-| 高并发群聊     | `chat_pending_mode = "queue"`，`session_control_time = 30`            |
-| 长对话记忆     | `enable_memory_abstract = true`，`memory_abstract_proportion = 0.4`   |
-| Token 成本控制 | 启用 `usage_limit`，合理设置 `total_daily_token_limit`                |
-| 响应速度       | 开启 `stream = true`，`use_minimal_context = false`（保留完整上下文） |
-| 安全敏感场景   | `report_invoke_level = "high"`，`cookie.enable_cookie = true`         |
+| 场景           | 建议                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| 高并发群聊     | `chat_pending_mode = "queue"`，`session_control_time = 30`                                       |
+| 长对话记忆     | `core.llm.enable_memory_abstract = true`，`memory_abstract_proportion = 0.4`                     |
+| Token 成本控制 | 启用 `usage_limit`，合理设置 `total_daily_token_limit`                                           |
+| 响应速度       | 开启 `stream = true`（`default_preset.config`），`use_minimal_context = false`（保留完整上下文） |
+| 安全敏感场景   | `llm.tools.report_invoke_level = "high"`，`core.cookie.enable_cookie = true`                     |
 
 优化建议：
 
@@ -169,13 +170,19 @@ keywords_mode = "starts_with"   # starts_with / contains
 
 ```toml
 [default_preset]
-model = ""                # 模型名称（如 gpt-4）
+model = "auto"            # 模型名称（"auto" 为自动选择）
 name = "default"          # 预设名称
 base_url = ""             # API基础URL（为空使用默认）
 api_key = ""              # API密钥
 protocol = "__main__"     # 协议类型
-thought_chain_model = false  # 思维链模式
+
+[default_preset.config]
+top_k = 50                # top-k 采样
+top_p = 0.8               # 核采样概率
+temperature = 0.6         # 生成温度 (0-2，越高越随机)
+stream = false            # 是否流式输出
 multimodal = false        # 多模态支持
+cot_model = false         # 思维链（CoT）模型
 ```
 
 ### 6.2 预设扩展
@@ -209,7 +216,7 @@ send_msg_after_be_invited = false      # 被邀请后发送消息
 ### 7.2 敏感内容处理
 
 ```toml
-[llm_config]
+[llm]
 block_msg = [              # 拦截消息列表
     "嗨～你好，我们换个话题吧～"
 ]
@@ -227,9 +234,9 @@ after_deleted_say_what = [  # 消息被删除后的回复选项
 ### 8.1 Cookie（提示词电子水印） 管理
 
 ```toml
-[cookies]
-cookie = ""              # Cookie值
-enable_cookie = false    # 是否启用Cookie
+[core.cookie]
+enable_cookie = true     # 是否启用Cookie反注入检测
+cookie = ""              # Cookie值（留空自动生成随机字符串）
 ```
 
 ### 8.2 数据持久化
@@ -238,10 +245,10 @@ enable_cookie = false    # 是否启用Cookie
 
 ```dotenv
 # .env 文件示例
-DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
+SQLALCHEMY_DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
 # 或使用其他数据库
-# DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/amrita
-# DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/amrita
+# SQLALCHEMY_DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/amrita
+# SQLALCHEMY_DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/amrita
 ```
 
 ## 9. 最佳实践
@@ -278,12 +285,12 @@ DATABASE_URL=sqlite+aiosqlite:///./data/db.sqlite3
 
 常见问题及解决方法：
 
-| 问题             | 可能原因                    | 解决方案            |
-| ---------------- | --------------------------- | ------------------- |
-| 响应超时         | `llm_timeout` 过小          | 增加至 60-120 秒    |
-| 上下文丢失       | `session_control_time` 过短 | 增加至 60+ 分钟     |
-| Token 超限       | `session_max_tokens` 不足   | 根据模型能力调整    |
-| 工具调用失败     | MCP 服务器未启动            | 检查 MCP 服务器状态 |
-| 自动回复过于频繁 | `probability` 过高          | 降低至 0.01-0.05    |
+| 问题             | 可能原因                               | 解决方案                          |
+| ---------------- | -------------------------------------- | --------------------------------- |
+| 响应超时         | `llm_timeout` 过小                     | 增加至 60-120 秒                  |
+| 上下文丢失       | `session_control_time` 过短            | 增加至 60+ 分钟                   |
+| Token 超限       | `core.llm.session_tokens_windows` 过小 | 调大上下文窗口（注意 token 成本） |
+| 工具调用失败     | MCP 服务器未启动                       | 检查 MCP 服务器状态               |
+| 自动回复过于频繁 | `probability` 过高                     | 降低至 0.01-0.05                  |
 
 通过合理配置和持续优化这些参数，可以显著提升 AmritaBot 框架的性能、稳定性和用户体验。建议根据实际使用场景，采用小步快跑的方式逐步调优。

@@ -4,7 +4,7 @@ AmritaBot WebUI是Amrita原生的轻量级UI，用于信息显示与管理Bot本
 
 ## 访问
 
-访问Bot监听的端口，默认为8080，因此，WebUI的地址为：`http://localhost:8080`
+WebUI 与 Bot 共用同一服务端口，端口由环境变量 `PORT` 控制（NoneBot 默认 `8080`，Amrita 示例 `.env` 使用 `11451`）。例如使用默认端口时，WebUI 地址为：`http://localhost:8080`
 
 ## 安全警告
 

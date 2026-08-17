@@ -130,6 +130,10 @@
 ## 🧩 插件开发 API
 
 参见 [权限 API](../features/permission/API.md) | [菜单 API](../features/other-modules/menu.md) | [WebUI API](../features/webui/customization.md)
+
+### 配置管理器示例
+
+```python
 from amrita.config_manager import BaseDataManager
 from pydantic import BaseModel
 
@@ -151,7 +155,7 @@ dm = MyDataManager()
 config = await dm.safe_get_config()
 print(config.api_key)
 
-````
+```
 
 ### 消息发送示例
 
@@ -160,7 +164,7 @@ from amrita.utils.admin import send_to_admin
 
 # 发送消息到管理员
 await send_to_admin("系统启动成功")
-````
+```
 
 ### 速率限制示例
 
@@ -210,6 +214,6 @@ print(f"健康等级: {health_info['health_level']}")
 
 ### 事件处理
 
-此处请参考 [NoneBot 官方文档](hhttps://nonebot.dev/docs/tutorial/handler)
+此处请参考 [NoneBot 官方文档](https://nonebot.dev/docs/tutorial/handler)
 
 这些 API 提供了 AmritaBot 的核心功能接口。有关更详细的使用方法，请参考其他文档部分。

@@ -31,15 +31,15 @@ AmritaBot 使用的环境变量分为两类：AmritaBot 自身定义的配置项
 
 ### NoneBot / 适配器 / 插件提供
 
-| 变量名                | 类型 | 默认值                           | 说明                        | 来源                      |
-| --------------------- | ---- | -------------------------------- | --------------------------- | ------------------------- |
-| `ENVIRONMENT`         | str  | `dev`                            | 运行环境                    | NoneBot                   |
-| `DRIVER`              | str  | `~fastapi`                       | NoneBot 驱动器              | NoneBot                   |
-| `PORT`                | int  | `8080`                           | 服务端口（也是 WebUI 端口） | NoneBot                   |
-| `HOST`                | str  | `127.0.0.1`                      | 服务监听地址                | NoneBot                   |
-| `LOCALSTORE_USE_CWD`  | bool | `true`                           | 使用当前目录存储数据        | nonebot-plugin-localstore |
-| `DATABASE_URL`        | str  | `sqlite+aiosqlite:///db.sqlite3` | 数据库连接 URL              | nonebot-plugin-orm        |
-| `ONEBOT_ACCESS_TOKEN` | str  | 无默认值                         | OneBot V11 访问令牌         | nonebot-adapter-onebot    |
+| 变量名                    | 类型 | 默认值                                      | 说明                        | 来源                      |
+| ------------------------- | ---- | ------------------------------------------- | --------------------------- | ------------------------- |
+| `ENVIRONMENT`             | str  | `dev`                                       | 运行环境                    | NoneBot                   |
+| `DRIVER`                  | str  | `~fastapi`                                  | NoneBot 驱动器              | NoneBot                   |
+| `PORT`                    | int  | `8080`                                      | 服务端口（也是 WebUI 端口） | NoneBot                   |
+| `HOST`                    | str  | `127.0.0.1`                                 | 服务监听地址                | NoneBot                   |
+| `LOCALSTORE_USE_CWD`      | bool | `true`                                      | 使用当前目录存储数据        | nonebot-plugin-localstore |
+| `SQLALCHEMY_DATABASE_URL` | str  | `sqlite+aiosqlite:///<数据目录>/db.sqlite3` | 数据库连接 URL              | nonebot-plugin-orm        |
+| `ONEBOT_ACCESS_TOKEN`     | str  | 无默认值                                    | OneBot V11 访问令牌         | nonebot-adapter-onebot    |
 
 > **提示**：除上述配置外，`config/` 目录下的 TOML 文件提供了更详细的插件级配置，可在 WebUI 中直接编辑。
 

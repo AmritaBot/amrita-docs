@@ -19,7 +19,9 @@ MCP（Model Context Protocol）是Amrita框架中用于集成外部AI服务和�
 编辑Amrita的聊天模块配置文件（`config/chat/config.toml`）
 
 ```toml
-[llm.tools]
+[core.function_config]
+# 启用 MCP 客户端（必须为 true 才能连接 MCP 服务器）
+agent_mcp_client_enable = true
 # 在此处添加MCP服务器的脚本/地址
 agent_mcp_server_scripts = [
    "./mcp_servers/dify_connector.py",
@@ -30,10 +32,13 @@ agent_mcp_server_scripts = [
 
 ### 方法二：通过Amrita指令添加（动态配置）
 
-在已运行的Amrita机器人实例中，可以使用管理指令动态挂载MCP服务器：
+在已运行的Amrita机器人实例中，可以使用管理指令动态挂载MCP服务器（需 `lp.admin` 权限）：
 
 ```text
-/mcp add your-mcp-server-script
+/mcp add <server_script>     # 添加 MCP 服务器
+/mcp del <server_script>     # 移除 MCP 服务器
+/mcp reload                  # 重载 MCP 配置
+/mcp stats [-d|--details]    # 查看 MCP 服务器状态
 ```
 
 ### 方法三：通过Web UI添加（图形化配置）
@@ -46,11 +51,15 @@ Amrita内置了WebUI，提供图形化配置方式：
 4. 填写MCP服务器的脚本/地址，并保存
 
 ::: tip
-使用以上方式都需要先启用MCP服务
+使用以上方式都需要先在 `config/chat/config.toml` 中启用 MCP 客户端：
+
+```toml
+[core.function_config]
+agent_mcp_client_enable = true
+```
 
 <!-- TODO: MCP服务器配置页面截图，显示MCP工具列表及连接状态 -->
 
-将这里的enable改为true
 :::
 
 ## 实际案例：集成Dify平台
