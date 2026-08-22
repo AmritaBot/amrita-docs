@@ -139,6 +139,7 @@ export default withMermaid({
                 text: "工具调用 (Function Calling)",
                 link: "/amrita/features/chat/tools",
               },
+              { text: "Skills 接入", link: "/amrita/features/chat/skills" },
               { text: "MCP 服务集成", link: "/amrita/features/chat/mcp" },
               {
                 text: "长期记忆与知识库",

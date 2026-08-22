@@ -47,6 +47,7 @@ AmritaBot 的聊天功能以 AmritaCore 作为 Agent 引擎，提供了从基础
 - Agent 模式（循环推理-行动-观察，支持 `react` 普通循环与 `step-react` Step 驱动循环两种工作流）
 - 权限控制集成
 - MCP（Model Context Protocol）客户端支持
+- Skills 技能接入（faskill，Anthropic Agent Skills 兼容）
 
 ### 事件交互
 
@@ -66,5 +67,6 @@ AmritaBot 的聊天功能以 AmritaCore 作为 Agent 引擎，提供了从基础
 - [基础对话使用](./basic.md)
 - [高级对话功能](./advanced.md)
 - [工具调用详解](./tools.md)
+- [Skills 接入](./skills.md)
 - [长期记忆与知识库](./memory.md)
 - [MCP 服务器集成](./mcp.md)
