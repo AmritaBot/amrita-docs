@@ -214,6 +214,10 @@ export default withMermaid({
           { text: "贡献指南", link: "/amrita/developer/contributing" },
           { text: "核心 API 参考", link: "/amrita/developer/api-reference/" },
           { text: "插件开发指南", link: "/amrita/developer/plugin-dev" },
+          {
+            text: "扩展点与事件钩子",
+            link: "/amrita/developer/extension-points",
+          },
         ],
       },
       {
