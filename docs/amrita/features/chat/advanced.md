@@ -234,30 +234,113 @@ graph TD
 
 - 配置项`session_max_tokens`已弃用，它不会有任何作用，请改用`core.llm.session_tokens_windows`来配置最大上下文窗口Tokens
 
+### 会话指令
+
+| 指令 | 作用 |
+| --- | --- |
+| `/session info` | 查看当前会话占用与状态（方块占用条） |
+| `/session list` | 列出已归档的历史会话 |
+| `/session use <编号>` | 切换到指定历史会话 |
+| `/session del <编号>` | 删除指定历史会话 |
+| `/session archive` | 立即归档当前会话 |
+| `/session clear confirm` | **删除全部归档记录**（不可恢复） |
+| `/session forget` | 仅清空当前对话上下文 |
+| `/session compact [force]` | 压缩上下文（见下一节） |
+| `/session abstract [clear]` | 查看/清空摘要 |
+
+::: warning `clear` 与 `forget` 的区别
+
+两者容易混淆，务必区分：
+
+- **`/session forget`**：只清空当前对话上下文，归档记录保留
+- **`/session clear confirm`**：删除 MemorySessions 里**全部归档记录**，不可恢复
+
+`clear` 需要二次确认：直接发 `/session clear` 只会提示你补上 `confirm`，
+并提醒你是否其实想用 `forget`。
+
+:::
+
+::: tip 运行中的会话受保护
+
+破坏性指令（`clear` / `forget` / `use` / `del` / `archive` / `abstract clear`）
+在会话正在生成回复时会被拒绝：本轮结束后记忆会被回写，覆盖掉指令刚做的改动
+（归档被复活、恢复被撤销、清空被填回）。
+
+需要强制执行时加 `force`：`/session clear confirm force`。此时指令会等待本轮结束
+（复用与聊天同一把锁），而不是绕过。
+
+:::
+
 ## 上下文压缩
 
 ### 说明
 
-AmritaBot 内置了上下文摘要功能，当对话历史过长导致token消耗过大时，系统会自动触发上下文压缩机制。该功能通过调用大语言模型对历史对话进行智能摘要，将多轮对话压缩为简洁的上下文描述，从而在保持对话连贯性的同时显著减少token使用量。上下文压缩可以在配置中设置触发阈值，并支持手动触发压缩操作，有效平衡对话质量和资源消耗。
+AmritaBot 内置了上下文摘要功能，当对话历史过长导致 token 消耗过大时，系统会自动触发上下文压缩机制。该功能通过调用大语言模型对历史对话进行智能摘要，将多轮对话压缩为简洁的上下文描述，从而在保持对话连贯性的同时显著减少 token 使用量。上下文压缩可以在配置中设置触发阈值，并支持手动触发压缩操作，有效平衡对话质量和资源消耗。
+
+::: tip 1.0 起压缩由 ContextCompactor 负责
+
+旧版由 AmritaCore 的 `MemoryLimiter` 承担，1.0 已改为
+`amrita_core.components.compaction.ContextCompactor`，
+对应的配置项也全部更换（见下）。
+
+:::
 
 ### 配置
 
-1. 打开WebUI，导航到 `chat` 插件的配置页面
+1. 打开 WebUI，导航到 `chat` 插件的配置页面
 
 2. 展开 `core.llm` 配置组
 
-<!-- TODO: 记忆抽象与回复控制页面截图，显示记忆抽象、自动回复、消息截断配置 -->
+<!-- TODO: 上下文压缩与回复控制页面截图，显示压缩开关、触发比例、自动回复、消息截断配置 -->
 
 **配置项说明**
 
-- `memory_abstract_proportion`: 上下文摘要比例，进行上下文摘要时截取当前上下文内容的比例。
+- `enable_compaction`: 是否启用上下文压缩，默认 `true`
+- `compaction_trigger_ratio`: 占用达到上下文窗口的该比例时触发压缩，默认 `0.9`
+- `compaction_max_tokens`: 生成摘要时的最大 token 数，默认 `2048`
+- `memory_length_limit`: 原始记忆轮数上限，默认 `200`
+- `session_tokens_windows`: 上下文窗口，默认 `65536`；**预设声明 `max_context` 后以预设为准**
+- `enable_overflow_recovery`: 溢出时自动恢复，默认 `true`
+
+::: warning 已移除的旧字段
+
+| 旧字段 | 替代 |
+| --- | --- |
+| `enable_memory_abstract` | `enable_compaction` |
+| `memory_abstract_proportion` | `compaction_trigger_ratio` |
+
+:::
+
+### 手动压缩
+
+`/session compact` 可手动触发压缩。为避免误操作，满足以下条件之一才会执行：
+
+- 当前占用已达到 `compaction_trigger_ratio` 之外的实际阈值（占用比例 ≥ 15%）
+- 或加 `force` 参数强制压缩：`/session compact force`
+
+压缩完成后会回复折叠了多少条历史消息、压缩前后的占用，以及摘要调用自身消耗的 token
+（摘要调用单独记账，不计入会话）。
+
+::: tip 查看当前占用
+
+`/session info` 会用方块图形展示上下文占用：🟩 已用、🟨 为响应预留、⬜ 未用，
+并标出压缩线位置。窗口来自预设的 `max_context`，预留来自 `max_output`。
+
+:::
 
 ## Agent与Tools
 
 Agent 与工具调用的完整说明见[Tool](./tools.md)一章。这里补充 Agent 执行相关的 `llm` 配置：
 
-- **`llm.agent_strategy`**：Agent 执行策略，`react`（默认，标准 ReAct）/ `hybrid-react`（**已弃用**，计划 v0.14.0 移除）/ `no-action`（跳过 Agent，直接对话）
+- **`llm.agent_strategy`**：Agent 执行策略，`react`（默认，标准 ReAct）/ `hybrid-react`（**已弃用**，1.0 起已归并到 `react`）/ `no-action`（跳过 Agent，直接对话）
 - **`llm.agent_workflow`**：推理工作流，`react`（默认，普通 ReAct 循环）/ `step-react`（Step 驱动的 ReAct 循环：LLM 先分解计划，框架逐 Step 执行，支持计划修订 `update_step`、停滞检测、Step 间压缩，需模型支持结构化输出）
+
+::: tip 在工具调用前后介入
+
+1.0 暴露了 `agent.tool_call` / `agent.tool_return` 等步骤事件，插件可改写工具参数或返回值、
+甚至取消调用。详见[扩展点与事件钩子](../../developer/extension-points.md#agent-步骤事件)。
+
+:::
 
 ## 概率性自动回复
 

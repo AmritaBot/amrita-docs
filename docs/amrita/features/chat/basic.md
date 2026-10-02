@@ -75,7 +75,7 @@ AmritaBot 内置了基础提示词，因此您无需在提示词中而外对格�
 | ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ---------- |
 | **/model**    | `/model list` 可用模型<br>`/model switch <名>` 切换<br>`/model info` 详情<br>`/model test [名] [-d]` 测试 | 查看、切换与测试模型                                    | `lp.admin` |
 | **/prompt**   | `/prompt set <文本>` 设置<br>`/prompt clear` 清空<br>`/prompt template [group\|private] [名称]` 模板      | 设置自定义提示词与切换模板                              | 群管理     |
-| **/session**  | `/session info\|list\|use <编号>\|del <编号>\|archive\|clear\|compact [force]\|forget\|abstract [clear]`  | 会话信息、历史、压缩与记忆管理                          | 群管理     |
+| **/session**  | `/session info\|list\|use <编号>\|del <编号>\|archive\|clear confirm\|compact [force]\|forget\|abstract [clear]` | 会话信息、历史、压缩与记忆管理                          | 群管理     |
 | **/chat**     | `/chat on\|off` 聊天开关<br>`/chat auto <on\|off>` 自动回复<br>`/chat status` 状态                        | 开启/关闭聊天与自动回复                                 | 群管理     |
 | **/debug**    | `/debug <on\|off\|status>`                                                                                | 调试模式开关                                            | `lp.admin` |
 | **/insights** | `/insights [global\|top10]`                                                                               | 查看今日AI用量统计（`global` 与 `top10` 需 `lp.admin`） | 所有用户   |

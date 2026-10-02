@@ -107,7 +107,7 @@ flowchart TB
         Scheduler --> Runner["SubconsciousRunner"]
         Runner --> ChatObject["ChatObject<br/>(容器)"]
         ChatObject --> WF["Workflow 管线"]
-        WF --> LM["LIMITING_MEMORY<br/>Core MemoryLimiter"]
+        WF --> LM["COMPACT_HISTORY<br/>ContextCompactor"]
         LM --> Build["BUILD_MESSAGE"]
         Build --> AgentLoop["ReAct Agent Loop"]
         AgentLoop -->|"工具调用"| STools["subconscious_* 工具"]
@@ -143,13 +143,13 @@ flowchart TB
 | 事件驱动     | 用户发消息触发，无活动则永远空闲                          |
 | 惩罚退避     | 连续触发时指数延长延迟（30min→45min→...→1440min）         |
 | 自动整理     | LLM 后台去重、合并、标签补全、低质清理                    |
-| 记忆压缩     | Core `MemoryLimiter` 截断超限 + 自动摘要                  |
+| 记忆压缩     | Core `ContextCompactor` 截断超限 + 自动摘要               |
 | 去重辅助     | `subconscious_duplicate_helper` 返回待整理记忆 + 合并指导 |
 | 统计概览     | `subconscious_get_memory_stats` 总量/重要性/标签分布      |
 | 膨胀感知     | ChromaDB 超 `memory_warn_threshold` 时注入压缩提示        |
 | 滑动窗口     | `max_abstracts` 轮摘要保留，跨轮传递进度                  |
 | 用户画像     | 行级增量更新，Markdown 文件持久化                         |
-| Session 摘要 | MemoryLimiter 全量摘要 + LRU 缓存                         |
+| Session 摘要 | `ContextCompactor` 全量摘要 + LRU 缓存                    |
 | 主动消息     | LLM 向用户发起主动问候（需 `allow_send_to_user`）         |
 | Token 统计   | 复用 Bot `InsightsModel` 全局统计                         |
 
