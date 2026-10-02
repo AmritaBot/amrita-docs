@@ -295,19 +295,22 @@ AmritaBot 内置了上下文摘要功能，当对话历史过长导致 token 消
 
 **配置项说明**
 
-- `enable_compaction`: 是否启用上下文压缩，默认 `true`
-- `compaction_trigger_ratio`: 占用达到上下文窗口的该比例时触发压缩，默认 `0.9`
+- `context_strategy`: 历史超预算后的处理方式，`compact`（折叠成摘要）/ `slide`（直接丢弃最旧消息）/ `none`（不处理），默认 `compact`
+- `compaction_trigger_ratio`: 占用达到上下文窗口的该比例时触发，默认 `0.9`
+- `slide_target_ratio`: `slide` 策略下裁剪到的窗口比例，默认 `0.7`，需小于 `compaction_trigger_ratio`
 - `compaction_max_tokens`: 生成摘要时的最大 token 数，默认 `2048`
 - `memory_length_limit`: 原始记忆轮数上限，默认 `200`
 - `session_tokens_windows`: 上下文窗口，默认 `65536`；**预设声明 `max_context` 后以预设为准**
-- `enable_overflow_recovery`: 溢出时自动恢复，默认 `true`
+- `enable_overflow_recovery`: 溢出时自动恢复，默认 `true`（`context_strategy = "none"` 下无效）
 
 ::: warning 已移除的旧字段
 
 | 旧字段 | 替代 |
 | --- | --- |
-| `enable_memory_abstract` | `enable_compaction` |
+| `enable_memory_abstract` | `enable_compaction`（1.2 起再改为 `context_strategy`） |
 | `memory_abstract_proportion` | `compaction_trigger_ratio` |
+| `enable_compaction` | `context_strategy`（1.2 起） |
+| `auto_retry` | （无，框架从未读取） |
 
 :::
 

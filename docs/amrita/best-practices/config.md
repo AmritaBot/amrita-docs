@@ -31,37 +31,39 @@ session_tokens_windows = 65536 # 会话上下文窗口（tokens），预设未�
 memory_length_limit = 200      # 原始记忆轮数上限
 llm_timeout = 60               # 单次请求超时（秒）
 require_tools = false          # 是否强制模型必须调用工具
-auto_retry = true              # 失败自动重试
 max_retries = 3                # 重试次数上限
 max_fallbacks = 5              # 预设降级次数上限
 enable_multi_modal = true      # 全局多模态开关（还需预设 multimodal = true）
 
-# 上下文压缩（1.0 起由 ContextCompactor 负责，取代旧的 MemoryLimiter）
-enable_compaction = true          # 是否启用上下文压缩
-compaction_trigger_ratio = 0.9    # 占用达到窗口的该比例时触发压缩
+# 历史管理（1.0 起由 ContextCompactor 负责，取代旧的 MemoryLimiter；1.2 起改为策略）
+context_strategy = "compact"      # compact(折叠成摘要) / slide(丢弃最旧消息) / none(不处理)
+compaction_trigger_ratio = 0.9    # 占用达到窗口的该比例时触发
+slide_target_ratio = 0.7          # slide 策略下裁剪到的窗口比例（需小于触发比例）
 compaction_max_tokens = 2048      # 摘要生成的最大 token
-enable_overflow_recovery = true   # 溢出时自动恢复
+enable_overflow_recovery = true   # 溢出时自动恢复（context_strategy = "none" 下无效）
 ```
 
 > 温度（`temperature`）、采样（`top_p`/`top_k`）等生成参数不在 `[core.llm]` 下，而是位于第 6 节的 `[default_preset.config]` 中。
 
-::: warning 1.0 已移除的字段
+::: warning 已移除的字段
 
-以下字段在 AmritaCore 1.0 中**已不存在**，写在配置里会被 pydantic 静默忽略：
+以下字段在 AmritaCore 中**已不存在**，写在配置里会被 pydantic 静默忽略：
 
 | 旧字段 | 替代方案 |
 | --- | --- |
 | `tokens_count_mode` | 无 —— 本地分词器整体移除，用量只来自 provider 上报 |
-| `enable_memory_abstract` | `enable_compaction` |
+| `enable_memory_abstract` | `enable_compaction`（1.2 起再改为 `context_strategy`） |
 | `memory_abstract_proportion` | `compaction_trigger_ratio` |
 | `enable_tokens_limit` | 无 —— 改为按窗口 + 压缩阈值控制 |
+| `enable_compaction` | `context_strategy`（1.2 起） |
+| `auto_retry` | 无 —— 框架从未读取，重试由 `max_retries` / `max_fallbacks` 控制 |
 
 :::
 
 优化建议：
 
 - **对话型应用**：temperature 0.7–1.0；**工具调用/严谨场景**：0–0.3（在 `default_preset.config` 中调整）
-- 长对话建议保持 `enable_compaction = true`，把 `compaction_trigger_ratio` 调到 0.6–0.8 让压缩更早介入
+- 长对话建议保持 `context_strategy = "compact"`，把 `compaction_trigger_ratio` 调到 0.6–0.8 让压缩更早介入；早期轮次可以丢弃时用 `"slide"`，省掉每次裁剪的摘要调用
 - 预设中声明 `max_context` 后，`session_tokens_windows` 仅在未声明时生效
 
 ### 1.2 Agent 工具调用
@@ -190,7 +192,7 @@ keywords_mode = "starts_with"   # starts_with / contains
 | 场景           | 建议                                                                                                        |
 | -------------- | ----------------------------------------------------------------------------------------------------------- |
 | 高并发群聊     | `chat_pending_mode = "queue"`，`session_control_time = 30`                                                  |
-| 长对话记忆     | `core.llm.enable_compaction = true`，`compaction_trigger_ratio = 0.7`（更早压缩）                           |
+| 长对话记忆     | `core.llm.context_strategy = "compact"`，`compaction_trigger_ratio = 0.7`（更早压缩）                       |
 | Token 成本控制 | 启用 `usage_limit`，合理设置 `total_daily_token_limit`                                                      |
 | 响应速度       | 开启 `stream = true`（`default_preset.config`），`use_minimal_context = false`（保留完整上下文）            |
 | 安全敏感场景   | `llm.tools.report_invoke_level = "high"`，`core.cookie.enable_cookie = true`                                |

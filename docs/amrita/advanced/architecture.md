@@ -17,6 +17,8 @@ AmritaBot 的技术栈分为三层：
 - 上下文裁剪与摘要由 `MemoryLimiter` 改为 `ContextCompactor`，配置项从
   `enable_memory_abstract` / `memory_abstract_proportion` 改为
   `enable_compaction` / `compaction_trigger_ratio`
+  （1.2 起 `enable_compaction` 再改为三选一的 `context_strategy`：
+  `compact` / `slide` / `none`）
 - 本地分词器（`amrita_core.tokenizer`）整体移除，用量只来自 provider 上报
 - `HybridReActAgentStrategy` 归并到 `ReActAgentStrategy`
 
