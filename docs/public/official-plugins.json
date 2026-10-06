@@ -1,0 +1,33 @@
+{
+  "_note": "Amrita 官方插件清单：只存身份。版本、描述与依赖约束都在运行时从 PyPI 解析，不落进仓库——手抄的版本号一旦过期，安装时就会锁到旧版本。新增插件时补 module_name / project_link / name 即可；module_name 必须与 pip 安装后可导入的模块名一致。",
+  "plugins": [
+    {
+      "module_name": "amrita_plugin_deepseek",
+      "project_link": "amrita_plugin_deepseek",
+      "name": "DeepSeek 模型安全增强",
+      "target": "amrita",
+      "is_official": true
+    },
+    {
+      "module_name": "amrita_plugin_exec",
+      "project_link": "amrita-plugin-exec",
+      "name": "命令执行",
+      "target": "amrita",
+      "is_official": true
+    },
+    {
+      "module_name": "amrita_plugin_memory",
+      "project_link": "amrita_plugin_memory",
+      "name": "长期记忆",
+      "target": "amrita",
+      "is_official": true
+    },
+    {
+      "module_name": "amrita_plugin_omikuji",
+      "project_link": "amrita-plugin-omikuji",
+      "name": "御神签",
+      "target": "amrita",
+      "is_official": true
+    }
+  ]
+}
