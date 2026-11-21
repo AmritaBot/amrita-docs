@@ -172,6 +172,8 @@ Cookie 反注入也不需要手写 `{cookie}`。开启 `core.cookie.enable_cooki
 
 具体路径可以用 `ambot nb localstore` 查看，或在 WebUI 的「提示词预设」页面直接编辑。切换模板用 `/prompt template group|private <名称>`，1.12 起该操作要求超级管理员。
 
+![群聊与私聊提示词模板](/webui/prompts.png)
+
 迭代建议：
 
 1. 先写一个最小版本，跑 10–20 条真实对话；

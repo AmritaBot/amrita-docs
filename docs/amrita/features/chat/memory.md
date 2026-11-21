@@ -186,6 +186,8 @@ L3 复用 Core 的 `REACT_ONLY`，`SubconsciousRunner` 只注入隔离的 `Subco
 
 ### 触发与空闲窗口
 
+<!-- TODO: 补一张 /memory heatmap 的作息热度图与下次运行时间截图。 -->
+
 用户发消息就给所在时槽加一次热度、`penalty + 1`、重新挑选窗口。默认按 **7 天 × 12 槽**（每槽 2 小时）的热度图找冷段：
 
 - `penalty` 的含义是「要求多长的冷段」，不是延迟分钟数；

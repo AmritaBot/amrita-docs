@@ -205,6 +205,8 @@ print(json.dumps({"commits": []}, ensure_ascii=False))
 
 ## 6. 触发与选择
 
+![技能管理中的执行策略与注册模式](/webui/skills-policy.png)
+
 - `all_skills = true` 时所有技能都参与选择；技能很多时，description 之间会互相竞争。
 - `all_skills = false` 时只启用 `selected` 里的技能。生产环境建议按场景白名单，避免无关技能被误触发。
 - 技能不是越多越好。一个机器人同时启用 20 个技能，模型在 description 之间做选择的难度会明显上升。

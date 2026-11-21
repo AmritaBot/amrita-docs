@@ -9,7 +9,7 @@ Amrita 的 WebUI 组件基于 **React 19 + Tailwind CSS v4**，采用 ShadCN 风
 
 :::
 
-<!-- TODO: UI 组件库总览截图占位（亮色/暗色各一张），后续统一补拍 -->
+![Card 与 StatCard 在仪表盘中的组合效果](/webui/components-cards.png)
 
 ## 包结构
 
@@ -59,6 +59,10 @@ frontend/packages/ui/          # git submodule: AmritaBot-UI
 | `useTheme()` | 读取/切换明暗主题 |
 
 `UI_EXPORTS` 是组件名清单。宿主把它挂到 `window.__AMRITA_HOST__.UI`，插件构建套件据此生成「从宿主取组件」的再导出，因此增删导出时要同步改 `src/exports.ts`，并提醒宿主 bump `HOST_CONTRACT_VERSION`。
+
+`DataTable`、`Badge`、`Tabs`、`Button` 在插件管理页面的组合效果：
+
+![DataTable、Badge、Tabs 与 Button 的组合效果](/webui/plugins.png)
 
 ## 在宿主页面中使用
 

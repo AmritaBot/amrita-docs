@@ -34,6 +34,8 @@ private_prompt_character = "default"  # 顶层：私聊提示词
 
 它们不是同一个东西。把 `agent_tool_call_limit` 写进 `[function]` 会被忽略。
 
+<!-- TODO: 补一张配置编辑器分组截图（core.function_config、meta、skills 三组），待配置项中文说明完善后统一补拍。 -->
+
 ## 2. 上下文与压缩
 
 ```toml
