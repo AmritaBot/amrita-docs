@@ -2,10 +2,15 @@
 
 ## 概述
 
-长期记忆由 **`amrita_plugin_memory`** 插件提供（v0.3.1），是基于向量数据库（ChromaDB）与 Loop Engineering 的长期记忆与知识库插件。它采用**双层架构**：表层 Function Calling 记忆工具 + 底层事件驱动潜意识推理。
+长期记忆由 **`amrita_plugin_memory`** 插件提供，当前版本 0.9.x，采用三层记忆模型：
 
-- **表层** — LLM 在对话中按需调用记忆工具（读写删改列），ChromaDB 语义检索。
-- **底层** — 用户发消息时触发后台 Agent 整理记忆库，基于 Core Agent 框架复用 `ChatObject` 管线。
+| 层 | 名称 | 载体 | 何时使用 |
+| --- | --- | --- | --- |
+| L1 | 备忘录 | 插件自有 ORM 表（每个 uni_id 一行） | 恒常注入，每轮都在 system prompt 里 |
+| L2 | 向量记忆 | ChromaDB 向量库 | LLM 按需检索、写入、更新 |
+| L3 | 离线巩固循环（DMN） | 后台 ReAct Agent | 空闲窗口到达时整理记忆、画像与知识 |
+
+L1 是一段千字内的用户元信息，放身份、稳定偏好、用户指定的工具调用模式；L2 是长尾事实库，按需检索；L3 在用户作息里的冷门时段跑一轮后台整理，做去重、压缩、画像精炼和知识沉淀。
 
 ## 安装
 
@@ -13,9 +18,14 @@
 uv run ambot plugin add amrita_plugin_memory
 ```
 
-前置依赖：Python 3.10+ / AmritaBot 实例 / Ollama 或 OpenAI 嵌入服务 / ChromaDB。
+前置依赖：
 
-安装后插件会自动注册到 `pyproject.toml` 的 `[tool.amrita.plugins]` 列表：
+- Python **3.11–3.13**（插件元数据要求 `<3.14,>=3.11`，Python 3.10 环境装不上）
+- AmritaBot 1.10+
+- Ollama 或 OpenAI 兼容的嵌入服务（**必需**，插件不自带嵌入模型）
+- ChromaDB（本地模式随依赖安装，也可连远程服务）
+
+安装后插件会写入 `pyproject.toml` 的 `[tool.amrita.plugins]`：
 
 ```toml
 [tool.amrita]
@@ -24,7 +34,9 @@ plugins = ["amrita.plugin.chat", "amrita_plugin_memory"]
 
 ## 快速开始
 
-### 1. 配置环境变量（`.env`）
+### 1. 配置嵌入与向量库
+
+在 `.env` 中至少配置嵌入服务：
 
 ```env
 VECTOR_DB_TYPE=local
@@ -33,22 +45,29 @@ EMBEDDING_MODEL_NAME=auto
 EMBEDDING_PROCTOL=ollama-embed
 ```
 
-| 环境变量                  | 默认值                   | 说明                                           |
-| ------------------------- | ------------------------ | ---------------------------------------------- |
-| `VECTOR_DB_TYPE`          | `local`                  | ChromaDB 类型：`local` / `remote`              |
-| `VECTOR_DB_SERVER`        | `127.0.0.1`              | 远程 ChromaDB 地址（仅 `remote` 生效）         |
-| `VECTOR_DB_PORT`          | `8000`                   | 远程 ChromaDB 端口（仅 `remote` 生效）         |
-| `VECTOR_DB_SERVER_SSL`    | `false`                  | 远程 ChromaDB 是否使用 SSL（仅 `remote` 生效） |
-| `EMBEDDING_MODEL_URL`     | `http://127.0.0.1:11434` | Embedding 模型地址                             |
-| `EMBEDDING_MODEL_NAME`    | `auto`                   | Embedding 模型名称                             |
-| `EMBEDDING_PROCTOL`       | `ollama-embed`           | Embedding 协议：`openai` / `ollama-embed`      |
-| `EMBEDDING_MODEL_API_KEY` | 空                       | Embedding 模型 API 密钥（可选）                |
+| 环境变量 | 默认值 | 说明 |
+| --- | --- | --- |
+| `VECTOR_DB_TYPE` | `local` | `local` 本地持久化 / `remote` 远程 ChromaDB |
+| `VECTOR_DB_SERVER` | `127.0.0.1` | 远程地址（仅 `remote`） |
+| `VECTOR_DB_PORT` | `8000` | 远程端口（仅 `remote`） |
+| `VECTOR_DB_SERVER_SSL` | `false` | 远程是否使用 SSL（仅 `remote`） |
+| `VECTOR_DB_REMOTE_HEADERS` | `{}` | 远程请求头（仅 `remote`） |
+| `VECTOR_DB_TENANT` | `default` | 远程租户 |
+| `VECTOR_DB_DATABASE` | `default` | 远程数据库 |
+| `EMBEDDING_MODEL_URL` | `http://127.0.0.1:11434` | 嵌入模型地址 |
+| `EMBEDDING_MODEL_NAME` | `auto` | 嵌入模型名称 |
+| `EMBEDDING_PROCTOL` | `ollama-embed` | `openai` / `ollama-embed` |
+| `EMBEDDING_MODEL_API_KEY` | 空 | 嵌入服务 API Key（可选） |
+| `EMBED_CHECK_ON_STARTUP` | `true` | 启动时校验嵌入指纹 |
+| `EMBED_MISMATCH_POLICY` | `ask` | 模型变更时 `ask` / `auto` / `never` |
+| `REEMBED_BATCH_SIZE` | `64` | 重映射每批条数 |
+| `REEMBED_BACKUP_KEEP` | `3` | 保留备份份数 |
 
-### 2. 开启表层记忆
+### 2. L1 与 L2 开箱可用
 
-表层记忆**开箱即用**，无需额外配置。LLM 会在需要时自动调用 `write_memory` / `read_memory` 等工具。
+无需额外配置。LLM 会在需要时调用 `write_memory` / `read_memory` / `update_memo` 等工具；L1 备忘录一旦写入，此后每轮对话都会自动注入。
 
-### 3. 开启潜意识推理（可选）
+### 3. 开启 L3 离线巩固循环
 
 编辑 `config/amrita_plugin_memory/config.toml`：
 
@@ -58,203 +77,269 @@ enabled = true
 target_user_id = "你的QQ号"
 ```
 
-设置 `target_user_id` 为目标用户的 QQ 号，重启 Bot 即可。用户每次发消息后，后台 Agent 会在 30 分钟后自动整理记忆库。
+默认按作息热度图挑空闲窗口，不再固定 30 分钟。第一次运行时热度图还是空的，会落在 `idle_target_hour` 指定的固定窗口。
 
-> **适用场景**：潜意识推理专为**个人助理**场景设计——单个 Bot 服务单个用户。它会在后台持续调用 LLM 进行记忆整理，**每轮推理可能消耗数万 tokens**。如果 Bot 服务于大量用户或对 token 成本敏感，建议保持 `enabled = false`。
-
-如需允许 Agent 主动给用户发私聊消息，额外开启：
+如需允许 Agent 主动发私聊消息：
 
 ```toml
+[subconscious]
 allow_send_to_user = true
 ```
 
-如需关闭全局知识库以节省 token：
+关闭全局知识库以节省 token：
 
 ```toml
+[subconscious]
 enable_knowledge = false
 ```
 
-> 知识库依赖潜意识推理——当 `enabled = false` 时，知识库也会自动禁用。
+> L3 专为**单用户个人助理**场景设计，单轮可能消耗数万 tokens。多用户部署或对成本敏感时保持 `enabled = false`。知识库当前依赖 L3，`enabled = false` 时知识库也会自动禁用。
 
 ### 4. 验证
 
-观察日志中 `[Subconscious]` 前缀的输出：
+```bash
+uv run ambot memory status
+```
+
+观察日志中的 `[Subconscious]` / `[Memory]` 前缀：
 
 ```text
 [Subconscious] Starting for user=你的QQ号
 [Subconscious] Idle — waiting for user chat to trigger first run
 ```
 
-用户发消息后约 30 分钟，会看到 `Cycle #1` 开始执行。
+用户发消息后会先看到 `Rescheduled: penalty=#1, ...`，里面带着选中的窗口（星期几、起止时刻、长度、分层、放宽次数）。时间到了才有 `Cycle start`。
 
-## 双层架构
+## 三层架构
 
 ```mermaid
 flowchart TB
-    subgraph Surface["表层：Long-Term Memory Tools"]
-        S_LLM["对话 LLM"] -->|"write_memory"| S_Write["写入记忆"]
-        S_LLM -->|"read_memory"| S_Read["语义检索"]
-        S_LLM -->|"update/delete/list"| S_Mut["更新 / 删除 / 列表"]
-        S_Write --> ChromaDB[("ChromaDB<br/>向量数据库")]
-        S_Read --> ChromaDB
-        S_Mut --> ChromaDB
-        S_LLM -->|"knowledge_list/read/search"| ChromaDB
+    subgraph L1["L1 备忘录"]
+        Memo["UserMemo 表<br/>≤ memo_max_chars"]
+        Inject["on_precompletion<br/>每轮注入"]
+        Memo --> Inject
     end
 
-    subgraph Subconscious["底层：Subconscious Reasoning"]
-        UserChat["用户发消息"] --> Hook["on_precompletion hook"]
-        Hook -->|"cancel_and_reschedule"| Scheduler["APScheduler<br/>指数惩罚延迟"]
-        Scheduler --> Runner["SubconsciousRunner"]
-        Runner --> ChatObject["ChatObject<br/>(容器)"]
-        ChatObject --> WF["Workflow 管线"]
-        WF --> LM["COMPACT_HISTORY<br/>ContextCompactor"]
-        LM --> Build["BUILD_MESSAGE"]
-        Build --> AgentLoop["ReAct Agent Loop"]
-        AgentLoop -->|"工具调用"| STools["subconscious_* 工具"]
-        STools --> ChromaDB
-        AgentLoop --> KB["KnowledgeBaseManager<br/>文件 + JSON + ChromaDB"]
-        AgentLoop --> Profile["用户画像<br/>行级增量更新"]
+    subgraph L2["L2 向量记忆"]
+        Tools["write/read/update/delete/list"]
+        Chroma[("ChromaDB<br/>amrita_user_memory")]
+        Decay["时间退化<br/>软衰减 + 分层清理"]
+        Tools --> Chroma
+        Chroma --> Decay
     end
 
-    Surface -->|"knowledge_suggest"| SuggQueue["知识建议队列"]
-    SuggQueue --> AgentLoop
-    Surface -.->|"共享 ChromaDB"| Subconscious
-    Runner -->|"持久化状态"| CachedRepo["CachedUserDataRepository"]
-    Runner -->|"usage 统计"| Insights["InsightsModel<br/>全局 Token 统计"]
+    subgraph L3["L3 离线巩固循环"]
+        Chat["用户发消息"] --> Heat["热度图 + 惩罚"]
+        Heat --> Window["空闲窗口"]
+        Window --> Runner["SubconsciousRunner"]
+        Runner --> Agent["ReAct Agent"]
+        Agent --> Chroma
+        Agent --> Memo
+        Agent --> Profile["用户画像<br/>user_profile.md"]
+        Agent --> KB["知识库<br/>文件 + JSON + ChromaDB"]
+    end
+
+    Chat -.->|"触发重排"| Heat
+    Agent -->|"压缩 L1"| Memo
 ```
 
-## 功能
+## L1 备忘录
 
-### 表层：长期记忆
+`memo_max_chars`（默认 1000）是硬上限。主力写入方式是整篇替换：读当前 memo、融合新事实、输出全文，服务端校验长度后落库。超长时工具直接拒绝并返回当前字数，由 LLM 自己压缩重试。
 
-| 功能     | 说明                                           |
-| -------- | ---------------------------------------------- |
-| 语义检索 | ChromaDB 嵌入向量相似度搜索                    |
-| 分区隔离 | `scope="user"` 个人 / `scope="group"` 群共享   |
-| 重要性   | low / medium / high 三级，支持过滤             |
-| 标签分类 | 自定义标签（preference、project、personal 等） |
-| 过期清理 | 短期 7 天 / 长期 90 天                         |
-| 并发安全 | 用户 ID 粒度 `aiologic.Lock`                   |
+- 存什么：身份、稳定偏好、用户明确要求的工具调用模式；
+- 不存什么：具体事件与项目细节放 L2；祈使句规则应写 `extra_prompt`，插件不读也不写它；
+- 注入范围：私聊注入个人 memo；群聊只注入群 memo，不注入群成员的个人 memo；空 memo 不注入；
+- 表结构：`amrita_plugin_memory_user_memo`，主键为框架 `uni_id`，个人与群各占一行。
 
-### 底层：潜意识推理
+工具三个：
 
-| 功能         | 说明                                                      |
-| ------------ | --------------------------------------------------------- |
-| 事件驱动     | 用户发消息触发，无活动则永远空闲                          |
-| 惩罚退避     | 连续触发时指数延长延迟（30min→45min→...→1440min）         |
-| 自动整理     | LLM 后台去重、合并、标签补全、低质清理                    |
-| 记忆压缩     | Core `ContextCompactor` 截断超限 + 自动摘要               |
-| 去重辅助     | `subconscious_duplicate_helper` 返回待整理记忆 + 合并指导 |
-| 统计概览     | `subconscious_get_memory_stats` 总量/重要性/标签分布      |
-| 膨胀感知     | ChromaDB 超 `memory_warn_threshold` 时注入压缩提示        |
-| 滑动窗口     | `max_abstracts` 轮摘要保留，跨轮传递进度                  |
-| 用户画像     | 行级增量更新，Markdown 文件持久化                         |
-| Session 摘要 | `ContextCompactor` 全量摘要 + LRU 缓存                    |
-| 主动消息     | LLM 向用户发起主动问候（需 `allow_send_to_user`）         |
-| Token 统计   | 复用 Bot `InsightsModel` 全局统计                         |
+| 工具 | 作用 |
+| --- | --- |
+| `read_memo` | 读取当前作用域备忘录全文 |
+| `append_memo` | 在末尾追加一段 |
+| `update_memo` | 整篇替换（推荐用法） |
 
-### 共享：全局知识库
+## L2 向量记忆
 
-知识库是**表层和潜意识双层共享**的资源。读取操作（`list`/`read`/`search`）通过双重 `@on_tools` 注册，对话 LLM 和后台 Agent 均可直接调用。**写入操作**（`create`/`update`/`delete`）仅限潜意识 Agent——表层通过 `knowledge_suggest` 提交建议，由 Agent 在下一轮推理中审查后决定是否实际写入：
+`scope` 表达语义，分区键跟随 Amrita 的 `make_uni_id`（旧版 `user_{qq}`，新版 `QQPlatform_Private_{qq}`）。插件不硬编码键格式，升级后自动跟随，存量 Key 由启动检查幂等迁移。
+
+| `scope` | 含义 | 可用场景 |
+| --- | --- | --- |
+| `user` | 个人专属，群聊私聊互通 | 任意 |
+| `group` | 群共享，群内所有人可见 | 仅群聊 |
+
+每条记忆带 `user_id` / `scope` / `tags` / `importance` / `created_at`。`read_memory` 支持 `top_k` 与 `importance` 过滤，结果附带距离（ChromaDB 默认 l2，越小越相似）。
+
+### 时间退化
+
+分两段，均由 `[decay].enabled` 控制：
+
+1. **软衰减**：检索期按 `1/(1+d) × max(0.5^(age/half_life), floor)` 重排后截回 `top_k`，只影响排序，不删除数据；
+2. **分层清理**：按 importance 的寿命阈值扫描，超龄先降级，降到 `low` 仍超龄才删除。
+
+`low` 层默认 7 天，`high` 层默认 90 天，`medium` 取几何中值。清理任务按 `sweep_interval_hours` 周期执行。
+
+## L3 离线巩固循环（DMN）
+
+L3 复用 Core 的 `REACT_ONLY`，`SubconsciousRunner` 只注入隔离的 `SubconsciousBackend` 与 `ReActAgentStrategy`。每轮第一件事必须调 `subconscious_get_context`（精确时间、距上轮间隔、上轮摘要、待审建议、库规模），system prompt 因此只放不变量，同一天内逐字节一致，能吃到 provider 的前缀缓存。
+
+### 触发与空闲窗口
+
+用户发消息就给所在时槽加一次热度、`penalty + 1`、重新挑选窗口。默认按 **7 天 × 12 槽**（每槽 2 小时）的热度图找冷段：
+
+- `penalty` 的含义是「要求多长的冷段」，不是延迟分钟数；
+- 冷段不足时按 `idle_max_relax_steps` 逐次减半放宽；
+- 窗口起止留 `idle_buffer_minutes` 安全缓冲，并扣掉 `idle_run_estimate_minutes` 的预计耗时；
+- 没有历史时落在 `idle_target_hour` 的固定窗口。
+
+关闭 `use_idle_window_planner` 后回退到旧的固定指数退避方案，此时 `rethink_base_delay_minutes` / `rethink_penalty_multiplier` / `rethink_max_delay_minutes` 才生效。
+
+### 整理职责
+
+- 去重合并、重要性校准与标签统一；
+- 画像精炼与知识沉淀；
+- 临近上限时压缩 L1，把细节下放到 L2，只留指针；
+- 读取归档 sessions 做跨会话摘要。
+
+### 调度可靠性
+
+- 待执行任务的触发时刻随状态落盘，重启后补排；停机期间错过的窗口一分钟内补跑；
+- `misfire_grace_time` 置空，事件循环被卡住也不会静默丢掉这次运行；
+- 单轮失败按 30 分钟间隔最多重试 3 次，用户再发消息会重置重试计数；
+- `penalty` 与热度图一起存在 `SubconsciousState.payload`，重启后继续使用。
+
+## 全局知识库
+
+知识库是 L2 与 L3 共享的资源。读取操作对对话 LLM 开放，但受权限控制；写入只发生在 L3。
 
 ```mermaid
 flowchart LR
-    ChatLLM["对话 LLM"] -->|"knowledge_suggest"| Queue["建议队列<br/>(持久化)"]
-    Queue -->|"subconscious_read_suggestions"| Agent["Subconscious Agent<br/>下一轮推理"]
+    ChatLLM["对话 LLM"] -->|"knowledge_suggest"| Queue["建议队列<br/>持久化"]
+    Queue -->|"subconscious_read_suggestions"| Agent["Subconscious Agent"]
     Agent -->|"审查"| Decision{"值得记录？"}
-    Decision -->|"Yes"| SubCreate["subconscious_knowledge_create"]
+    Decision -->|"Yes"| Create["knowledge_create / update"]
     Decision -->|"No"| Drop["忽略"]
+    ChatLLM -->|"knowledge_list / read / search"| KB[("知识库")]
+    Agent --> KB
 ```
 
-每条知识由三个组件共同管理：
+每条知识由三部分组成：
 
-```mermaid
-flowchart LR
-    subgraph File["Markdown 文件"]
-        direction TB
-        Title["# 标题"]
-        Summary["摘要文本"]
-        Sep["---"]
-        Body["正文内容"]
-        Title --> Summary --> Sep --> Body
-    end
+- **Markdown 文件**：第一行 `# 标题`，随后摘要文本，`---` 之后是正文；
+- **JSON 索引**：`knowledge_index.json`，记录 `kid` / `title` / `summary` 等；
+- **ChromaDB**：`{kid → embedding(summary)}`，只对摘要做向量化。
 
-    subgraph Index["JSON 索引"]
-        KnowledgeIndex["knowledge_index.json<br/>[{kid, title, summary, ...}]"]
-    end
+LLM 只需传 `title` / `summary` / `body`，分隔符由框架维护。`knowledge_read` 支持 `start_line` / `end_line`，长条目可以分段读。
 
-    subgraph Vector["ChromaDB"]
-        Embedding["{kid → embedding(summary)}"]
-    end
+启动时 `validate_on_startup` 会计算三方 ID 集合差集，自动修复孤文件、孤索引、缺向量、悬空向量四种不一致。
 
-    File <-->|"解析/写入"| Index
-    File <-->|"向量化/搜索"| Vector
-    Index <-->|"校验/修复"| Vector
-```
+### 读取权限
 
-**文件格式**：第一行 `# 标题`，然后摘要文本，`---` 之后是正文。框架自动管理分割——LLM 只需传 `title`/`summary`/`body` 三个字段，无需手动处理 `---`。摘要被向量化存入 ChromaDB 用于语义搜索，正文存在文件中支持按行分段读取。
+`knowledge_list` / `knowledge_read` / `knowledge_search` 需要 LP 权限节点 `memory.knowledge`，`lp.admin` 与 `.env` 里的超级用户始终持有。未授权时返回错误 JSON，不返回任何知识内容。
 
-**启动自修复**（`validate_on_startup`）：启动时计算三方 ID 集合的差集，自动修复四种不一致：
-
-| 场景     | 检测                         | 修复                        |
-| -------- | ---------------------------- | --------------------------- |
-| 孤文件   | 文件在，JSON 索引无          | 解析文件追加到索引 + 向量化 |
-| 孤索引   | JSON 在，文件无              | 从索引中删除 + 清理向量     |
-| 缺向量   | JSON+文件都在，ChromaDB 缺失 | 从摘要重新向量化写入        |
-| 悬空向量 | 向量在，JSON 索引无          | 从 ChromaDB 删除            |
-
-**行级读取**：`knowledge_read` 支持 `start_line`/`end_line` 参数——LLM 可以用滑动窗口分段读取长知识，避免一次加载超长内容。`knowledge_search` 只匹配摘要向量，找到相关条目后再用 `knowledge_read` 按需拉取正文。
+`read_profile` 走另一条口径：只对 `subconscious.target_user_id` 开放，且只能读目标用户自己的画像，不占用权限节点。画像写入只发生在 L3 内部。
 
 ## 工具参考
 
 ### 表层工具
 
-| 工具                | 参数                                         |
-| ------------------- | -------------------------------------------- |
-| `write_memory`      | content, tags, importance(enum), scope(enum) |
-| `read_memory`       | query, top_k(5), importance?, scope(enum)    |
-| `update_memory`     | id, scope, content?, tags?, importance?      |
-| `delete_memory`     | id, scope                                    |
-| `list_memory`       | limit, scope                                 |
-| `knowledge_list`    | —                                            |
-| `knowledge_read`    | kid, start_line?, end_line?                  |
-| `knowledge_search`  | query, top_k?                                |
-| `knowledge_suggest` | action, title, summary, body, reason         |
+| 工具 | 参数 |
+| --- | --- |
+| `write_memory` | content, tags, importance(enum), scope(enum) |
+| `read_memory` | query, top_k(5), importance?, scope(enum) |
+| `update_memory` | id, scope, content?, tags?, importance? |
+| `delete_memory` | id, scope |
+| `list_memory` | limit(10, 上限 50), offset, scope |
+| `read_memo` | — |
+| `append_memo` | content |
+| `update_memo` | content |
+| `knowledge_list` | — |
+| `knowledge_read` | kid, start_line?, end_line? |
+| `knowledge_search` | query, top_k? |
+| `knowledge_suggest` | action, title, summary, body, reason |
+| `read_profile` | start_line?, end_line? |
 
-**scope 分区**：
+### 巩固循环工具
 
-- `scope="user"`：用户专属记忆，返回 `user_{user_id}` 分区（群聊私聊互通）
-- `scope="group"`：群共享记忆，返回 `group_{group_id}` 分区（仅群聊可用）
+`rethinking/tools.py` 中注册了 21 个 handler，挂在隔离的 `_SUBCONSCIOUS_TOOLS` 上，不污染全局工具管理器。
 
-### 潜意识工具（`rethinking/tools.py`）
+| 工具 | 用途 |
+| --- | --- |
+| `subconscious_read_memory` | 语义检索 |
+| `subconscious_write_memory` | 写入新记忆 |
+| `subconscious_update_memory` | 更新指定 ID |
+| `subconscious_delete_memory` | 删除指定 ID |
+| `subconscious_list_memory` | 列出记忆 |
+| `subconscious_duplicate_helper` | 去重辅助 |
+| `subconscious_get_memory_stats` | 总量 / 重要性 / 标签分布 |
+| `subconscious_get_context` | 时间、间隔、上轮摘要、待审建议、库规模 |
+| `subconscious_read_chat_context` | 读取最近聊天记录 |
+| `subconscious_read_sessions` | 读取归档 sessions |
+| `subconscious_iter_stop` | 结束本轮 |
+| `subconscious_send_to_user` | 主动发消息 |
+| `subconscious_knowledge_list` | 列出知识 |
+| `subconscious_knowledge_read` | 读取知识（支持行窗口） |
+| `subconscious_knowledge_search` | 语义搜索知识 |
+| `subconscious_knowledge_create` | 创建知识 |
+| `subconscious_knowledge_update` | 更新知识 |
+| `subconscious_knowledge_delete` | 删除知识 |
+| `subconscious_read_suggestions` | 读取并清空待审建议 |
+| `subconscious_get_profile` | 读取画像（行窗口） |
+| `subconscious_update_profile` | 增量更新画像 |
 
-记忆和 session/画像工具注册在隔离的 `_SUBCONSCIOUS_TOOLS` 上。知识库中 `list`/`read`/`search` 通过双重注册同时暴露给表层和潜意识；`create`/`update`/`delete` 仅潜意识可用（表层通过 `knowledge_suggest` 提交建议）：
+## 命令参考
 
-| 工具                             | 用途                                   |
-| -------------------------------- | -------------------------------------- |
-| `subconscious_read_memory`       | 语义检索                               |
-| `subconscious_write_memory`      | 写入新记忆                             |
-| `subconscious_update_memory`     | 更新指定 ID 记忆                       |
-| `subconscious_delete_memory`     | 删除指定 ID 记忆                       |
-| `subconscious_list_memory`       | 列出全部记忆                           |
-| `subconscious_iter_stop`         | 结束本轮推理                           |
-| `subconscious_send_to_user`      | 主动向用户发消息                       |
-| `subconscious_read_chat_context` | 读取最近聊天记录                       |
-| `subconscious_duplicate_helper`  | 去重辅助（返回记忆 + 合并指导 prompt） |
-| `subconscious_get_memory_stats`  | 记忆统计（总量/重要性/标签分布）       |
-| `subconscious_knowledge_create`  | 创建知识条目                           |
-| `subconscious_knowledge_update`  | 更新知识条目                           |
-| `subconscious_knowledge_delete`  | 删除知识条目                           |
-| `subconscious_knowledge_search`  | 语义搜索知识                           |
+### 用户命令 `/memory`
+
+| 命令 | 作用 |
+| --- | --- |
+| `/memory user list [页码]` | 分页列出个人记忆，每页 10 条 |
+| `/memory user search <关键词>` | 搜索个人记忆，top_k=10 |
+| `/memory user delete <ID>` | 删除个人记忆 |
+| `/memory group list [页码]` | 列出群共享记忆 |
+| `/memory group search <关键词>` | 搜索群共享记忆 |
+| `/memory group delete <ID>` | 删除群共享记忆（仅管理员 / 群主） |
+| `/memory memo` | 以合并转发查看当前作用域备忘录 |
+| `/memory dmn` | 立即触发一轮巩固循环（隐藏，需管理员） |
+| `/memory heatmap` | 作息热度图与下次运行时间（隐藏，需管理员） |
+
+`dmn` 与 `heatmap` 不进菜单与 usage 提示，鉴权顺序为超级用户白名单、`lp.admin`。`dmn` 还要求 `subconscious.enabled = true` 且已配置 `target_user_id`。兼容旧格式 `/memory list`，默认按个人范围执行。
+
+### 运维命令 `ambot memory`
+
+| 命令 | 作用 |
+| --- | --- |
+| `ambot memory status` | 嵌入指纹、记忆分布、分区键版本、备份列表 |
+| `ambot memory reindex [--yes]` | 强制全量重映射并写新指纹 |
+| `ambot memory migrate-keys [--dry-run]` | 迁移分区键到当前 `uni_id` 格式 |
+| `ambot memory reset-fingerprint` | 只写指纹、不重嵌入（逃生舱） |
+| `ambot memory backup list` | 列出备份 |
+| `ambot memory backup create` | 手动备份 |
+| `ambot memory backup restore <file>` | 从备份恢复，用当前模型重新嵌入 |
+
+这些命令会先设置 `EMBED_CHECK_ON_STARTUP=false` 再加载插件，避免启动检查在 CLI 里触发交互。`ambot memory` 命令组需要本地 `ambot-inlinectl` 版本包含该实现，`ambot` 过旧时先升级。
 
 ## 配置参考
 
-编辑 `config/amrita_plugin_memory/config.toml`：
+`config/amrita_plugin_memory/config.toml`：
 
 ```toml
-short_term_expiry_days = 7
-long_term_expiry_days = 90
-per_session_memory_limit = 50
+# L2
+per_session_memory_limit = 100
+memo_max_chars = 1000
+
+[decay]
+enabled = true
+short_term_days = 7
+long_term_days = 90
+half_life_days = 30.0
+importance_boost = 1.0
+overfetch = 3
+score_floor = 0.05
+sweep_enabled = true
+sweep_interval_hours = 24
+sweep_batch_limit = 5000
 
 [subconscious]
 enabled = false
@@ -262,13 +347,11 @@ target_user_id = ""
 allowed_tools = []
 max_iterations = 10
 loop_detect_threshold = 3
-rethink_base_delay_minutes = 30
-rethink_penalty_multiplier = 1.5
-rethink_max_delay_minutes = 1440
-prompt_file = "prompt/subconscious_main.md.jinja2"
-prompt_send_file = "prompt/subconscious_send.md.jinja2"
-prompt_knowledge_file = "prompt/knowledge_guide.md.jinja2"
-prompt_profile_file = "prompt/profile_guide.md.jinja2"
+use_idle_window_planner = true
+idle_timezone = "Asia/Shanghai"
+idle_target_hour = 3
+idle_base_slots = 3
+idle_max_slots = 6
 enable_memory_compress = true
 allow_send_to_user = false
 memory_warn_threshold = 100
@@ -278,28 +361,68 @@ knowledge_collection_name = "amrita_global_knowledge"
 enable_knowledge = true
 ```
 
-| 配置项                                    | 默认值  | 说明                                             |
-| ----------------------------------------- | ------- | ------------------------------------------------ |
-| `short_term_expiry_days`                  | `7`     | 短期记忆过期天数                                 |
-| `long_term_expiry_days`                   | `90`    | 长期记忆过期天数                                 |
-| `per_session_memory_limit`                | `50`    | 每个会话的记忆数量限制                           |
-| `subconscious.enabled`                    | `false` | 是否启用潜意识推理循环                           |
-| `subconscious.target_user_id`             | `""`    | 目标用户 ID（MVP 仅支持单用户），为空则不启动    |
-| `subconscious.max_iterations`             | `10`    | 单次推理最大 ReAct 循环步数（1-50）              |
-| `subconscious.loop_detect_threshold`      | `3`     | 连续相同工具调用次数阈值（2-10），触发后注入提示 |
-| `subconscious.rethink_base_delay_minutes` | `30`    | 用户聊天后首次计划延迟（分钟）                   |
-| `subconscious.rethink_penalty_multiplier` | `1.5`   | 取消惩罚指数倍率（1.0-10.0）                     |
-| `subconscious.rethink_max_delay_minutes`  | `1440`  | 惩罚延迟上限（分钟，默认 1 天）                  |
-| `subconscious.enable_memory_compress`     | `true`  | 每次运行后压缩持久化摘要                         |
-| `subconscious.allow_send_to_user`         | `false` | 允许潜意识主动向用户发消息                       |
-| `subconscious.memory_warn_threshold`      | `100`   | ChromaDB 超量时注入压缩提示的阈值                |
-| `subconscious.max_abstracts`              | `5`     | 保留最近 N 轮摘要的滑动窗口大小（1-20）          |
-| `subconscious.knowledge_max_chars`        | `10000` | 全局知识库单条正文最大字符数                     |
-| `subconscious.enable_knowledge`           | `true`  | 是否启用全局知识库                               |
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `per_session_memory_limit` | `100` | 单个分区（uni_id）的记忆条数上限 |
+| `memo_max_chars` | `1000` | L1 备忘录字数硬上限（100–10000） |
+| `decay.enabled` | `true` | 时间退化总开关 |
+| `decay.short_term_days` | `7` | `low` 层寿命阈值 |
+| `decay.long_term_days` | `90` | `high` 层寿命阈值 |
+| `decay.half_life_days` | `30.0` | 软衰减基础半衰期 |
+| `decay.importance_boost` | `1.0` | high 半衰期为 `1+2·boost` 倍 |
+| `decay.sweep_enabled` | `true` | 分层清理开关 |
+| `subconscious.enabled` | `false` | 是否启用 L3 |
+| `subconscious.target_user_id` | `""` | 目标用户，为空不启动 |
+| `subconscious.allowed_tools` | `[]` | 额外工具，从全局工具池查找 |
+| `subconscious.max_iterations` | `10` | 单轮 ReAct 最大步数（1–50） |
+| `subconscious.loop_detect_threshold` | `3` | 连续重复工具调用阈值（2–10） |
+| `subconscious.use_idle_window_planner` | `true` | 空闲窗口调度；关闭后回退固定延迟 |
+| `subconscious.idle_timezone` | `Asia/Shanghai` | 热度图与窗口时区 |
+| `subconscious.idle_target_hour` | `3` | 冷启动偏好触发小时 |
+| `subconscious.idle_base_slots` | `3` | 首次计划要求的最短冷段（1 槽=2h） |
+| `subconscious.idle_max_slots` | `6` | 冷段要求封顶 |
+| `subconscious.allow_send_to_user` | `false` | 允许主动私聊 |
+| `subconscious.memory_warn_threshold` | `100` | 超量时注入压缩提示 |
+| `subconscious.max_abstracts` | `5` | 摘要滑动窗口（1–20） |
+| `subconscious.knowledge_max_chars` | `10000` | 单条知识正文上限 |
+| `subconscious.enable_knowledge` | `true` | 知识库开关 |
+
+空闲窗口调度还有十余个调参项（各层衰减常数、冷槽阈值、收缩强度、buffer 与预估耗时），默认值见 `config.py`，一般不需要改。
+
+## 持久化与升级
+
+| 存储 | 技术 | 内容 |
+| --- | --- | --- |
+| L1 备忘录 | `UserMemo` 表 | 常驻用户元信息 |
+| 循环状态 | `SubconsciousState` 表 | `total_runs`、摘要、待审建议、penalty、热度图 |
+| Session 摘要缓存 | `LRUCache[int, str]`（128 条） | session DB id → 摘要 |
+| L2 记忆 | ChromaDB `amrita_user_memory` | 向量、文档、元数据、嵌入指纹 |
+| 用户画像 | `data/amrita_plugin_memory/user_profile.md` | `summary---body` 格式 |
+| 知识库 | `data/.../knowledge/` + JSON + ChromaDB | 三方同步 |
+| Token 统计 | `InsightsModel` | 全局 prompt/completion token |
+
+### 嵌入模型变更
+
+向量只在同一模型下可比。插件在集合 metadata 里记录 `sha256(protocol|model|base_url)`，每次启动校验。不一致时按 `EMBED_MISMATCH_POLICY`：
+
+- `auto`：备份后删集合重建、全量重嵌；
+- `ask`：交互确认，非 TTY 环境拒绝加载插件；
+- `never`：只告警。
+
+指纹只看配置，同名模型被服务端换掉检测不到，用 `ambot memory reindex` 手动处理。
+
+### 数据库迁移
+
+插件自带两条 ORM 迁移：`21f55abc2b90` 建 `UserMemo`，`6004d221a7de` 建 `SubconsciousState`，`depends_on` 指向 `nonebot_plugin_amrita` 的初始迁移。升级插件后执行：
+
+```bash
+uv run ambot orm upgrade
+```
 
 ## 注意事项
 
-- 潜意识推理每轮可能消耗**数万 tokens**，请根据成本预算决定是否开启
-- 表层记忆与潜意识共享同一个 ChromaDB（`VECTOR_DB_PATH = data/amrita_plugin_memory/vector_db.chroma`）
-- 知识库写入（`create`/`update`/`delete`）仅限潜意识 Agent，表层 LLM 只能通过 `knowledge_suggest` 提交建议
-- 依赖 `nonebot_plugin_apscheduler`（定时调度）与 `nonebot_plugin_localstore`（本地数据目录）
+- L3 每轮可能消耗数万 tokens，按成本预算决定是否开启；
+- 表层记忆与 L3 共享同一个 ChromaDB（`data/amrita_plugin_memory/vector_db.chroma`）；
+- 知识库写入仅限 L3，表层只能通过 `knowledge_suggest` 提交建议；
+- 依赖 `nonebot_plugin_apscheduler`、`nonebot_plugin_localstore`、`nonebot_plugin_orm`；
+- 旧版 penalty 语义是「被推迟的次数」，新版是「要求的冷段长度」，不可换算。启用空闲规划时若检测到 payload 里没有 `idle_planner`，会清零一次并打日志。
