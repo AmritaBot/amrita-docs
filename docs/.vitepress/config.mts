@@ -203,9 +203,10 @@ export default withMermaid({
         text: "最佳实践",
         collapsed: true,
         items: [
-          { text: "提示词工程", link: "/amrita/best-practices/prompt" },
-          { text: "Agent 设计与配置", link: "/amrita/best-practices/agent" },
-          { text: "性能与配置优化", link: "/amrita/best-practices/config" },
+          { text: "提示词设计", link: "/amrita/best-practices/prompt" },
+          { text: "Agent 设计与运行", link: "/amrita/best-practices/agent" },
+          { text: "编写有效的 Skills", link: "/amrita/best-practices/skills" },
+          { text: "配置与调优", link: "/amrita/best-practices/config" },
         ],
       },
       {

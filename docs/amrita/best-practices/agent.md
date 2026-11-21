@@ -1,235 +1,199 @@
-# 充分利用 AmritaBot Agent 功能
+# Agent 设计与运行实践
 
-AmritaBot 的 Agent 模式基于 **AmritaCore 的 Agent 运行时** 与 **AmritaSense 的指令集执行模型**。AmritaSense 将控制流（IF/WHILE/TRY 等）编译为线性指令序列，由轻量 VM 逐条执行；AmritaCore 在此基础上提供了策略（`AgentStrategy`）、工具管理（`ToolsManager`）、MCP 客户端和事件钩子。
+Agent 模式不是「把工具都打开，让模型自己想办法」。它是一套有预算、有停止条件、有展示策略的运行机制。配得好，模型能稳定完成多步任务；配得差，会出现空转、重复调用、上下文爆掉或用户被中间消息刷屏。
 
-这种架构意味着：Agent 的每一次思考-行动循环都不是用轮询或图遍历实现的，而是由 AmritaSense 的程序计数器（`PointerVector`）自然驱动 —— 零调度开销，原生支持挂起/恢复。
+本文从使用者的角度讲怎么选模式、设预算、控制展示和排查问题。底层状态机与工具职责见[系统架构](../advanced/architecture.md)。
 
-## 1. Agent 模式核心设计哲学
+## 1. 先选运行模式
 
-Agent 模式的核心是让 LLM 像一个自主智能体一样工作。AmritaCore 通过 `AgentStrategy`（抽象基类）和内置的 **ReAct Agent 策略**来控制执行流程。
+`core.builtin.tool_calling_mode` 决定 Agent 是否调用工具：
 
-### 1.1 策略类别
+| 模式 | 行为 | 适用场景 |
+| --- | --- | --- |
+| `agent`（默认） | 迭代式工具调用，框架管理循环、预算与终止 | 需要查资料、调接口、多步操作 |
+| `rag` | 只调用一次工具，拿到结果后生成回复 | 单次检索、单次查询 |
+| `none` | 不调用工具，直接对话 | 纯聊天、角色扮演、低延迟场景 |
 
-AmritaCore 根据 `tool_calling_mode` 选择策略执行方式，而 `agent_workflow` 决定**推理工作流**（普通 ReAct 循环 vs Step 驱动的 ReAct 循环）：
+`llm.agent_workflow` 决定推理工作流：
 
-| 模式    | 策略类别           | 行为                                     |
-| ------- | ------------------ | ---------------------------------------- |
-| `agent` | `single_execute()` | 迭代式工具调用，框架管理循环、计数和终止 |
-| `rag`   | `run()`            | 最小化上下文，单次检索后生成回复         |
-| `none`  | `run()`            | 不调用工具，直接进行普通对话             |
+| 工作流 | 行为 | 适用场景 |
+| --- | --- | --- |
+| `react`（默认） | 普通 ReAct 循环，一轮工具调用内完成推理与执行 | 大多数场景 |
+| `step-react` | 先分解计划，再逐 Step 执行，支持计划修订、停滞检测、Step 间压缩 | 长任务、步骤多、需要中途纠偏 |
 
-| 工作流（`agent_workflow`） | 说明                                                                                        |
-| -------------------------- | ------------------------------------------------------------------------------------------- |
-| `react`（默认）            | 普通 ReAct 循环：一轮工具调用内完成推理与执行（工作流以 `WHILE` 包装策略循环）              |
-| `step-react`               | Step 驱动的 ReAct 循环：LLM 先分解计划，框架逐 Step 执行（`NATIVE_DO(STEP_BODY)` 原生循环） |
+选择建议：
 
-### 1.2 关键设计要点
+- 先保持 `agent + react`，把工具描述和提示词写清楚。多数问题不是工作流不够强，而是工具描述太模糊。
+- 任务经常超过 5 个步骤、需要「先做 A 再做 B，B 失败改做 C」时，再考虑 `step-react`。
+- `step-react` 依赖模型的结构化输出能力。模型不支持结构化输出时，分解决策会不稳定，不如留在 `react`。
+- 纯聊天场景直接用 `none`，省掉工具选择与循环开销。
 
-- **`_suggested_stop` 标志位**：控制 `tool_choice` 参数。`False`（默认）时 `tool_choice="required"` 强制调用工具；当 `STOP_TOOL` 被调用后设为 `True`，切换到 `tool_choice="auto"`，允许模型自由选择是否继续调用工具。
-- **工具集注入**：`STOP_TOOL` 仅在 `tool_calling_mode="agent"` 时注入工具列表，其他模式下不存在。
-- **并发工具调用**：`_run_tool_calls_concurrently()` 通过 `asyncio.gather` 并行执行多个工具调用，一次失败不取消其他。
-- **循环检测**：`reasoning_pc` 计数器跟踪重复推理次数，超过 `loop_reasoning_trigger` 阈值时注入纠正提示。
-
-## 2. 启用与配置 Agent 模式
-
-AmritaBot 的 Agent 模式无需显式开关——只要在 `config/chat/config.toml` 中正确配置 AmritaCore 层即可生效。配置分布在 `core.function_config` 和 `llm.tools` 两个位置：
+## 2. 设好预算与停止条件
 
 ```toml
-# ── AmritaCore 层（core.function_config）──
 [core.function_config]
-agent_tool_call_limit = 10       # 每个会话最大工具调用次数
-agent_middle_message = true      # 允许 Agent 向用户发送进度消息
-agent_mcp_client_enable = false  # 是否启用 MCP 客户端
-agent_mcp_server_scripts = []    # MCP 服务器脚本/地址列表
-use_minimal_context = false      # 是否使用最小化上下文
+agent_tool_call_limit = 10        # 一次运行最多几轮工具调用
+agent_tool_parallel_limit = 0     # 单轮内并发工具数，0=不限制，1=串行
+agent_tool_refusal_rounds = 2     # 预算用尽后允许模型收尾的轮数
+validate_tool_arguments = true    # 调用前校验参数
+agent_step_token_budget = -1      # 单个 Step 的 token 预算，-1=不限制
+agent_middle_message = true       # 允许处理进度消息
+```
 
-# ── Chat 插件层（llm.tools）──
-[llm.tools]
-enable_report = true             # 启用内容审查（Agent 调用审查工具时生效）
-report_invoke_level = "medium"   # 审查严格程度: low / medium / high
+几个容易误解的点：
 
-# ── Agent 策略选择 ──
+- `agent_tool_call_limit` 数的是**轮次**，不是工具个数。一轮里模型请求三个工具，只花一个单位。
+- 预算用尽不会硬切断，框架会进入收尾阶段，让模型基于已有信息回答；`agent_tool_refusal_rounds` 限制收尾阶段还能请求几轮工具。
+- `agent_tool_parallel_limit` 只限制**同一轮内**的并发。声明为不安全的工具和流程控制工具始终单独执行。
+- `validate_tool_arguments` 建议保持开启。参数不合法时模型会收到 `ERR:` 结果并有机会纠正，比直接抛异常好排查。
+
+经验值：
+
+| 场景 | 建议 |
+| --- | --- |
+| 单次查询 | `rag`，或 `agent` + 3–5 轮 |
+| 常规多步任务 | `agent` + 8–12 轮 |
+| 长任务 / 研究型 | `agent` + 15–20 轮，配合 `step-react` |
+| 高并发群聊 | 降低轮次，限制并发，避免单个请求占满资源 |
+
+轮次不是越大越好。给太多预算，模型可能在无关工具之间来回试；给太少，任务做一半就收尾。先按任务类型设一个中间值，观察日志里的实际调用轮次再调。
+
+## 3. 控制思考与中间消息的展示
+
+Agent 的中间过程有三类：思考块、工具通知、进度消息。它们都该按场景开关，而不是全部打开。
+
+```toml
+[meta]
+enable = true
+reasoning = true           # 框架整段思考块
+stream_reasoning = false   # 收集完整段后一次性发送
+reasoning_summary = false  # 发送前先摘要
+tool_call = false          # 工具调用通知
+skill_trigger = true       # 技能触发通知
+```
+
+建议：
+
+- **群聊**：`stream_reasoning = false`、`tool_call = false`，只保留最终回答与必要的进度消息。群里没人想看 Calling/Called。
+- **个人助理**：可以开 `stream_reasoning = true`，让自己看到模型的思考方向；长思考建议同时开 `reasoning_summary`，把几万字的思考压成一两百字。
+- **调试**：临时开 `tool_call = true`，确认模型到底调了哪个工具；生产环境关掉。
+- `reasoning_summary` 会多一次模型调用，失败或超时回退原文。模型慢时把 `reasoning_summary_timeout_seconds` 放宽。
+
+1.19 起 `stream_reasoning` 是「整段发送」，不是逐 token 流式。模型正文会先缓冲，出现工具调用时作为一条 `💬` 中间消息发出，本轮结束再由最终回答统一发送，不会把半句话提前发出去。
+
+## 4. 工具要为模型而设计
+
+工具是 Agent 的手脚。工具设计得差，提示词再漂亮也救不回来。
+
+### 4.1 描述写「何时用」，不只写「做什么」
+
+```python
+# 不推荐
+"description": "查询天气"
+
+# 推荐
+"description": "查询指定城市未来 1-3 天的天气。用户询问气温、降雨、穿衣建议时使用；历史天气请改用 weather_history。"
+```
+
+描述里至少包含：能力边界、触发场景、不适用场景、返回内容。模型靠这些判断要不要调用。
+
+### 4.2 参数 schema 要严格
+
+- 必填项明确标 `required`；
+- 枚举值用 `enum`，不要让模型自由发挥；
+- 时间、城市、ID 这类参数写清格式和示例；
+- 不要用一个大而全的 `data: object` 接所有参数，模型很难填对。
+
+### 4.3 返回值要短、稳定、可解析
+
+- 只返回模型需要的信息，不要把整个 HTTP 响应体塞回去；
+- 用固定字段名，别让同一工具这次返回 `data`、下次返回 `result`；
+- 错误也用结构化结果返回，例如 `{"ok": false, "error": "城市不存在"}`，而不是抛一串 traceback；
+- 大结果分页或截断，并告诉模型「还有更多，用 offset 继续」。
+
+### 4.4 危险操作要单独授权
+
+删除、写入、执行命令、发消息这类工具，不要和查询工具混在一个权限级别。用 Amrita 的权限系统限制调用者，或在工具内部校验 `user_id` / 群权限。工具本身也要幂等或可回滚。
+
+## 5. 技能与工具的分工
+
+技能适合「一段可复用的工作流说明 + 支持文件 + 可选脚本」，工具适合「一个明确的原子能力」。
+
+- 需要模型按步骤做事、读参考资料、执行脚本：写成 Skill；
+- 只需要一次 API 调用或一次数据查询：写成 Tool；
+- 只是改变说话风格或角色设定：写在提示词里，不要包装成技能。
+
+默认 `skills.mode = "progressive"` 时，所有技能只暴露 `skill_open` / `skill_read` 两个工具。模型先按 description 选中技能，再打开正文，最后按需读支持文件。这样技能数量增长不会把工具池撑爆。
+
+编写方法见[编写有效的 Skills](./skills.md)，运行与配置见[Skills 接入](../features/chat/skills.md)。
+
+## 6. `step-react` 的使用边界
+
+`step-react` 不是「更高级的 react」，它解决的是特定问题：
+
+- 任务需要显式计划，且计划可能在中途修订；
+- 单步执行时间长，需要在 Step 之间压缩上下文；
+- 需要在某个 Step 卡住时检测停滞并换策略。
+
+代价是更多模型调用、更长的提示词、对结构化输出的依赖。简单任务用它，通常只是增加延迟和成本。
+
+如果决定用：
+
+```toml
 [llm]
-agent_strategy = "react"         # react / hybrid-react(已弃用) / no-action
-agent_workflow = "react"         # react / step-react
+agent_workflow = "step-react"
+
+[core.function_config]
+agent_step_token_budget = 16000   # 按模型窗口设置，-1 为不限制
 ```
 
-在 WebUI 中，进入 `chat` 插件配置页面，展开 `core.function_config` 和 `llm.tools` 配置块即可编辑。
+同时确认模型能稳定输出结构化结果。分解决策失败时，先换模型或回到 `react`，不要靠反复改提示词硬撑。
 
-### 2.1 策略选择与高级选项
+## 7. MCP 的稳定性
 
-通过 `[llm]` 下的 `agent_strategy` 选择 Agent 执行策略，通过 `agent_workflow` 选择推理工作流：
+MCP 服务是外部进程或远端连接，不能假设它一定可用。1.16 起 Amrita 会逐个加载服务，单个服务失败不会拖垮整个聊天插件，但使用时仍要注意：
 
-- **`react`**（默认）：标准 ReAct 策略，模型在思考-行动-观察循环中自主决策
-- **`hybrid-react`**：混合 ReAct 策略，**已弃用**（计划于 v0.14.0 移除）。它无法忠实建模 `reasoning_content`（将推理追加为普通助手文本，绕过思考过滤），建议改用 `agent_workflow = "step-react"` 获得结构化推理
-- **`no-action`**：跳过 Agent 运行，直接进行普通对话
+- 给每个服务设置合理的启动超时，别让一个慢服务拖住整轮对话；
+- 工具描述里写清服务提供的能力，避免模型把 MCP 工具当成本地工具乱调；
+- MCP 工具返回大结果时，在服务端就截断，不要指望模型自己忽略；
+- 服务重载后工具列表可能变化，长任务中途重载要确认工具还在。
 
-**推理工作流（`agent_workflow`）**：
+## 8. 排查清单
 
-- **`react`**（默认）：普通 ReAct 循环，在一轮工具调用内完成推理与执行
-- **`step-react`**：Step 驱动的 ReAct 循环。LLM 先**分解计划**（可选择是否分解为子步骤 DAG），框架通过原生 `NATIVE_DO` 循环**逐 Step 执行**，支持：
-  - `update_step`：运行中修订计划
-  - **停滞检测**：同一工具调用签名反复出现时注入纠正提示或放弃
-  - **Step 间压缩**：按 `agent_step_token_budget` 在 Step 之间做 Token 驱动的上下文压缩
-  - 需要模型支持**结构化输出**（用于分解决策与 Step 摘要）
+| 现象 | 先看什么 |
+| --- | --- |
+| 模型完全不调工具 | `tool_calling_mode` 是否为 `none`；工具描述是否写清触发场景；提示词是否在说「不要调用工具」 |
+| 一直重复调用同一个工具 | 工具返回是否没有提供新信息；`loop_reasoning_trigger` 是否过高；提示词是否要求「必须查到为止」 |
+| 任务做一半就回答 | `agent_tool_call_limit` 是否太小；工具是否返回了模糊错误；模型是否误判任务已完成 |
+| 中间消息刷屏 | 关闭 `meta.tool_call`；检查 `processing_message` 的使用频率；群聊关闭 `stream_reasoning` |
+| 上下文爆掉 | 开 `context_strategy = "compact"`；降低 `agent_tool_call_limit`；工具结果截断；考虑 `step-react` 的 Step 间压缩 |
+| 延迟很高 | 减少串行工具；检查 `agent_tool_parallel_limit`；关闭不必要的思考展示；MCP 服务是否慢 |
+| 成本失控 | 降轮次、缩短工具返回、关闭 `reasoning_summary` 之外的额外调用；检查是否有技能在后台反复触发 |
 
-> AmritaCore 还提供了 `ReactConfig` 配置块（`core.builtin.react_config`），支持以下高级选项：
->
-> - `structured_reasoning` — 启用 `[Step N/M] [phase]` 分步推理
-> - `reasoning_depth` — 推理最大步数（默认 3）
-> - `enable_reflection` — 启用 `verify_reasoning` 反思工具
-> - `reflection_depth` — 反思最大轮次
-> - `tool_prediction` — 推理时让模型预测所需工具（需 `structured_reasoning=true` 才生效）
+## 9. 一份可用的起点配置
 
-## 3. 内置工具详解：Agent 的"思维器官"
+```toml
+[core.builtin]
+tool_calling_mode = "agent"
+agent_thought_mode = "chat"
 
-AmritaCore 提供了**四个**内置工具来支撑 Agent 的思维流程。`REASONING_TOOL`、`PROCESS_MESSAGE`、`STOP_TOOL` 在任何 Agent 模式下可用，`REFLECTION_TOOL` 需要额外启用 `core.builtin.react_config.enable_reflection`。
+[core.function_config]
+agent_tool_call_limit = 10
+agent_tool_parallel_limit = 0
+agent_tool_refusal_rounds = 2
+validate_tool_arguments = true
+agent_middle_message = true
+use_minimal_context = false
 
-### 3.1 REASONING_TOOL (`think_and_reason`) — "思考与规划"
+[llm]
+agent_strategy = "react"
+agent_workflow = "react"
 
-```python
-FunctionDefinitionSchema(
-    name="think_and_reason",
-    description="Think about what you should do next, always call this tool to think when completing a tool call.",
-    parameters={
-        "last_step": "上一步做了什么（首次可为空）",
-        "summary": "正在思考什么（必填）",
-    }
-)
+[meta]
+reasoning = true
+stream_reasoning = false
+reasoning_summary = false
+tool_call = false
 ```
 
-- **调用时机**：**每轮工具调用循环开始时被强制调用**（框架设置 `tool_choice=REASONING_TOOL`），不是模型自行决定
-- **职责**：模型输出 `last_step`（上一步回顾）和 `summary`（当前思考方向）。框架将 summary 渲染为系统消息注入上下文，驱动下一轮工具调用决策
-- **结构化推理（可选）**：启用 `structured_reasoning` 后，推理模板引导模型输出 `[Step N/M] [phase]` 格式（analyze/plan/execute/verify），并支持 `[TOOL_PREDICTION]` 预测所需工具
-
-### 3.2 PROCESS_MESSAGE (`processing_message`) — "进度同步"
-
-```python
-FunctionDefinitionSchema(
-    name="processing_message",
-    description="向用户描述 Agent 当前正在做什么、表达内部想法。用于沟通当前行为，而非通用回复。",
-    parameters={"content": "消息内容，以系统指令的语气描述"}
-)
-```
-
-- **职责**：向用户实时汇报工作状态。不同于 `REASONING_TOOL` 的内部思考，这是对外的自然语言沟通，提升交互透明度
-- **启用条件**：需设置 `agent_middle_message = true`
-
-### 3.3 STOP_TOOL (`agent_stop`) — "流程切换器"
-
-```python
-FunctionDefinitionSchema(
-    name="agent_stop",
-    description="表示已收集足够信息，准备形成最终答案。调用后不得再调用任何其他工具。",
-    parameters={"result": "简要说明在本次任务中做了什么（可选）"}
-)
-```
-
-- **关键行为**：
-  1. 模型调用 `agent_stop`
-  2. 框架设置 `_suggested_stop = True`，将 `tool_choice` 从 `"required"` 切换到 `"auto"` — 后续由模型**自由决定**是否调用工具，而非强制停止
-  3. 如果启用了 Reflection，框架在此处运行反思验证流程
-  4. 框架追加 `<BEGIN_OF_INSTRUCTIONS>...Now generate the final response. You must NOT call any tools again.` 指令，引导模型进入回答阶段
-
-### 3.4 REFLECTION_TOOL (`verify_reasoning`) — "推理验证"
-
-```python
-FunctionDefinitionSchema(
-    name="verify_reasoning",
-    description="在输出最终答案前验证推理链的逻辑正确性、内部一致性和完整性。",
-    parameters={
-        "check_type": "self_check / contradiction_check / completeness_check",
-        "result": "pass / warning / fail",
-        "detail": "检查发现说明"
-    }
-)
-```
-
-- **启用条件**：`react_config.enable_reflection = true`，最多循环 `reflection_depth` 次
-- **工作流**：`STOP_TOOL` 触发后，框架逐一检查逻辑正确性、内部一致性和需求覆盖完整性。若有 `fail`，注入 `<BEGIN_OF_REFLECTION_CORRECTION>` 提示模型重新推理
-
-## 4. Agent 工作流完整解析
-
-### 4.1 普通 ReAct 循环（`agent_workflow = "react"`）
-
-以下基于 `BaseReActAgentStrategy.single_execute()` 的实际状态机，工作流以 `WHILE` 包装策略循环（`REACT_BLOCK = STRATEGY_INIT >> AGENT_ENTRY >> WHILE(SINGLE_STRATEGY_CALL).ACTION(REACT_COUNTER) >> AGENT_POST_PROCESS`）：
-
-```text
-循环开始 (call_count=1, tool_choice="required")
-│
-├─ 1. _generate_reasoning_msg()
-│      └─ 渲染 REASONING_TEMPLATE（注入 last_step + origin_msg）
-│      └─ tools_caller(tool_choice=REASONING_TOOL) → 强制调用 think_and_reason
-│      └─ _generate_reasoning_content() → 流式输出 AgentReasoningMetadata
-│
-├─ 2. tools_caller(tool_choice="required" 或 "auto")
-│      └─ 模型返回 tool_calls[] （可能包含多个工具调用）
-│
-├─ 3. _run_tool_calls_concurrently() — asyncio.gather 并发执行
-│      ├─ think_and_reason → 重新生成推理内容
-│      ├─ agent_stop:
-│      │   ├─ _suggested_stop = True （tool_choice → "auto"）
-│      │   ├─ (可选) _run_reflection()
-│      │   └─ 追加 <BEGIN_OF_INSTRUCTIONS>
-│      ├─ processing_message → 流式发送中间消息
-│      └─ 其他业务工具 → call_tool()
-│
-├─ 4. call_count >= agent_tool_call_limit → on_limited() 终止
-│
-└─ 5. reasoning_pc > loop_reasoning_trigger → 注入循环纠正提示
-
-循环结束 → tool_choice="auto" → 模型自主决定是否继续 → 最终补全 → 流式输出给用户
-```
-
-**关键认知**：
-
-- `think_and_reason` 是**每轮起点**，不是模型自行决定——框架通过 `tool_choice=REASONING_TOOL` 强制触发
-- `agent_stop` 的语义是**切换模式**而非硬停止——它将 `tool_choice` 从 required 切换为 auto
-- 循环由 `call_count`（上限）和 `reasoning_pc`（重复检测）双重保护
-- 工具调用是**并发的**——模型可以一次性发起多个工具调用，框架用 `asyncio.gather` 并行执行
-
-### 4.2 Step 驱动循环（`agent_workflow = "step-react"`）
-
-与普通 ReAct 循环不同，step-react 使用**原生循环**（`STEP_REACT_BLOCK = STRATEGY_INIT >> AGENT_ENTRY >> NATIVE_DO(STEP_BODY).WHILE(task_cond) >> AGENT_POST_PROCESS`），由 `NATIVE_DO` 指令承载循环体（`STEP_BODY = NODE_INTRO >> NATIVE_WHILE(iter_cond).ACTION(STEP_EXEC) >> NODE_LEAVE`），`task_cond` 判断计划是否完成：
-
-```text
-STRATEGY_INIT → AGENT_ENTRY（实例化 StepReActAgentStrategy）
-│
-├─ 分解阶段（结构化输出）
-│      └─ 模型输出任务计划（可含子步骤 DAG）
-│      └─ 计划注入上下文（快照用于变更检测）
-│
-└─ NATIVE_DO(STEP_BODY) 原生循环 — WHILE(task_cond)
-       │
-       ├─ NODE_INTRO（Step 开始标记）
-       │      └─ 暴露 update_step 内置工具（幂等，仅注入一次）
-       │
-       ├─ NATIVE_WHILE(iter_cond) — Step 内迭代
-       │      ├─ 单次 single_execute（同 4.1 的思考-行动循环）
-       │      ├─ _record_tool_call：记录工具调用签名（停滞检测）
-       │      └─ iter_cond：Step 预算 / 停滞 / 完成判断
-       │
-       ├─ NODE_LEAVE（Step 结束标记）
-       │      └─ Step 间 Token 预算检查（agent_step_token_budget）
-       │      └─ 压缩触发点（TokenBudget.exhausted → 停止迭代）
-       │
-       └─ task_cond 计划完成 → 退出循环 → AGENT_POST_PROCESS
-```
-
-**step-react 特有机制**：
-
-- **计划分解与修订**：分解阶段模型输出计划（可含 DAG 子步骤）；运行中可通过 `update_step` 内置工具修订（`replan` 更新整个 DAG、`add_step` 追加、删除指定步骤），计划快照用于变更检测
-- **停滞检测**（`_detect_step_stall`）：记录当前 Step 内每次工具调用签名，同一签名反复出现判定为停滞，注入纠正提示或放弃
-- **Step 间压缩**：`agent_step_token_budget`（config.py，默认 -1 禁用）限制每个 Step 的提示词 Token 预算，Step 累积达到预算时迭代循环停止（`TokenBudget.exhausted`）
-- **结构化输出要求**：分解决策与 Step 摘要依赖模型结构化输出能力（`_structured_reasoning_template`）
-
-## 5. 最佳实践
-
-1. **理解 `agent_stop` 的语义**：它不是"停止"，而是"我可以开始回答了吗"的信号。在此之后模型仍可能调用工具（如果 Reflection 发现错误）。
-2. **合理设置 `agent_tool_call_limit`**：简单任务设 3-5，复杂多步任务设 10-15，避免过小导致未完成任务就被截断。
-3. **启用 Reflection 提升可靠性**：对于关键业务场景，建议 `enable_reflection = true`，让模型在回答前自我检查。
-4. **利用结构化推理**：对复杂推理任务，启用 `structured_reasoning` 让模型显式分步规划，可观察 `AgentStructuredReasoningChunkMetadata` 流式元数据。
-5. **工具结果净化**：自定义工具返回给模型的内容应简洁、无内部格式标记——这会直接影响后续推理质量。
-6. **监控 `reasoning_pc`**：如果频繁触发 `loop_reasoning_trigger`，检查提示词设计是否导致模型陷入循环。
-
-通过深入理解上述架构、流程与工具职责，您可以充分发挥 AmritaBot Agent 模式的潜力，构建出既能处理复杂任务又稳定可靠的智能体应用。
+先让 Agent 稳定完成一类任务，再逐步加工具、加技能、换工作流。每加一层，都观察调用轮次、延迟和失败率。Agent 的效果是调出来的，不是一次配置出来的。
