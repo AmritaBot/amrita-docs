@@ -226,25 +226,32 @@ register_router(router, prefix="/api/myplugin", tags=["myplugin"])
 ### 注册页面（无需重新构建前端）
 
 ```python
+from pathlib import Path
+
 from amrita.plugins.webui.API import register_page
+from amrita.plugins.webui.service.plugin_assets import mount_plugin_assets
+
+# 推荐：插件自带产物，随 Python 包分发
+mount_plugin_assets("my_plugin", Path(__file__).parent / "webui")
 
 register_page(
     "/myplugin/dashboard",
     "我的面板",
     category="我的插件",
     icon="activity",
-    external_url="/myplugin/page",  # 或者 module_url="/static/plugins/myplugin/page.js"
+    module_dir="my_plugin",  # 也可以是 external_url="/myplugin/page"
 )
 ```
 
 前端按以下顺序解析页面组件：
 
 1. 前端内置 `registry`（Amrita 自带页面，需前端构建）
-2. `module_url`：运行期 `import()` 的 ESM 模块，取其 `default` 作为组件
-3. `external_url`：`<iframe>` 嵌入的独立页面
-4. 都没有时渲染占位页
+2. `module_dir`：插件产物名，宿主解析为 `/plugin-assets/<name>/index.js?v=<mtime>`，运行期 `import()`
+3. `module_url`：1.10 起的旧接口，插件直接给完整 ESM URL，宿主不校验可用性
+4. `external_url`：`<iframe>` 嵌入的独立页面
+5. 都没有时渲染占位页
 
-**只要提供 `module_url` 或 `external_url`，第三方插件就无需重新构建前端。**
+**只要提供 `module_dir`、`module_url` 或 `external_url`，第三方插件就无需重新构建前端。** 新插件请用 `module_dir`，产物缺失时前端会显示「插件产物不可用」和具体原因。
 
 #### iframe 页面（任何技术栈）
 
@@ -253,20 +260,27 @@ register_page(
 
 #### 运行期 ESM 模块（原生 UI）
 
-模块需 `export default` 一个 React 组件，并把宿主依赖设为 external，
-通过 `window.__AMRITA_HOST__` 取用，以保证 React 单实例：
+模块需 `export default` 一个 React 组件。推荐用 `@amrita-constant/webui-plugin-kit` 构建，它会自动把宿主依赖替换成 `window.__AMRITA_HOST__` 的引用，避免打进第二份 React：
+
+```bash
+bun add -d @amrita-constant/webui-plugin-kit @amrita-constant/ambot-ui
+bunx amrita-plugin-build
+```
+
+页面代码：
 
 ```tsx
-const { React } = window.__AMRITA_HOST__!;
+import { useState } from "react";
+import { Button } from "@amrita-constant/webui-plugin-kit/ui";
 
 export default function Page() {
-  const [n, setN] = React.useState(0);
-  return React.createElement("button", { onClick: () => setN(n + 1) }, `点击 ${n}`);
+  const [n, setN] = useState(0);
+  return <Button onClick={() => setN(n + 1)}>点击 {n}</Button>;
 }
 ```
 
-宿主暴露的键：`React`、`ReactDOM`、`ReactDOMClient`、`ReactRouterDOM`。
-模块加载失败只影响当前页面（前端有错误边界兜住）。
+宿主暴露的键：`React`、`ReactDOM`、`ReactDOMClient`、`ReactRouterDOM`、`ReactQuery`、`LucideReact`、`UI`、`notifyUnauthorized`。契约版本当前为 `3`。
+模块加载失败只影响当前页面（前端有错误边界兜住）。完整构建流程见[页面扩展开发](/amrita/features/webui/customization)。
 
 ### WebSocket 频道
 
@@ -301,4 +315,4 @@ WebUI 页面开发的完整说明见[页面扩展开发](/amrita/features/webui/
 - **插件生命周期**：`amrita/utils/plugins.py` 仍是 `# TODO: Amrita plugin system`，
   尚无正式的第三方插件生命周期钩子。
 - **前端页面运行时扩展**：`registry.tsx` 仍是编译期常量表；
-  `module_url` / `external_url` 是绕过它的两种方式。
+  `module_dir` / `module_url` / `external_url` 是绕过它的三种方式。

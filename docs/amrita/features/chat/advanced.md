@@ -133,6 +133,12 @@ Amrita 的预设分为两类：**模型预设** 与 **提示词模板**。
 
 对应模板文件位于 localstore 插件配置目录的 `group_prompts` / `private_prompts` 目录下（`提示词.txt`），可使用 `/prompt template [group|private] [名称]` 指令或在 WebUI 中切换。
 
+::: warning 切换模板是全局操作
+
+`/prompt template ... <名称>` 会写入全局配置，1.12 起要求超级管理员（`superusers` 或 `lp.admin`）。普通用户与群管理员可以查看列表，但不能切换。WebUI 侧不受此限制，因为它本身已经要求登录管理员账号。
+
+:::
+
 ## 聊天总开关
 
 `chat` 插件配置中的 `enable` 控制聊天功能总开关（默认关闭，需在 WebUI 中开启）。开启后：
@@ -148,6 +154,20 @@ Amrita 的预设分为两类：**模型预设** 与 **提示词模板**。
 - **chat_pending_mode**：并发处理模式，可选 `single`（单队列）、`queue`（排队，默认）、`single_with_report`、`interactive`
 - **synthesize_forward_message**：是否将合并转发消息整合进上下文（默认开启）
 - **nature_chat_style**：切句回复，将 LLM 回复切分为自然语句分条发送，使回复更拟人（默认开启）
+- **chat_debounce_window**：消息防抖窗口（秒，默认 `0` 关闭）。窗口内同一会话、同一用户的多条消息合并为一次请求的用户输入
+- **chat_debounce_max_messages**：单批最大条数（默认 `20`，`<=0` 不限制）
+- **chat_debounce_max_wait**：单批最长存活时长（秒，默认 `5`，`<=0` 不限制）
+
+防抖按「会话 + 用户」分桶，群聊里不会把不同人的发言并进同一请求；用户发完文字紧接着补图片，图片也会落进同一批。合并时保留每条消息原有的 XML / legacy 结构与时间戳，顺序不变。窗口内持续发言会不断重置静默计时，但受最大条数与最长存活时间兜底，不会无限拖长。
+
+```toml
+[function]
+chat_debounce_window = 1.5
+chat_debounce_max_messages = 20
+chat_debounce_max_wait = 5.0
+```
+
+> 防抖适合用户习惯「一句拆成好几条发」的群聊。私聊或指令场景通常不需要，保持 `0` 即可。
 
 ## 会话进程管理（/chatobj）
 
@@ -167,6 +187,11 @@ Amrita 除了对话与指令外，还内置了三个事件响应（无需指令�
 - **撤回回复**：Bot 自己的消息被撤回后，随机回复一条消息。由 `extended.say_after_self_msg_be_deleted` 控制（默认关闭），`extended.after_deleted_say_what` 为随机回复列表
 - **入群欢迎**：Bot 被拉入新群时发送欢迎消息。由 `extended.send_msg_after_be_invited` 控制（默认关闭），`extended.group_added_msg` 为欢迎消息内容
 
+两个容易忽略的边界：
+
+- `/set_enable false` 关闭本群/本会话聊天后，戳一戳也不会再触发回复；poke 事件会先检查聊天启用状态。
+- 只包含 xml/json 卡片段的消息不会进入聊天链路，也不会写入静默上下文；需要在卡片外附带文字才会触发。
+
 ## 调试模式
 
 `/debug <on|off|status>` 指令（`lp.admin` 权限）控制调试日志输出。开启后，可在控制台看到更详细的对话与工具调用日志，便于排查问题。
@@ -179,7 +204,47 @@ Amrita 除了对话与指令外，还内置了三个事件响应（无需指令�
 - **step**：Step 生命周期消息，包含 `decompose`（任务分解）、`intro`（开始）、`leave`（结束）、`stall`（卡住）、`compress`（压缩）各阶段的提示开关
 - **reflection**：反思过程提示（默认开启）
 - **error_report**：错误报告（默认开启）
-- **stream_reasoning**：流式输出思考过程（默认关闭）
+- **reasoning**：框架整段思考块（`reasoning` / `structured_reasoning_step`）的显示开关（默认开启）
+- **stream_reasoning**：收集完整段思考后一次性发送（默认关闭）
+- **reasoning_summary**：发送前先摘要（默认关闭）
+- **tool_call**：工具调用通知（默认关闭）
+- **skill_trigger**：技能触发通知（默认开启）
+
+### 思考块与摘要
+
+1.19 起，`stream_reasoning` 的语义是「整段发送」，不再是逐 token 刷屏：
+
+- 原生 `cot_chunk` 与框架包装的 `reasoning_chunk` 一起累积，只在一次思考结束时整段发出，不会在 chunk 之间切段；
+- 思考文本超过 `function.forward_threshold` 时改用合并转发分段，避免单条消息超限；
+- 思考与中间消息都按文本段发送，模型输出里的 CQ 码不会被解析成提及或图片。
+
+开启 `reasoning_summary` 后，发送前会先调一次模型做摘要，失败或超时则回退原文。摘要参数都可调：
+
+| 配置项 | 默认值 | 范围 | 说明 |
+| --- | --- | --- | --- |
+| `reasoning_summary_max_chars` | `120` | 40–400 | 摘要字数上限，提示词与超长截断共用 |
+| `reasoning_summary_input_chars` | `6000` | 500–50000 | 喂给摘要模型的原文长度，超出只取尾部 |
+| `reasoning_summary_max_output` | `1024` | 64–8192 | 摘要调用的输出预算下限 |
+| `reasoning_summary_timeout_seconds` | `20` | 1–180 | 单次摘要调用超时 |
+
+```toml
+[meta]
+stream_reasoning = true
+reasoning_summary = true
+reasoning_summary_max_chars = 120
+```
+
+> 摘要调用会单独消耗一次模型请求。模型较慢时把超时放宽；只想自己看原文、不想多花钱时，关掉 `reasoning_summary` 即可。
+
+### 工具调用通知
+
+`meta.tool_call` 默认关闭。关闭时：
+
+- `function_call` 的 Calling / Called 生命周期文案不会作为消息发出；
+- 只有模型正文会按「工具调用前的中间消息」或「最终回答」展示；
+- 工具执行失败仍会写日志，不会因为通知开关而丢失。
+
+需要在聊天里看到「调用了工具：xxx」时再打开。注意 1.19.1 之前这些生命周期文案会被当成 💬 正文刷屏，升级后默认安静。
 
 ## Sessions管理
 
@@ -239,9 +304,10 @@ graph TD
 | 指令 | 作用 |
 | --- | --- |
 | `/session info` | 查看当前会话占用与状态（方块占用条） |
-| `/session list` | 列出已归档的历史会话 |
-| `/session use <编号>` | 切换到指定历史会话 |
-| `/session del <编号>` | 删除指定历史会话 |
+| `/session list` | 列出已归档的历史会话（`ID <id>｜标签｜时间`） |
+| `/session use <ID>` | 切换到指定历史会话 |
+| `/session del <ID>` | 删除指定历史会话 |
+| `/session rename <ID> <新名称>` | 重命名指定归档会话 |
 | `/session archive` | 立即归档当前会话 |
 | `/session clear confirm` | **删除全部归档记录**（不可恢复） |
 | `/session forget` | 仅清空当前对话上下文 |
@@ -260,7 +326,31 @@ graph TD
 
 :::
 
-::: tip 运行中的会话受保护
+### 归档标签与重命名
+
+每次归档会由后台任务生成一行短标签，`/session list` 用它代替大面积的「（无描述）」。标签生成不占会话锁，也不阻塞命令返回；失败或 30 秒超时留空，与「用户手动改过」区分开。
+
+手动改名：
+
+```text
+/session rename 42 项目周报讨论
+```
+
+- 名称最长 16 个汉字，超出会截断并提示；
+- 改名会覆盖自动生成的标签；
+- 改名不再被视为破坏性操作，不被运行中会话锁拦截。
+
+### 会话寻址
+
+`/session use`、`del`、`rename` 只认会话 ID：
+
+- 直接写数字：`/session use 42`
+- 带 `#`：`/session use #42`
+- 列表里的 `ID 42` 就是可用的值
+
+1.19.1 起不再支持「列表序号」寻址。这样即使列表顺序变化，ID 仍稳定指向同一条归档。ID 只在当前用户自己的归档里解析，找不到与不属于自己统一提示「请输入正确的会话 ID」，不会泄露别人的会话是否存在。
+
+### 运行中的会话受保护
 
 破坏性指令（`clear` / `forget` / `use` / `del` / `archive` / `abstract clear`）
 在会话正在生成回复时会被拒绝：本轮结束后记忆会被回写，覆盖掉指令刚做的改动
@@ -269,7 +359,7 @@ graph TD
 需要强制执行时加 `force`：`/session clear confirm force`。此时指令会等待本轮结束
 （复用与聊天同一把锁），而不是绕过。
 
-:::
+`rename` 只改标签，不碰消息与摘要，因此不在保护范围内。
 
 ## 上下文压缩
 

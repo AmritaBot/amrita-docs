@@ -35,12 +35,14 @@ agent_mcp_server_scripts = [
 在已运行的Amrita机器人实例中，可以使用管理指令动态挂载MCP服务器（需 `lp.admin` 权限）：
 
 ```text
-/mcp add <server_script>     # 添加 MCP 服务器
-/mcp del <server_script>     # 移除 MCP 服务器
-/mcp reload                  # 重载 MCP 配置
-/mcp deep-reload             # 深度重载（重建 MCP 客户端会话）
-/mcp stats [-d|--details]    # 查看 MCP 服务器状态（-d 仅私聊可用）
+/mcp add <server_script>        # 添加 MCP 服务器
+/mcp del <ID|server_script>     # 按运行时 ID 或脚本地址移除
+/mcp reload                     # 重载 MCP 配置
+/mcp deep-reload                # 深度重载（重建 MCP 客户端会话）
+/mcp stats [-d|--details]       # 查看 ID、脚本、状态与工具数（-d 仅私聊可用）
 ```
+
+每个服务在加载时会分配一个进程内稳定的运行时 ID（`mcp1`、`mcp2`……）。同一脚本重载后沿用原 ID，删掉再添加才会换号。删除、更新、查看都以运行时状态为准，不再依赖配置里是否还留着这一项。
 
 ### 方法三：通过Web UI添加（图形化配置）
 
@@ -59,9 +61,22 @@ Amrita内置了WebUI，提供图形化配置方式：
 agent_mcp_client_enable = true
 ```
 
-<!-- TODO: MCP服务器配置页面截图，显示MCP工具列表及连接状态 -->
+<!-- TODO: MCP 服务器页面截图占位（列表 + 连接状态 + 工具数），后续统一补拍 -->
 
 :::
+
+## 加载与故障隔离
+
+1.16 起，MCP 服务逐个加载，单个服务失败不会牵连其余服务，也不会让整个聊天插件启动失败：
+
+- 每个服务有 30 秒初始化上限，stdio 拉起进程与远端建连都算在内；
+- 失败尝试留下的半成品工具会被移除，避免工具路由指向不存在的客户端；
+- 启动、`/mcp reload`、`/mcp deep-reload` 与 WebUI 重载都返回部分结果，而不是在第一个坏服务上整体中止；
+- 重载以配置里的脚本列表为准：启动时就失败、没有客户端在册的服务也会重试，配置之外的客户端会被断开，避免删除后又被重载复活；
+- 增删改共用一把进程内锁。添加或更新时先连上新服务，再断开旧服务；写盘失败会回滚连接与配置；
+- 删除按运行时 ID 或脚本地址寻址，即使配置里已经找不到该项也能清理。
+
+WebUI 的 MCP 列表由运行时状态生成，行内直接显示 ID、脚本、`connected` / `error`、工具数量与失败原因。
 
 ## 实际案例：集成Dify平台
 

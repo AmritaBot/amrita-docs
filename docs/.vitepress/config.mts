@@ -122,6 +122,7 @@ export default withMermaid({
           { text: "配置参考", link: "/amrita/guide/configuration" },
           { text: "连接 QQ 机器人", link: "/amrita/guide/to_bot" },
           { text: "创建第一个对话机器人", link: "/amrita/guide/first-bot" },
+          { text: "版本变更", link: "/amrita/guide/changelog" },
         ],
       },
       {

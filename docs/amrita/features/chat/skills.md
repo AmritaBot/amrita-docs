@@ -123,14 +123,28 @@ Reply with the translation only, no extra commentary.
 [skills]
 # 技能系统总开关
 enable = true
-# 启用的技能名称列表：空列表 = 全部启用；非空 = 仅列表内的技能启用
+# 工具注册模式：progressive = 统一注册 skill_open / skill_read；invoke = 每个技能一个工具
+mode = "progressive"
+# 是否全部启用。true 时 selected 不生效
+all_skills = true
+# 仅在 all_skills = false 时有意义：留空即一个都不启用
 selected = []
+# 技能返回内容是否带本机目录前缀，远程沙箱建议关闭
+echo_skill_directory = true
+# 是否允许注入并执行 scripts/ 下的技能脚本
+allow_script_execution = true
 ```
 
-| 配置项     | 默认值 | 说明                                                     |
-| ---------- | ------ | -------------------------------------------------------- |
-| `enable`   | `true` | 技能系统总开关；`false` 时所有技能不注册、不写入使用指引 |
-| `selected` | `[]`   | 白名单：空列表 = 全部启用；非空 = 仅列表内的技能启用     |
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `enable` | `true` | 技能系统总开关；`false` 时所有技能不注册、不写入使用指引 |
+| `mode` | `progressive` | `progressive` 统一注册 `skill_open` / `skill_read`；`invoke` 为每个技能注册一个工具（旧行为，旧配置自动按此解释） |
+| `all_skills` | `true` | 全部启用。为 `true` 时 `selected` 不生效 |
+| `selected` | `[]` | 仅在 `all_skills = false` 时生效；此时空列表表示一个都不启用 |
+| `echo_skill_directory` | `true` | 技能返回内容开头是否附带技能目录。远程沙箱场景建议关闭，避免暴露本机路径 |
+| `allow_script_execution` | `true` | 关闭后不再注入脚本工具，技能只返回 `SKILL.md` 正文；与目录回显相互独立 |
+
+> 1.19 起 `selected = []` 不再兼作「全部启用」的哨兵。要全部启用请显式设置 `all_skills = true`；只启用部分时设置 `all_skills = false` 并列出名字。旧配置没有 `all_skills` 字段时，会按原来的 `selected` 语义推断，升级后行为不变。
 
 保存后**重启机器人**（或直接使用第 4 步 WebUI 的 `重新加载` 让改动生效）。
 
@@ -141,13 +155,18 @@ WebUI 提供图形化技能管理，无需手工编辑配置文件。
 1. 登录 Amrita WebUI；
 2. 导航到 `聊天管理` -> `技能`；
 3. 页面展示已发现的全部技能列表，每项包含：名称、描述、版本、路径、启用状态（Switch）、校验状态（`ok` / `error`）；
-4. **行内开关**：勾选/取消勾选单个技能，即时启停（等价于修改 `selected` 名单）；
-5. **全部启用** 按钮：清空启用名单（`selected = []`），使目录下所有技能生效；
-6. **重新加载** 按钮：重新扫描技能目录，拾取新增/修改的 `SKILL.md`；
-7. 若某个技能校验失败，列表对应项会显示 `error` 原因，可按第 7 节排查。
+4. **行内开关**：勾选/取消勾选单个技能，即时启停。从「全部启用」切到单选时，页面会先把当前技能铺开，再移除目标，因此关掉最后一个就是一个都不启用；
+5. **全部启用** 按钮：设置 `all_skills = true` 并清空 `selected`，使目录下所有技能生效；
+6. **执行策略**：可切换「回显技能目录」「允许执行技能脚本」和工具注册模式，保存后下一轮请求生效；
+7. **重新加载** 按钮：重新扫描技能目录，拾取新增/修改的 `SKILL.md`；
+8. 若某个技能校验失败，列表对应项会显示 `error` 原因，可按「故障排除」一节排查。
+
+<!-- TODO: 技能管理页面截图占位（列表 + 执行策略卡片），后续统一补拍 -->
+
+保存期间的开关会被禁用，服务端对读-改-写加锁，避免并发请求互相覆盖。
 
 ::: tip
-WebUI 保存的正是 `[skills]` 配置段（`enable` / `selected`），与直接编辑 `config/chat/config.toml` 完全等效，二者可随时互相切换使用。
+WebUI 保存的正是 `[skills]` 配置段（`enable` / `mode` / `all_skills` / `selected` / 执行策略），与直接编辑 `config/chat/config.toml` 完全等效，二者可随时互相切换使用。
 :::
 
 ## 第 5 步：对话测试验证
@@ -171,7 +190,7 @@ WebUI 保存的正是 `[skills]` 配置段（`enable` / `selected`），与直�
 
 - ✅ 出现技能触发通知 → 技能已被模型调用；
 - ✅ 返回翻译结果 → 技能模板执行成功；
-- ❌ 未触发 → 检查第 7 节"故障排除"。
+- ❌ 未触发 → 检查「故障排除」一节。
 
 ### 关闭触发通知（可选）
 
@@ -200,12 +219,22 @@ config/chat/skills/my-skill/
 
 ### 工作机制：渐进披露（Progressive Disclosure）
 
-技能工具采用"按需激活"策略：
+`mode = "progressive"` 时，技能不再给每个技能注册一个工具，而是统一注册两个：
 
-1. **初始阶段**：会话工具池仅注册技能入口工具（单参数 `arguments`，参数为用户请求原文）；
-2. **技能被调用后**：其附带的脚本工具（`scripts/`）才注入同一会话工具池，供后续调用使用。
+| 工具 | 作用 |
+| --- | --- |
+| `skill_open` | 按技能名加载 `SKILL.md` 正文（L2）。参数：`name` 必填，`arguments` 会替换正文中的 `$ARGUMENTS`，`section` 可按标题只加载一部分 |
+| `skill_read` | 读取已打开技能目录内的支持文件（L3），如 `references/api.md`。参数：`name`、`path`，可选 `start_line` / `end_line` |
 
-这样既避免工具池过早膨胀（工具越多越容易干扰模型选择），也让脚本工具在真正需要时才暴露给模型。同时，技能工具基于全局工具池**克隆**（copy+mixin）注册，不会污染全局单例，与其他工具共存无冲突。
+调用顺序：
+
+1. **初始阶段**：系统提示里只有技能名与描述，模型据此判断是否匹配；
+2. **`skill_open`**：匹配后读取正文，同时返回该技能可读取的文件清单；开启脚本执行时，`scripts/` 下的工具此时才注入同一会话工具池；
+3. **`skill_read`**：正文提到需要查详细资料时，再按相对路径读取支持文件。
+
+这样工具池不会因为技能数量增长而膨胀。`allow_script_execution = false` 时，`skill_open` 仍然返回正文，但不会注入脚本工具；`echo_skill_directory = false` 时，返回内容会剥掉 faskill 自动加的本机目录前缀。
+
+`mode = "invoke"` 保留旧行为：每个技能注册一个单参数工具，参数为用户请求原文，适合依赖旧工具形态的部署。技能工具始终基于全局工具池**克隆**（copy+mixin）注册，不会污染全局单例。
 
 ## 完成检查清单
 
@@ -214,6 +243,7 @@ config/chat/skills/my-skill/
 | `config/chat/skills/` 目录存在，技能子目录含 `SKILL.md` | ☐    |
 | `SKILL.md` 含 `name` / `description`（`version` 可选）  | ☐    |
 | `config.toml` 中 `[skills] enable = true`               | ☐    |
+| `all_skills` 与 `selected` 的组合符合预期               | ☐    |
 | WebUI `聊天管理` -> `技能` 能看到技能且校验 `ok`        | ☐    |
 | 对话触发技能，出现"使用了技能"通知并返回结果            | ☐    |
 
@@ -222,7 +252,9 @@ config/chat/skills/my-skill/
 | 现象                                    | 可能原因与解决办法                                    |
 | --------------------------------------- | ----------------------------------------------------- |
 | 技能页显示"没有发现技能"                | `config/chat/skills/` 下没有 `SKILL.md`，请先放入技能 |
-| 技能列表存在但模型不调用                | `description` 不精确；或技能未启用（检查 `selected`） |
+| 技能列表存在但模型不调用                | `description` 不精确；检查 `all_skills` 与 `selected` 的组合是否真的启用了它 |
+| 模型只打开技能，不读支持文件            | 正文里没有明确要求模型查阅文件；可在 `SKILL.md` 写明「需要时用 skill_read 读取 references/...」 |
+| 脚本工具没有出现                        | 检查 `allow_script_execution` 是否为 `true`，以及脚本是否放在 `scripts/` 下 |
 | 修改 `SKILL.md` 后不生效                | 在 WebUI 点击 `重新加载`，或重启机器人                |
 | 单技能校验失败（`ok: false` / `error`） | `SKILL.md` frontmatter 或正文解析失败，查看机器人日志 |
 | 技能触发通知不显示                      | 检查 `[meta]` 段的 `skill_trigger` 是否为 `true`      |
@@ -233,8 +265,9 @@ config/chat/skills/my-skill/
 至此，你已经完成了从"创建技能"到"对话使用"的完整流程。回顾一下关键要点：
 
 - 技能 = 目录 + `SKILL.md`（frontmatter 声明元信息 + 正文指令模板，`$ARGUMENTS` 注入用户请求原文）；
-- 启停控制：`[skills]` 配置（`enable` / `selected`）或 WebUI `聊天管理` -> `技能` 二选一；
+- 启停控制：`[skills]` 配置（`enable` / `all_skills` / `selected`）或 WebUI `聊天管理` -> `技能` 二选一；
 - 触发方式：模型自动判断，无需手动触发；`meta.skill_trigger` 控制触发通知；
-- 脚本工具：`scripts/` 目录 + 渐进披露，按需注入、不污染全局工具池。
+- 工具形态：默认 `progressive`，用 `skill_open` 打开正文、`skill_read` 读支持文件；`invoke` 兼容旧行为；
+- 脚本工具：`scripts/` 目录 + 渐进披露，按需注入、不污染全局工具池；`allow_script_execution` 可整体关闭。
 
 把高频、可复用的任务封装为技能，可以让你的机器人以更清晰、更可控的方式完成复杂工作。

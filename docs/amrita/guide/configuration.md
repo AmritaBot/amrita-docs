@@ -43,9 +43,69 @@ AmritaBot 使用的环境变量分为两类：AmritaBot 自身定义的配置项
 
 > **提示**：除上述配置外，`config/` 目录下的 TOML 文件提供了更详细的插件级配置，可在 WebUI 中直接编辑。
 
-## 其他配置
+## 聊天模块配置
 
-通常位于`config/`，在WebUI中有直接的配置选项，此处不多赘述。
+其他配置通常位于 `config/`，WebUI 的「配置管理」可以直接编辑。下面列出 1.11 到 1.19 新增或语义变化较大、容易踩坑的项。
+
+### `[function]`
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `chat_debounce_window` | `0` | 消息防抖窗口（秒），`<=0` 关闭。窗口内同一会话、同一用户的多条消息合并为一次请求 |
+| `chat_debounce_max_messages` | `20` | 单批最大条数，`<=0` 不限制 |
+| `chat_debounce_max_wait` | `5.0` | 单批最长存活时长（秒），`<=0` 不限制 |
+| `message_type` | `legacy` | 上下文消息格式，可选 `legacy` / `xml` |
+| `chat_pending_mode` | `queue` | 同会话并发调用时的行为：`single` / `queue` / `single_with_report` / `interactive` |
+| `forward_threshold` | `200` | 最终响应超过该字符数时改走合并转发，`0` 禁用 |
+| `forward_min_chunk` | `500` | 合并转发的分块最小字符数 |
+
+### `[meta]`
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `enable` | `true` | 元信息总开关 |
+| `reasoning` | `true` | 显示框架整段思考块 |
+| `stream_reasoning` | `false` | 收集完整段思考后一次性发送；1.19 起不再是逐 token 流式 |
+| `reasoning_summary` | `false` | 发送思考前先摘要，失败回退原文 |
+| `reasoning_summary_max_chars` | `120` | 摘要字数上限（40–400） |
+| `reasoning_summary_input_chars` | `6000` | 喂入摘要的原文上限，超出取尾部（500–50000） |
+| `reasoning_summary_max_output` | `1024` | 摘要输出预算下限（64–8192） |
+| `reasoning_summary_timeout_seconds` | `20` | 摘要调用超时（1–180 秒） |
+| `tool_call` | `false` | 工具调用通知；关闭时 Calling / Called 生命周期文案完全不发 |
+| `skill_trigger` | `true` | 技能触发通知 |
+
+### `[skills]`
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `enable` | `true` | 技能系统总开关 |
+| `mode` | `progressive` | `progressive` 注册 `skill_open` / `skill_read`；`invoke` 为每个技能注册一个工具 |
+| `all_skills` | `true` | 全部启用；为 `true` 时 `selected` 不生效 |
+| `selected` | `[]` | 仅在 `all_skills = false` 时生效，空列表表示一个都不启用 |
+| `echo_skill_directory` | `true` | 技能返回内容是否带本机目录前缀 |
+| `allow_script_execution` | `true` | 是否注入并执行 `scripts/` 下的技能脚本 |
+
+> 旧配置没有 `all_skills` 时，会按原有的 `selected` 语义推断；旧配置没有 `mode` 时按 `invoke` 解释，升级后行为不变。
+
+### `[context]`
+
+| 配置项 | 默认值 | 说明 |
+| --- | --- | --- |
+| `fake_ip_ranges` | `[]` | 放行的 fake-ip 保留段（CIDR）。Clash 等代理开启 fake-ip 后，需要登记 `198.18.0.0/15` 一类网段，否则图床域名会被 SSRF 护栏拒绝 |
+| `read_context_images` | `false` | `read_context` 是否还原历史图片；关闭时只返回文本 |
+| `max_images_per_request` | `8` | 单次请求最多发送给模型的图片数，超出降级为文字提示 |
+| `max_allowed_size` | `2048` | 归一化后允许存入上下文的单张图片体积（KB） |
+
+### 升级后
+
+升级 AmritaBot 后先同步依赖，再跑数据库迁移：
+
+```bash
+uv sync
+uv run ambot orm upgrade
+```
+
+`nonebot-plugin-amrita>=0.5.1` 包含 `created_at` 的 DOUBLE 迁移，不跑迁移时 MySQL 上的归档标签与重命名仍可能失效。
 
 ## 下一步
 

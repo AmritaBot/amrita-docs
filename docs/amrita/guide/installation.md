@@ -85,6 +85,30 @@ WEBUI_USER_NAME=admin
 WEBUI_PASSWORD=your_secure_password
 ```
 
+## ⬆️ 升级现有部署
+
+从旧版本升级时，按顺序执行：
+
+```bash
+git pull
+uv sync
+uv run ambot orm upgrade
+uv run ambot run
+```
+
+`uv sync` 会把 `nonebot-plugin-amrita` 拉到 0.5.1 以上。`ambot orm upgrade` 不能跳过：0.5.1 包含一次 `created_at` 列类型迁移，不跑迁移时 MySQL / MariaDB 上的会话标签、重命名与按 ID 操作会出现「找不到会话」一类问题。SQLite 部署同样建议执行，保持表结构一致。
+
+如果你是从源码构建而不是用发布包，还需要初始化前端子模块并重新构建前端：
+
+```bash
+git submodule update --init --recursive
+cd frontend
+bun install
+bun run build
+```
+
+升级后第一次打开 WebUI，建议先确认登录页显示的版本号、插件管理里 `nonebot-plugin-amrita` 的版本，以及数据库元信息页面是否正常。
+
 ## 🔒 安全配置
 
 ### 密码安全
