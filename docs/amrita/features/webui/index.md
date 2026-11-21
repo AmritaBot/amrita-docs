@@ -8,7 +8,7 @@ WebUI 与 Bot 共用同一服务端口，端口由环境变量 `PORT` 控制（N
 
 登录页会直接显示当前 AmritaBot 版本，排查问题时可以先确认这里与 `pyproject.toml` / PyPI 上的版本是否一致。
 
-> 📷 截图占位：WebUI 登录页（待补）
+![WebUI 登录页](/webui/login.png)
 
 ## 账号与密码
 
@@ -56,7 +56,7 @@ WEBUI_PASSWORD=your_password # 登录密码
 
 仪表盘把 Bot 连接、系统健康、消息趋势和最近日志放在同一页，适合作为日常入口：
 
-> 📷 截图占位：仪表盘（待补）
+![仪表盘](/webui/dashboard.png)
 
 ## 插件管理
 
@@ -66,7 +66,9 @@ WEBUI_PASSWORD=your_password # 登录密码
 
 列表把插件归为六种状态：运行中、已启用待重启、已禁用待重启、未加载、依赖项、内置插件。内置插件与 `nonebot-plugin-amrita` 这类被 Amrita 直接 `require` 的依赖不允许在页面里禁用，按钮会给出原因。
 
-> 📷 截图占位：已安装插件（待补）
+![已安装插件](/webui/plugins.png)
+
+![插件商店](/webui/plugins-store.png)
 
 ### 插件商店
 
@@ -91,7 +93,7 @@ WEBUI_PASSWORD=your_password # 登录密码
 
 模型预设页面用于维护 `config/chat/models/` 下的预设。新建或编辑时，协议字段是从 `/api/chat/models/adapters` 拉取的已注册适配器下拉框，旁边会提示当前协议由哪个适配器处理，不再需要手输协议名。
 
-> 📷 截图占位：模型预设（待补）
+![模型预设](/webui/models.png)
 
 ### 提示词预设
 
@@ -114,15 +116,15 @@ WEBUI_PASSWORD=your_password # 登录密码
 
 实时日志通过 WebSocket 推送，可按级别筛选、暂停滚动、查看单条详情。窄屏下时间与级别徽章占一行，正文另起一行，不再按字符折行。
 
-> 📷 截图占位：实时日志（待补）
+![实时日志](/webui/logs.png)
 
-> 📷 截图占位：移动端日志布局（待补）
+![移动端日志布局](/webui/logs-mobile.png)
 
 ## 数据库元信息
 
 数据库页面用于确认当前实际连接的数据库类型、版本和表结构，排查「迁移没跑」「连错库」一类问题时很直接。
 
-> 📷 截图占位：数据库元信息（待补）
+![数据库元信息](/webui/dbmeta.png)
 
 ## 快速导航
 
