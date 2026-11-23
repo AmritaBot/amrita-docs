@@ -54,7 +54,7 @@ EMBEDDING_PROCTOL=ollama-embed
 | `VECTOR_DB_REMOTE_HEADERS` | `{}` | 远程请求头（仅 `remote`） |
 | `VECTOR_DB_TENANT` | `default` | 远程租户 |
 | `VECTOR_DB_DATABASE` | `default` | 远程数据库 |
-| `EMBEDDING_ENABLED` | 空（自动探测） | 设为 `false` 则完全不调用嵌入服务 |
+| `EMBEDDING_ENABLED` | 空（自动尝试） | 设为 `false` 则完全不调用嵌入服务 |
 | `EMBEDDING_MODEL_URL` | `http://127.0.0.1:11434` | 嵌入模型地址 |
 | `EMBEDDING_MODEL_NAME` | `auto` | 嵌入模型名称 |
 | `EMBEDDING_PROCTOL` | `ollama-embed` | `openai` / `ollama-embed` |
@@ -184,7 +184,7 @@ flowchart TB
 | `vector` | 只走向量；没有模型时直接报错，不静默换语义 |
 
 关键词一路不依赖分词库：英文按词、中文按二元组切分后在本地算 BM25。嵌入模型不可用时，
-探测结果会被缓存，不会每次读写都去撞一个连不上的服务；写入改用占位向量占住 Chroma 的行
+嵌入请求失败一次就会被记为不可用并缓存，不会每次读写都去撞一个连不上的服务；写入改用占位向量占住 Chroma 的行
 （宽度沿用库里已有向量），检索完全不走向量路径。
 
 ### 时间退化
