@@ -2,15 +2,15 @@
 
 ## 概述
 
-长期记忆由 **`amrita_plugin_memory`** 插件提供，当前版本 0.9.x，采用三层记忆模型：
+长期记忆由 **`amrita_plugin_memory`** 插件提供 [![PyPI](https://img.shields.io/pypi/v/amrita-plugin-memory)](https://pypi.org/project/amrita-plugin-memory/)，采用三层记忆模型：
 
 | 层 | 名称 | 载体 | 何时使用 |
 | --- | --- | --- | --- |
 | L1 | 备忘录 | 插件自有 ORM 表（每个 uni_id 一行） | 恒常注入，每轮都在 system prompt 里 |
-| L2 | 向量记忆 | ChromaDB 向量库 | LLM 按需检索、写入、更新 |
+| L2 | 检索记忆 | ChromaDB（文档 + 可选向量） | LLM 按需检索、写入、更新 |
 | L3 | 离线巩固循环（DMN） | 后台 ReAct Agent | 空闲窗口到达时整理记忆、画像与知识 |
 
-L1 是一段千字内的用户元信息，放身份、稳定偏好、用户指定的工具调用模式；L2 是长尾事实库，按需检索；L3 在用户作息里的冷门时段跑一轮后台整理，做去重、压缩、画像精炼和知识沉淀。
+L1 是一段千字内的用户元信息，放身份、稳定偏好、用户指定的工具调用模式；L2 是长尾事实库，按需检索，默认关键词与向量混合，不配嵌入模型时退为纯关键词；L3 在用户作息里的冷门时段跑一轮后台整理，做去重、压缩、画像精炼和知识沉淀。
 
 ## 安装
 
@@ -22,7 +22,7 @@ uv run ambot plugin add amrita_plugin_memory
 
 - Python **3.11–3.13**（插件元数据要求 `<3.14,>=3.11`，Python 3.10 环境装不上）
 - AmritaBot 1.10+
-- Ollama 或 OpenAI 兼容的嵌入服务（**必需**，插件不自带嵌入模型）
+- Ollama 或 OpenAI 兼容的嵌入服务（**可选**，插件不自带嵌入模型；不配则 L2 只走关键词检索）
 - ChromaDB（本地模式随依赖安装，也可连远程服务）
 
 安装后插件会写入 `pyproject.toml` 的 `[tool.amrita.plugins]`：
@@ -34,9 +34,9 @@ plugins = ["amrita.plugin.chat", "amrita_plugin_memory"]
 
 ## 快速开始
 
-### 1. 配置嵌入与向量库
+### 1. 配置向量库与嵌入服务
 
-在 `.env` 中至少配置嵌入服务：
+向量库是必需的。嵌入服务可以不配，此时 L2 只用关键词检索：
 
 ```env
 VECTOR_DB_TYPE=local
@@ -54,6 +54,7 @@ EMBEDDING_PROCTOL=ollama-embed
 | `VECTOR_DB_REMOTE_HEADERS` | `{}` | 远程请求头（仅 `remote`） |
 | `VECTOR_DB_TENANT` | `default` | 远程租户 |
 | `VECTOR_DB_DATABASE` | `default` | 远程数据库 |
+| `EMBEDDING_ENABLED` | 空（自动尝试） | 设为 `false` 则完全不调用嵌入服务 |
 | `EMBEDDING_MODEL_URL` | `http://127.0.0.1:11434` | 嵌入模型地址 |
 | `EMBEDDING_MODEL_NAME` | `auto` | 嵌入模型名称 |
 | `EMBEDDING_PROCTOL` | `ollama-embed` | `openai` / `ollama-embed` |
@@ -65,7 +66,7 @@ EMBEDDING_PROCTOL=ollama-embed
 
 ### 2. L1 与 L2 开箱可用
 
-无需额外配置。LLM 会在需要时调用 `write_memory` / `read_memory` / `update_memo` 等工具；L1 备忘录一旦写入，此后每轮对话都会自动注入。
+无需额外配置。LLM 会在需要时调用 `write_memory` / `read_memory` / `update_memo` 等工具；L1 备忘录一旦写入，此后每轮对话都会自动注入。没有嵌入服务时 L2 退到关键词检索，增删改查照常。
 
 ### 3. 开启 L3 离线巩固循环
 
@@ -160,7 +161,7 @@ flowchart TB
 | `append_memo` | 在末尾追加一段 |
 | `update_memo` | 整篇替换（推荐用法） |
 
-## L2 向量记忆
+## L2 检索记忆
 
 `scope` 表达语义，分区键跟随 Amrita 的 `make_uni_id`（旧版 `user_{qq}`，新版 `QQPlatform_Private_{qq}`）。插件不硬编码键格式，升级后自动跟随，存量 Key 由启动检查幂等迁移。
 
@@ -169,13 +170,28 @@ flowchart TB
 | `user` | 个人专属，群聊私聊互通 | 任意 |
 | `group` | 群共享，群内所有人可见 | 仅群聊 |
 
-每条记忆带 `user_id` / `scope` / `tags` / `importance` / `created_at`。`read_memory` 支持 `top_k` 与 `importance` 过滤，结果附带距离（ChromaDB 默认 l2，越小越相似）。
+每条记忆带 `user_id` / `scope` / `tags` / `importance` / `created_at`。`read_memory` 支持 `top_k` 与 `importance` 过滤。
+
+### 检索模式
+
+`read_memory` 的 `mode` 参数由 LLM 按需选择，`vector_weight` 只在 `hybrid` 下生效：
+
+| `mode` | 行为 |
+| --- | --- |
+| `auto` | 有可用嵌入模型时用 `hybrid`，否则退到 `keyword`（默认） |
+| `hybrid` | 关键词 BM25 与向量各自排序，按 `vector_weight`（默认 0.6）加权 RRF 融合 |
+| `keyword` | 只走关键词，不调用嵌入服务 |
+| `vector` | 只走向量；没有模型时直接报错，不静默换语义 |
+
+关键词一路不依赖分词库：英文按词、中文按二元组切分后在本地算 BM25。嵌入模型不可用时，
+嵌入请求失败一次就会被记为不可用并缓存，不会每次读写都去撞一个连不上的服务；写入改用占位向量占住 Chroma 的行
+（宽度沿用库里已有向量），检索完全不走向量路径。
 
 ### 时间退化
 
 分两段，均由 `[decay].enabled` 控制：
 
-1. **软衰减**：检索期按 `1/(1+d) × max(0.5^(age/half_life), floor)` 重排后截回 `top_k`，只影响排序，不删除数据；
+1. **软衰减**：检索期按「相关度 × `max(0.5^(age/half_life), floor)`」重排后截回 `top_k`。相关度在向量模式下来自距离映射（`1/(1+d)`），混合模式下来自融合分；只影响排序，不删除数据；
 2. **分层清理**：按 importance 的寿命阈值扫描，超龄先降级，降到 `low` 仍超龄才删除。
 
 `low` 层默认 7 天，`high` 层默认 90 天，`medium` 取几何中值。清理任务按 `sweep_interval_hours` 周期执行。
@@ -341,7 +357,10 @@ overfetch = 3
 score_floor = 0.05
 sweep_enabled = true
 sweep_interval_hours = 24
-sweep_batch_limit = 5000
+[retrieval]
+default_mode = "auto"
+vector_weight = 0.6
+keyword_candidate_limit = 2000
 
 [subconscious]
 enabled = false
@@ -367,6 +386,9 @@ enable_knowledge = true
 | --- | --- | --- |
 | `per_session_memory_limit` | `100` | 单个分区（uni_id）的记忆条数上限 |
 | `memo_max_chars` | `1000` | L1 备忘录字数硬上限（100–10000） |
+| `retrieval.default_mode` | `auto` | 默认检索模式，可被工具 `mode` 覆盖 |
+| `retrieval.vector_weight` | `0.6` | `hybrid` 下向量权重，其余归关键词 |
+| `retrieval.keyword_candidate_limit` | `2000` | 关键词检索单次扫描上限 |
 | `decay.enabled` | `true` | 时间退化总开关 |
 | `decay.short_term_days` | `7` | `low` 层寿命阈值 |
 | `decay.long_term_days` | `90` | `high` 层寿命阈值 |
@@ -398,7 +420,7 @@ enable_knowledge = true
 | L1 备忘录 | `UserMemo` 表 | 常驻用户元信息 |
 | 循环状态 | `SubconsciousState` 表 | `total_runs`、摘要、待审建议、penalty、热度图 |
 | Session 摘要缓存 | `LRUCache[int, str]`（128 条） | session DB id → 摘要 |
-| L2 记忆 | ChromaDB `amrita_user_memory` | 向量、文档、元数据、嵌入指纹 |
+| L2 记忆 | ChromaDB `amrita_user_memory` | 文档、向量（纯关键词部署为占位向量）、元数据、嵌入指纹 |
 | 用户画像 | `data/amrita_plugin_memory/user_profile.md` | `summary---body` 格式 |
 | 知识库 | `data/.../knowledge/` + JSON + ChromaDB | 三方同步 |
 | Token 统计 | `InsightsModel` | 全局 prompt/completion token |
@@ -408,10 +430,10 @@ enable_knowledge = true
 向量只在同一模型下可比。插件在集合 metadata 里记录 `sha256(protocol|model|base_url)`，每次启动校验。不一致时按 `EMBED_MISMATCH_POLICY`：
 
 - `auto`：备份后删集合重建、全量重嵌；
-- `ask`：交互确认，非 TTY 环境拒绝加载插件；
+- `ask`：交互确认，非 TTY 环境只告警；
 - `never`：只告警。
 
-指纹只看配置，同名模型被服务端换掉检测不到，用 `ambot memory reindex` 手动处理。
+指纹只看配置，同名模型被服务端换掉检测不到，用 `ambot memory reindex` 手动处理。嵌入服务不可用时跳过重映射，不挡启动；`EMBEDDING_ENABLED=false` 时 `reindex` 直接拒绝。
 
 ### 数据库迁移
 
