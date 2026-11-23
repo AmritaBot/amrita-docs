@@ -2,7 +2,7 @@
 
 ## 概述
 
-长期记忆由 **`amrita_plugin_memory`** 插件提供，当前版本 0.9.x，采用三层记忆模型：
+长期记忆由 **`amrita_plugin_memory`** 插件提供 [![PyPI](https://img.shields.io/pypi/v/amrita-plugin-memory)](https://pypi.org/project/amrita-plugin-memory/)，采用三层记忆模型：
 
 | 层 | 名称 | 载体 | 何时使用 |
 | --- | --- | --- | --- |
